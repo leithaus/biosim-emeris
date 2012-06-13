@@ -9,6 +9,7 @@
 /.svn
 /dist
 /
+/build.properties
 
 # /client/
 /client/.bzrignore
@@ -18,9 +19,9 @@
 /client/.gwt
 /client/.git
 /client/target
+/client/build.properties
 
 # /client/war/
-/client/war/Biosim.css
 /client/war/biosim
 
 # /client/war/WEB-INF/

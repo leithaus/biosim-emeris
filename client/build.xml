@@ -19,13 +19,13 @@
     <fileset dir="target/dependency/" includes="**/*.jar"/>
   </path>
 
+
   <target name="libs" description="Copy libs to WEB-INF/lib">
     <mkdir dir="war/WEB-INF/lib" />
     <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
     <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-deps.jar" />
-    <!-- Add any additional server libs that need to be copied -->
   </target>
-
+  
   <target name="javac" depends="libs" description="Compile java source to bytecode">
     <mkdir dir="war/WEB-INF/classes"/>
     <javac srcdir="src" includes="**" encoding="utf-8"

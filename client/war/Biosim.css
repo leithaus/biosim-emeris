@@ -1,0 +1,126 @@
+/** Add css rules here for your application. */
+html,body {
+	min-width: 1000px;
+	min-height: 100%;
+	overflow: auto;
+}
+
+.sendButton {
+	display: block;
+	font-size: 16pt;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+	width: 400px;
+}
+
+.connectionIcon {
+	margin: 5px;
+}
+
+.connectionIconDragging {
+	background-color: red;
+}
+
+.connectionSelected {
+	background-color: blue;
+}
+
+.dialogVPanel {
+	margin: 5px;
+}
+
+.serverResponseLabelError {
+	color: red;
+}
+
+.windowHeight {
+	min-height: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
+.biosimbox {
+	margin: 8px 10px;
+	/* padding: .3em .45em; */
+	background-image: url("../images/drag_background.png"); 
+	background-repeat: repeat-y;
+}
+
+.biosimbox img {
+	padding: 0;
+	margin-top: 10px;
+	margin-bottom: 6px;
+	margin-left: 5px;
+}
+
+.biosimbox td {
+	vertical-align: middle;
+}
+
+.gwt-TabPanelBottom {
+	border: none !important;
+	overflow: auto !important;
+}
+
+.fleft {
+	float: left;
+}
+
+.fright {
+	float: right;
+}
+
+.clearBoth {
+	clear: both;
+}
+
+.tabBar-tab {
+	padding: .5em 1em .5em 1em;
+	margin: 0 .2em 0px 0;
+	float:left;
+	cursor: default;
+}
+
+.tabFilterBar {
+	min-height: 100px;
+    padding: 2px 3px;
+}
+
+.tabFilterBar-filter {
+	float:left;
+	cursor: move;
+	margin-right: .2em;
+	padding: 4px 6px;
+}
+
+.TooltipPopup {
+	 background-color: white;
+	 border: 1px solid black;
+   min-height: 10px;
+   min-width: 10px;
+   max-height: 400px;
+   max-width: 400px;
+}
+
+.titledBorderDiv {
+}
+
+.titledBorderDivTitle {
+    float: left; z-index: 1000; margin-top: -10px; margin-left: 20px; padding: 0; background-color: white;
+}
+
+/* .Biosim-DragHandle {
+	float:left; width: 20px; min-width: 20px; background-image: url("../images/drag_background.png") !important; 
+	background-repeat: repeat; border-right: 1px solid black; min-height: 100%;
+} */
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+	margin: 15px 6px 6px;
+}
+
+#tags .biosimbox {
+	display: table-cell;
+}
