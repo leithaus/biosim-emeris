@@ -26,12 +26,18 @@
 # /client/war/WEB-INF/
 /client/war/WEB-INF/deploy
 /client/war/WEB-INF/classes
+/client/war/WEB-INF/lib/
 
 # /server-mock/
 /server-mock/target
 /server-mock/.cache
 /server-mock/KVDBLogs*.log*
 /server-mock/.scala_dependencies
+/server-mock/database/
 
 # /server-mock/src/main/webapp/WEB-INF/
 /server-mock/src/main/webapp/WEB-INF/source-jsp
+
+
+/support/target/
+

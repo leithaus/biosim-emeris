@@ -28,7 +28,7 @@ public class BiosimWebSocket {
             @Override
             public IncomingMessage deserialize(String jsonMsg) {
                 GWT.log("received message " + jsonMsg);
-                Message msg = BiosimSerializer.get().fromJson(jsonMsg);
+                Message msg = BiosimSerializer.get().fromJson(jsonMsg, Message.class);
                 return msg.asIncomingMessage();
             }
             @Override
