@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link type="text/css" rel="stylesheet" href="Biosim.css">
+    <link type="text/css" rel="stylesheet" href="css/cupertino/jquery-ui-1.8.16.custom.css">
+    <title>Agent Services Personal Information Editor</title>
+    <script type="text/javascript" src="biosim/biosim.nocache.js"></script>
+    <script type="text/javascript" src="scripts/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript">
+		    $(function(){
+		        $('#tabs').tabs();
+		        $(window).resize(fitWindow).resize();
+		    });
+		    function getWindowHeight() {
+		        var myHeight = 0;
+		        if( typeof( window.innerWidth ) == 'number' ) {
+		            //Non-IE
+		            myHeight = window.innerHeight;
+		        } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+		            //IE 6+ in 'standards compliant mode'
+		            myHeight = document.documentElement.clientHeight;
+		        } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+		            //IE 4 compatible
+		            myHeight = document.body.clientHeight;
+		        }
+		        return myHeight;
+		    }
+		    
+            function fitWindow() {
+                var minDivHeight = getWindowHeight() - 100;
+                var divs = $('.windowHeight');
+                for( var i = 0; i < divs.length; i++) {
+             		var div = $(divs[i]).height(minDivHeight).css("max-height", minDivHeight).css("min-height", minDivHeight);
+                };
+                fitContentSection();
+            }
+            
+            function fitContentSection() {
+            	var contentSection = $('#contents');
+            	var tabNavigation = contentSection.find(".ui-tabs-nav");
+            	var tabContent = contentSection.find(".tabContent").children();
+            	var availableHeight = contentSection.height() - tabNavigation.height() - 25;
+            	
+         		var fixedHeightChildren = tabContent.children('.fixedHeight').each(function() {
+         			availableHeight -= $(this).height();
+         		});
+         		var otherChildren = tabContent.children(":not(.fixedHeight)");
+         		availableHeight = availableHeight /otherChildren.length;
+         		otherChildren.each(function() {
+         			$(this).height(availableHeight).css("max-height", availableHeight).css("min-height", availableHeight).css("overflow", "auto");
+         		});
+            }
+    </script>
+  </head>
+  <body>
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+    </noscript>
+    <div id="tabs">
+		<ul>
+            <li><a href="#agentProvisioningTab">Agent Provisioning</a></li>
+		</ul>
+        <div id="agentProvisioningTab">
+            <div class="container"></div>
+        </div>
+	</div>
+	
+</body>
+</html>

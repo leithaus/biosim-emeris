@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+  <classpathentry kind="src" path="src"/>
+  <classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-client/8.0.4.v20111024/jetty-client-8.0.4.v20111024.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-http/8.0.4.v20111024/jetty-http-8.0.4.v20111024.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-io/8.0.1.v20110908/jetty-io-8.0.1.v20110908.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-util/8.0.1.v20110908/jetty-util-8.0.1.v20110908.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-websocket/8.0.1.v20110908/jetty-websocket-8.0.1.v20110908.jar"/>
+  <classpathentry kind="output" path="target/classes"/>
+</classpath>

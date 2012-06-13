@@ -1,0 +1,13 @@
+
+
+To run in devmode, slower but you can attach a java debugger to the process to debug, use 
+
+ant devmode
+
+To run in production mode use
+
+ant gwtc 
+
+That will compile the java code to javascript.  The run devmode and use http://localhost:8080/Biosim.html as the url
+
+

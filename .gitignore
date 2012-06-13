@@ -1,0 +1,37 @@
+
+# /
+/.bzrignore
+/.bzr
+/gwt-unitCache
+/test-classes
+/.gwt
+/.git
+/.svn
+/dist
+/
+
+# /client/
+/client/.bzrignore
+/client/.bzr
+/client/gwt-unitCache
+/client/test-classes
+/client/.gwt
+/client/.git
+/client/target
+
+# /client/war/
+/client/war/Biosim.css
+/client/war/biosim
+
+# /client/war/WEB-INF/
+/client/war/WEB-INF/deploy
+/client/war/WEB-INF/classes
+
+# /server-mock/
+/server-mock/target
+/server-mock/.cache
+/server-mock/KVDBLogs*.log*
+/server-mock/.scala_dependencies
+
+# /server-mock/src/main/webapp/WEB-INF/
+/server-mock/src/main/webapp/WEB-INF/source-jsp

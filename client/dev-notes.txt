@@ -1,0 +1,58 @@
+
+
+ - websocket reconnects
+ - new content button 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ - messages
+  - CreateLink
+  - RemoveLink
+
+
+
+ - transaction api on client for creating multiple nodes, collecting them all up and sending to the server in one shot
+ 
+
+
+
+
+
+
+  - draggable texture on each node
+  - test data for each connection
+  - STYLING move content label to be under content
+  - multi-select working  
+  - use html 5 convas instead of proxy divs for drag and drop
+  - hover buttons
+    - label
+      - New
+        - Child Label
+        - Address
+        - Photo
+        - Message
+
+
+Bigger Items
+
+  - enhanced connections view
+  - musical score
+    - metronome
+    - way to go from main UI to metronome
+ 
+ 
+ 
