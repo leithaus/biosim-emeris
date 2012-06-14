@@ -41,7 +41,7 @@ public class BiosimWebSocket {
 
     public void send(final MessageBody body) {
 		final Message msg = body.createMessage();
-		final String jsonMsg = BiosimSerializer.get().toJson(msg);
+		final String jsonMsg = BiosimSerializer.get().toJson(msg, Message.class);
 		GWT.log("sending -- " + jsonMsg);
     	_impl.send(new WebSocket.OutgoingMessage() {
 			@Override
