@@ -152,7 +152,7 @@ public class LabelTreeBuilder {
 	}
 	
 	void addLeaf(final Node node) {
-		DialogHelper.showTextPrompt("Enter the Name of child label to add.", "", "200px 20px", new Function1<String,Void>() {
+		DialogHelper.showTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
 					Biosim.get().getDatabaseAccessLayer().addChildLabel(node, t);
