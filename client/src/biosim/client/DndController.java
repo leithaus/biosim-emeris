@@ -8,19 +8,23 @@ import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
 import biosim.client.eventlist.ObservableList;
+import biosim.client.model.Image;
 import biosim.client.model.Node;
+import biosim.client.model.NodeVisitor;
 import biosim.client.model.Person;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.ui.dnd.DropAction;
 import biosim.client.ui.dnd.MyDragController;
+import biosim.client.utils.DialogHelper;
 import biosim.client.utils.Pair;
 import biosim.client.utils.SetX;
 
 import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
 import com.allen_sauer.gwt.dnd.client.drop.AbstractDropController;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -137,7 +141,7 @@ public class DndController {
 				} else {
 					node = dropTarget;
 				}
-				
+								
 				NodeWidgetBuilder builder = biosim._contentController.builder(node);
 				ContentCriteria criteria = builder.getFilterAcceptCriteria();
 
@@ -158,8 +162,41 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(Node dragee, Node dropTarget) {
-				biosim.removeContentLinks(dragee);
-				biosim.removeContentLinks(dropTarget);
+				final Integer[] numImages = {0};
+				final Integer[] numLabels = {0};
+				dropTarget.visitChildren(new NodeVisitor() {
+					@Override
+					public void visit(Node node) {
+						if (node instanceof biosim.client.model.Image) {
+							numImages[0] += 1;
+						} else if (node instanceof biosim.client.model.Label) {
+							numLabels[0] += 1;
+						}
+					}
+				});
+				
+				StringBuilder alertText = new StringBuilder();
+				alertText.append("Are you sure you want to delete ");
+				alertText.append(dropTarget.getName());
+				alertText.append("?");
+				if (numImages[0] > 0 || numLabels[0] > 0) {
+					alertText.append("\nThis action will delete ");
+					if (numImages[0] > 0) {
+						alertText.append(numImages[0].toString() + " photos");
+						if (numLabels[0] > 0) {
+							alertText.append(" and ");
+						}
+					}
+					if (numLabels[0] > 0) {
+						alertText.append(numLabels[0].toString() + " messages");
+					}
+					alertText.append(".");
+				}
+				
+				if (DialogHelper.confirm(alertText.toString())) {
+					biosim.removeContentLinks(dragee);
+					biosim.removeContentLinks(dropTarget);
+				}	
 			}
 		}; 
 		registerDropAction(DndType.Content, DndType.Scissors, scissorsAction);
