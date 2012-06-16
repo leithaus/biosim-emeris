@@ -8,10 +8,14 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.Window;
+
 
 public class DialogHelper {
 
@@ -23,7 +27,37 @@ public class DialogHelper {
 	    	@Override
 	    	public Void apply(TextArea t) {
 	    		if ( t != null ) {
-	    			handler.apply(t.getText());
+	    			handler.apply(t.getText().trim());
+	    		}
+	    		return null;
+	    	}
+		});
+	}
+	
+	public static void showSingleLineTextPrompt(String prompt, String initialText, String size, final Function1<String,Void> handler) {
+	    // Add some text to the top of the dialog
+	    final TextBox widget = new TextBox();
+	    widget.setText(initialText);
+	    showWidgetPrompt(prompt, widget, size, new Function1<TextBox, Void>() {
+	    	@Override
+	    	public Void apply(TextBox t) {
+	    		if ( t != null ) {
+	    			handler.apply(t.getText().trim());
+	    		}
+	    		return null;
+	    	}
+		});
+	}
+	
+	public static void confirm (String prompt, final Function1<String,Void> handler) {
+		final Label widget = new Label();
+		widget.setText(prompt);
+		String size = new String("300px 50px");
+		showWidgetPrompt("Confirmation Required:", widget, size, new Function1<Label, Void>() {
+			@Override
+	    	public Void apply(Label t) {
+	    		if (t != null) {
+	    			handler.apply(t.getText().trim());
 	    		}
 	    		return null;
 	    	}
@@ -37,7 +71,9 @@ public class DialogHelper {
 		}
 	}
 	
-	public static <T extends Widget> void showWidgetPrompt(String prompt, final T widget, String size, final Function1<T,Void> handler) {
+	// TODO:  Setting the button text for these dialog boxes via optional parameter
+	public static <T extends Widget> void showWidgetPrompt(String prompt, final T widget, String size, 
+			final Function1<T,Void> handler ) {
 		final DialogBox dialogBox = new DialogBox();
 	    dialogBox.ensureDebugId("cwDialogBox");
 	    dialogBox.setText(prompt);

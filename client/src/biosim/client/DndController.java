@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
@@ -162,9 +163,13 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(Node dragee, Node dropTarget) {
+				final Node DRAGEE = dragee;
+				final Node DROP_TARGET = dropTarget;
+				
 				final Integer[] numImages = {0};
 				final Integer[] numLabels = {0};
-				dropTarget.visitChildren(new NodeVisitor() {
+				
+				dropTarget.visitDescendants(new NodeVisitor() {
 					@Override
 					public void visit(Node node) {
 						if (node instanceof biosim.client.model.Image) {
@@ -180,23 +185,32 @@ public class DndController {
 				alertText.append(dropTarget.getName());
 				alertText.append("?");
 				if (numImages[0] > 0 || numLabels[0] > 0) {
-					alertText.append("\nThis action will delete ");
+					alertText.append("\nThis action will also delete ");
 					if (numImages[0] > 0) {
-						alertText.append(numImages[0].toString() + " photos");
+						alertText.append(numImages[0].toString() + " photo");
+						if (numImages[0] > 1) {
+							alertText.append("s");
+						}
 						if (numLabels[0] > 0) {
 							alertText.append(" and ");
 						}
 					}
 					if (numLabels[0] > 0) {
-						alertText.append(numLabels[0].toString() + " messages");
+						alertText.append(numLabels[0].toString() + " label");
+						if (numLabels[0] > 1) {
+							alertText.append("s");
+						}
 					}
 					alertText.append(".");
 				}
 				
-				if (DialogHelper.confirm(alertText.toString())) {
-					biosim.removeContentLinks(dragee);
-					biosim.removeContentLinks(dropTarget);
-				}	
+				DialogHelper.confirm(alertText.toString(), new Function1<String,Void>() {
+					public Void apply(String s) {
+						biosim.removeContentLinks(DRAGEE);
+						biosim.removeContentLinks(DROP_TARGET);
+						return null;
+					}
+				});
 			}
 		}; 
 		registerDropAction(DndType.Content, DndType.Scissors, scissorsAction);
@@ -218,7 +232,6 @@ public class DndController {
 		registerDropAction(DndType.Connection, DndType.ViewConnection, viewConnectionAction);
 		
 		registerDropSite(DndType.Filter, null, biosim._filtersBar.getPanel());
-		
 	}
 	
 	
