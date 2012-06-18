@@ -53,7 +53,7 @@ public class BiosimWebSocket {
 				return jsonMsg;
 			}
 			@Override
-			public boolean ack() {
+			public boolean ack () {
 				return body.ack();
 			}
 		});
