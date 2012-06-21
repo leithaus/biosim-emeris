@@ -1,5 +1,6 @@
 package biosim.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,8 @@ public class DndController {
 			throw new RuntimeException("this should never happen");
 		}
 	};
+	
+	final ArrayList<NodeChildCounter> _nodeChildCounters = new ArrayList<NodeChildCounter>();
 
 	
 	public DndController(final Biosim biosim, AbsolutePanel boundaryPanel) {
@@ -164,17 +167,12 @@ public class DndController {
 				final Node DRAGEE = dragee;
 				final Node DROP_TARGET = dropTarget;
 				
-				final Integer[] numImages = {0};
-				final Integer[] numLabels = {0};
+				DndController.this.resetNodeChileCounters();
 				
 				dropTarget.visitDescendants(new NodeVisitor() {
 					@Override
 					public void visit(Node node) {
-						if (node instanceof biosim.client.model.Image) {
-							numImages[0] += 1;
-						} else if (node instanceof biosim.client.model.Label) {
-							numLabels[0] += 1;
-						}
+						DndController.this.checkNode(node);
 					}
 				});
 				
@@ -182,24 +180,17 @@ public class DndController {
 				alertText.append("Are you sure you want to delete ");
 				alertText.append(dropTarget.getName());
 				alertText.append("?");
-				if (numImages[0] > 0 || numLabels[0] > 0) {
-					alertText.append("\nThis action will also delete ");
-					if (numImages[0] > 0) {
-						alertText.append(numImages[0].toString() + " photo");
-						if (numImages[0] > 1) {
-							alertText.append("s");
-						}
-						if (numLabels[0] > 0) {
-							alertText.append(" and ");
-						}
-					}
-					if (numLabels[0] > 0) {
-						alertText.append(numLabels[0].toString() + " label");
-						if (numLabels[0] > 1) {
-							alertText.append("s");
+				
+				List<String> strings = DndController.this.getNodeChildStrings();
+				
+				if (strings.size() > 0) {
+					alertText.append("<br/>This action will also delete: ");
+					for (int i = 0; i < strings.size(); i += 1){
+						alertText.append(strings.get(i));
+						if (i < strings.size() - 1) {
+							alertText.append(", ");
 						}
 					}
-					alertText.append(".");
 				}
 				
 				DialogHelper.confirm(alertText.toString(), new Function1<String,Void>() {
@@ -230,15 +221,55 @@ public class DndController {
 		registerDropAction(DndType.Connection, DndType.ViewConnection, viewConnectionAction);
 		
 		registerDropSite(DndType.Filter, null, biosim._filtersBar.getPanel());
+		this.inititlizeNodeChildCounters();
 	}
 	
+	
+	void inititlizeNodeChildCounters() {
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Address.class, "address"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Alias.class, "alias"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Image.class, "image"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Label.class, "label"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Link.class, "link"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Need.class, "need"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Offer.class, "offer"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Person.class, "person"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Phone.class, "phone"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.TextMessage.class, "message"));
+	}
+	
+	List<String> getNodeChildStrings() {
+		ArrayList<String> ret = new ArrayList<String>();
+		
+		for (int i = 0; i < _nodeChildCounters.size(); i += 1){
+			if (!_nodeChildCounters.get(i).toString().isEmpty()) {
+				ret.add(_nodeChildCounters.get(i).toString());
+			}
+		}
+		
+		return ret;
+	}
+	
+	void resetNodeChileCounters() {
+		for (int i = 0; i < _nodeChildCounters.size(); i += 1){
+			_nodeChildCounters.get(i).count = 0;
+		}
+	}
+	
+	void checkNode(Node node) {
+		for (int i = 0; i < _nodeChildCounters.size(); i += 1){
+			_nodeChildCounters.get(i).incrementIfOfType(node);
+		}		
+	}
 	
 	Node node(DragContext dc) {
 		return dragSite(dc).node;
 	}
+	
 	DragSite dragSite(DragContext dc) {
 		return _widgetToDragSiteMap.get(dc.draggable);
 	}
+	
 	boolean canDrop(DragContext context, DropSite dropSite) {
 		try {
 			DropAction<Node, Node> dropAction = dropAction(context, dropSite);
@@ -355,5 +386,31 @@ public class DndController {
 		
 	}
 	
-	
+	class NodeChildCounter {
+		Integer count = 0;
+		final String kind;
+		final Class<?> clazz;
+		
+		public NodeChildCounter(Class<?> clazz, String kind) {
+			this.clazz = clazz;
+			this.kind = kind;
+		}
+		
+		public void incrementIfOfType(Object obj) {
+			if (this.clazz.getName() ==   obj.getClass().getName()) {
+				count += 1;
+			}
+		}
+		
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			if (count > 0) {
+				sb.append(count.toString() + " " + this.kind);
+				if (count > 1) {
+					sb.append("s");
+				}
+			}
+			return sb.toString();
+		}
+	}	
 }
