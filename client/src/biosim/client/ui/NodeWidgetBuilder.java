@@ -13,6 +13,11 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -58,9 +63,30 @@ public class NodeWidgetBuilder {
 		}
 		
 		if ( node instanceof biosim.client.model.Image ) {
-			Image i = new Image(((biosim.client.model.Image)node).getUrl());
-			i.setSize("150px", "150px");
-			_content = i;
+			
+			// Create a FlexTable into which the image will be displyed
+			FlexTable t = new FlexTable();
+			t.setCellPadding(7);
+			
+			// Create the image element
+			final String imageURL = ((biosim.client.model.Image)node).getUrl();
+			Image i = new Image(imageURL);
+			if (i.getHeight() > i.getWidth()) {
+				i.setHeight("150px");
+			} else {
+				i.setWidth("150px");
+			}
+			t.setWidget(0, 0,  i);
+			
+			// Create a button to display a full sized version of the image
+			Button b = new Button("View...", new ClickHandler() {
+			      public void onClick(ClickEvent event) {
+			          Window.open(imageURL, "imageURL", "");
+			        }
+			});
+			t.setWidget(0,  1, b);
+			
+			_content = t;
 			_widget.setHeight("175px");
 		} else if ( node.toHtmlString() != null ) {
 			_content = new HTML(node.toHtmlString());
