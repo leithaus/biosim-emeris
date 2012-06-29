@@ -25,8 +25,6 @@ cp -r server-mock/database dist/webapp/database
 
 find dist -name .svn | xargs rm -rf
 
-rsyncx --delete dist/ minime:/opt/biosim-demo/
-#rsyncx --delete dist/ stradverp:/opt/process-manager/apps/biosim-demo/
-# rsyncx --delete dist/ trin:/opt/biosim-demo/
+rsyncx --delete dist/ ratchet:/opt/biosim-demo/
 
 
