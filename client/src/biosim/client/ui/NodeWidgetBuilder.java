@@ -84,6 +84,8 @@ public class NodeWidgetBuilder {
 			          Window.open(imageURL, "imageURL", "");
 			        }
 			});
+			b.setTitle("View full sized image in a new window");
+			
 			t.setWidget(0,  1, b);
 			
 			_content = t;
