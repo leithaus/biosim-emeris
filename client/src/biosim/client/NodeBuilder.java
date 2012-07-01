@@ -11,6 +11,7 @@ import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.model.Address;
+import biosim.client.model.Blob;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
 import biosim.client.model.Label;
@@ -99,10 +100,12 @@ public class NodeBuilder {
                                 try {
                                     String buffer = reader.getStringResult();
                                     String base64 = Base64.toBase64(buffer);
-                                    Image image = new Image(Biosim.get().getDatabaseAccessLayer().getDataSet());
-                                    image.setAgent(Biosim.get().getAgentUid());
-                                    image.setDataInBase64(base64);
-                                    image.setFilename(file.getName());
+                                    DataSet dataSet = Biosim.get().getDatabaseAccessLayer().getDataSet();
+									Image image = new Image(dataSet);
+                                    Blob blob = new Blob(dataSet, Biosim.get().getAgentUid(), file.getName());
+                                    blob.setDataInBase64(base64);
+                                    image.setBlob(blob);
+                                    _databaseAccessLayer.addNode(blob);
                                     insert(image);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);

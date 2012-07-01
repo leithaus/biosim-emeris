@@ -11,6 +11,7 @@ import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
 import com.biosimilarity.emeris.AgentDataSet.Uid
 import com.biosimilarity.emeris.AgentDataSet.Image
+import com.biosimilarity.emeris.AgentDataSet.Blob
 import net.model3.util.Base64
 import net.model3.servlet.HttpStatusCodes
 import javax.servlet.http.HttpServletRequest
@@ -44,28 +45,35 @@ class ImageData @Inject() (
     }
   }
   
-  def respondWithImageData(agentUid: Uid, imageName: String) = {
+  def respondWithImageData(agentUid: Uid, blobName: String) = {
   
-    val imageUid = Uid(imageName.lastIndexOf(".") match {
-      case -1 => imageName
-      case to => imageName.substring(0, to)
+    val blobUid = Uid(blobName.lastIndexOf(".") match {
+      case -1 => blobName
+      case to => blobName.substring(0, to)
     })
 
-    logger.debug("getting image data for {}", imageUid)
+    logger.debug("getting blob data for {}", blobUid)
 
-    val nodeOpt: Option[Node] = KvdbFactory.database(agentUid).fetchOne(imageUid)
+    val db = 
+      KvdbFactory.
+        database(agentUid)
     
-    val kvdb = nodeOpt match {
-	  case Some(image: Image) => {
-	    val bytes = Base64.base64ToByteArray(image.dataInBase64)
+    val blobOpt = 
+     KvdbFactory.
+      database(agentUid).
+      fetchOne[Node](blobUid)
+    
+    val kvdb = blobOpt match {
+	  case Some(blob: Blob) => {
+	    val bytes = Base64.base64ToByteArray(blob.dataInBase64)
 	    response.getOutputStream.write(bytes)
 	  }
 	  case Some(n) => {
 	    val json = NodeWrapper(n).asJsonStr
 	    logger.debug("not an image {}", json)
-	    sys.error(imageName + " is not an image \n" + json)
+	    sys.error(blobName + " is not an image \n" + json)
 	  }
-	  case None => sys.error(imageName + " not found in " + agentUid)
+	  case None => sys.error(blobName + " not found in " + agentUid)
 	}
     
   }

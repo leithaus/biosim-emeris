@@ -18,6 +18,7 @@ import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.model.Alias;
+import biosim.client.model.Blob;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
 import biosim.client.model.Label;
@@ -119,8 +120,13 @@ public class LabelTreeBuilder {
 		}
 		
 		if ( isEditable(node) ) {
+			
 			final Button add = new Button("+");
+			final Button edit = new Button("~");
+			
 			w.add(add);
+			w.add(edit);
+			
 			add.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -128,10 +134,18 @@ public class LabelTreeBuilder {
 //					_popup.show(node, event);
 				}
 			});
+			edit.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					editLabel(node);
+				}
+			});
+			
 			w.addDomHandler(new MouseOutHandler() {
 				@Override
 				public void onMouseOut(MouseOutEvent event) {
 					GqueryUtils.setVisibility(add.getElement(), Visibility.HIDDEN);
+					GqueryUtils.setVisibility(edit.getElement(), Visibility.HIDDEN);
 //					add.setVisible(false);
 				}
 			},  MouseOutEvent.getType());
@@ -140,12 +154,15 @@ public class LabelTreeBuilder {
 				@Override
 				public void onMouseOver(MouseOverEvent event) {
 					GqueryUtils.setVisibility(add.getElement(), Visibility.VISIBLE);
+					GqueryUtils.setVisibility(edit.getElement(), Visibility.VISIBLE);
 //					add.setVisible(true);
 				}
 			},  MouseOverEvent.getType());
 			
 //			add.setVisible(false);
 			GqueryUtils.setVisibility(add.getElement(), Visibility.HIDDEN);
+			GqueryUtils.setVisibility(edit.getElement(), Visibility.HIDDEN);
+			
 		}
 		
 		return ti;
@@ -160,6 +177,10 @@ public class LabelTreeBuilder {
 				return null;
 			}
 		});
+	}
+	
+	void editLabel(final Node node) {
+		
 	}
 
     void addPhone(final Node node) {
@@ -190,10 +211,12 @@ public class LabelTreeBuilder {
                                 try {
                                     String buffer = reader.getStringResult();
                                     String base64 = Base64.toBase64(buffer);
-                                    Image image = new Image(Biosim.get().getDatabaseAccessLayer().getDataSet());
-                                    image.setAgent(Biosim.get().getAgentUid());
-                                    image.setDataInBase64(base64);
-                                    image.setFilename(file.getName());
+                                    DataSet dataSet = Biosim.get().getDatabaseAccessLayer().getDataSet();
+									Image image = new Image(dataSet);
+                                    Blob blob = new Blob(dataSet, Biosim.get().getAgentUid(), file.getName());
+                                    blob.setDataInBase64(base64);
+                                    image.setBlob(blob);
+                                    Biosim.get().getDatabaseAccessLayer().addNode(blob);
                                     Biosim.get().getDatabaseAccessLayer().addNode(image, parent);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);

@@ -23,6 +23,8 @@ object AgentDataSet {
     def jsonTypes: List[Class[_]] = List(
         classOf[Address]
         , classOf[Alias]
+        , classOf[Blob]
+        , classOf[BlobRef]
         , classOf[Label]
         , classOf[Link]
         , classOf[NodeWrapper]
@@ -95,10 +97,18 @@ object AgentDataSet {
 
 	case class Need(description: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 	
-	case class Image(dataInBase64: String, agent: Uid, filename: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node {
-	  def url = "/blobs/" + agent.value + "/" + uid.value + "." + ext
-	  def ext = filename.substring(filename.lastIndexOf(".")+1)
+	case class Image(blobRef: BlobRef, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
+	
+	case class Blob(ref: BlobRef, dataInBase64: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
+	
+	case class BlobRef(agentUid: Uid, blobUid: Uid, filename: String) {
+	  def url = "/blobs/" + agentUid.value + "/" + blobUid.value + "." + extension
+	  def extension = filename.lastIndexOf(".") match {
+	    case -1 => ""
+	    case i => filename.substring(i+1)
+	  }
 	}
+
 	
 	case class TextMessage(text: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
 	

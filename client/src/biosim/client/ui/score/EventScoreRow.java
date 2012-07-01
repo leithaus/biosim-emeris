@@ -8,6 +8,7 @@ import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.ui.HorizontalPanelBuilder;
 import biosim.client.eventlist.ui.ObservableListPanelAdapter;
 import biosim.client.fun.Option;
+import biosim.client.model.HasBlob;
 import biosim.client.model.Node;
 import biosim.client.ui.ToolTipListener;
 
@@ -60,8 +61,8 @@ public class EventScoreRow {
 		Widget cellWidget;
 		if ( o.isDefined() ) {
 			Node node = o.get();
-			if ( node instanceof biosim.client.model.Image ) {
-				cellWidget = new Image(((biosim.client.model.Image)node).getUrl());
+			if ( node instanceof HasBlob ) {
+				cellWidget = new Image(((HasBlob)node).getBlobRef().getUrl());
 			} else {
 				cellWidget = new Image(node.getIconUrl());
 			}
@@ -76,8 +77,8 @@ public class EventScoreRow {
 
 	public Widget createToolTipWidget(Node node) {
 		Widget tooltipWidget;
-		if ( node instanceof biosim.client.model.Image ) {
-			tooltipWidget = new Image(((biosim.client.model.Image)node).getUrl());
+		if ( node instanceof HasBlob ) {
+			tooltipWidget = new Image(((HasBlob)node).getBlobRef().getUrl());
 			tooltipWidget.setSize("400px", "400px");
 		} else {
 			tooltipWidget = new HTML(node.toHtmlString());

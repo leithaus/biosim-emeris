@@ -1,4 +1,4 @@
-P=continuations\:enable
+P=
 Xcheck-null=false
 Xcheckinit=false
 Xdisable-assertions=false

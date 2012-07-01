@@ -1,6 +1,6 @@
 package com.biosimilarity.emeris.testdata;
 
-import com.biosimilarity.emeris.AgentDataSet.{ TextMessage, Image, Phone, Person, Node, Link, Label, Address, Uid }
+import com.biosimilarity.emeris.AgentDataSet.{ Blob, BlobRef, TextMessage, Image, Phone, Person, Node, Link, Label, Address, Uid }
 import com.biosimilarity.emeris.JsonHelper.decompose
 import com.biosimilarity.emeris.AgentDataSet
 import net.liftweb.json.{ render, pretty }
@@ -123,7 +123,9 @@ object CreateTestDataSet extends App {
       photoFiles.foreach { filename =>
         val file = new File("../client/war/events/" + filename)
         val base64Data = Base64.byteArrayToBase64(file.readBytes)
-        val photo = add(Image(base64Data, glen.uid, filename))
+        val blobUid = Uid()
+        val blob = Blob(BlobRef(glen.uid, blobUid, filename), base64Data)
+        val photo = add(Image(blob.ref))
         photoLabels.foreach { photoLabel =>
           if (filename.contains(photoLabel.name)) {
             addLink(photoLabel, photo)
