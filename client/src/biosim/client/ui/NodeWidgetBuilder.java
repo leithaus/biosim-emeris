@@ -69,7 +69,7 @@ public class NodeWidgetBuilder {
 			t.setCellPadding(7);
 			
 			// Create the image element
-			final String imageURL = ((biosim.client.model.Image)node).getUrl();
+			final String imageURL = ((biosim.client.model.Image)node).getBlobRef().getUrl();
 			Image i = new Image(imageURL);
 			if (i.getHeight() > i.getWidth()) {
 				i.setHeight("150px");
@@ -107,15 +107,19 @@ public class NodeWidgetBuilder {
 		
 		_widget.add(_sourceLabels);
 		
-		Scheduler.get().scheduleFinally(new ScheduledCommand() {
-	        @Override
-	        public void execute() {
-//	        	if(_icon != null) {
-//	        		GqueryUtils.center(_icon.getElement());
-//	        	}
-	        	GqueryUtils.center(_content.getElement());
-	        }
-	    });
+		if ( _content != null ) {
+			Scheduler.get().scheduleFinally(new ScheduledCommand() {
+		        @Override
+		        public void execute() {
+	//	        	if(_icon != null) {
+	//	        		GqueryUtils.center(_icon.getElement());
+	//	        	}
+		        	GqueryUtils.center(_content.getElement());
+		        }
+		    });
+		} else {
+			toString();
+		}
 		
 	}
 	
