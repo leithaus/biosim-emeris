@@ -42,9 +42,13 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -106,7 +110,7 @@ public class LabelTreeBuilder {
 	TreeItem createTreeItem(TreeItem parent, final Node node, final Link link) {
 		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label); 
 		final FlowPanel w = nwbuilder.getWidget();
-		TreeItem ti = new TreeItem(w);
+		final TreeItem ti = new TreeItem(w);
 		if ( link != null ) {
 			_treeItemsByLink.get(link).add(ti);
 			ti.setUserObject(link);
@@ -180,7 +184,25 @@ public class LabelTreeBuilder {
 	}
 	
 	void editLabel(final Node node) {
+		final VerticalPanel panel = new VerticalPanel();
+		HTML l1 = new HTML("Name:");
+		panel.add(l1);
+		final TextBox textBox = new TextBox();
+		textBox.setText(node.getName());
+		panel.add(textBox);
 		
+		HTML l2 = new HTML("Icon:");
+		panel.add(l2);
+        final FileUploadExt fileUploadExt = new FileUploadExt();
+		panel.add(fileUploadExt);
+		DialogHelper.showWidgetPrompt("Edit Label", panel, "200px 20px", new Function1<VerticalPanel,Void>() {
+			public Void apply(VerticalPanel p) {
+				if (p != null) {
+					node.setName(textBox.getText());
+				}
+				return null;
+			}
+		});		
 	}
 
     void addPhone(final Node node) {

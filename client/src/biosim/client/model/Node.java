@@ -42,6 +42,9 @@ public abstract class Node {
 	
 	public abstract String getName();
 	
+	public void setName(String name) {
+	}
+	
 	public Uid getUid() {
 		return _uid;
 	}
