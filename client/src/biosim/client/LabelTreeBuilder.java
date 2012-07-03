@@ -195,7 +195,38 @@ public class LabelTreeBuilder {
 		DialogHelper.showWidgetPrompt("Edit Label", panel, "200px 20px", new Function1<VerticalPanel,Void>() {
 			public Void apply(VerticalPanel p) {
 				if (p != null) {
-					node.setName(textBox.getText());
+					// Set the new name the node, if it is set
+					if (!textBox.getText().isEmpty()) {
+						node.setName(textBox.getText());
+					}
+					
+					// Get the files that were selected 
+                    FileList fileList = fileUploadExt.getFiles();
+                    for ( File file0 : fileList ) {
+                        final File file = file0;
+                        final FileReader reader = new FileReader();
+                        reader.addLoadEndHandler(new LoadEndHandler() {
+                            @Override
+                            public void onLoadEnd(LoadEndEvent event) {
+                                try {
+                                    String buffer = reader.getStringResult();
+                                    String base64 = Base64.toBase64(buffer);
+                                    DataSet dataSet = Biosim.get().getDatabaseAccessLayer().getDataSet();
+									Image image = new Image(dataSet);
+                                    Blob blob = new Blob(dataSet, Biosim.get().getAgentUid(), file.getName());
+                                    blob.setDataInBase64(base64);
+                                    image.setBlob(blob);
+                                    node.setIconRef(blob.getRef());
+                                    Biosim.get().getDatabaseAccessLayer().addNode(blob);
+                                    Biosim.get().getDatabaseAccessLayer().addNode(image, node);
+                                } catch ( Exception e ) {
+                                    GWT.log("something bad happened", e);
+                                }
+                            }
+                        });
+                        reader.readAsBinaryString(file);
+                    }
+
 				}
 				return null;
 			}

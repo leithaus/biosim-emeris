@@ -65,6 +65,9 @@ public abstract class Node {
 		return null;
 	}
 	
+	public void setIconRef(biosim.client.model.BlobRef iconRef0) {
+	}
+	
 	public Link link(Node to) {
 		return new Link(_dataSet, this._uid, to._uid);
 	}

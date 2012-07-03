@@ -21,6 +21,8 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -64,9 +66,9 @@ public class NodeWidgetBuilder {
 		
 		if ( node instanceof biosim.client.model.Image ) {
 			
-			// Create a FlexTable into which the image will be displyed
-			FlexTable t = new FlexTable();
-			t.setCellPadding(7);
+			// Create a FlexTable into which the image will be displayed
+			HorizontalPanel p = new HorizontalPanel();
+			p.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 			
 			// Create the image element
 			final String imageURL = ((biosim.client.model.Image)node).getBlobRef().getUrl();
@@ -76,7 +78,7 @@ public class NodeWidgetBuilder {
 			} else {
 				i.setWidth("150px");
 			}
-			t.setWidget(0, 0,  i);
+			p.add(i);
 			
 			// Create a button to display a full sized version of the image
 			Button b = new Button("View...", new ClickHandler() {
@@ -85,10 +87,9 @@ public class NodeWidgetBuilder {
 			        }
 			});
 			b.setTitle("View full sized image in a new window");
+			p.add(b);
 			
-			t.setWidget(0,  1, b);
-			
-			_content = t;
+			_content = p;
 			_widget.setHeight("175px");
 		} else if ( node.toHtmlString() != null ) {
 			_content = new HTML(node.toHtmlString());
