@@ -8,6 +8,10 @@ import java.util.Stack;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.props.ApplyCodeGeneration;
+import m3.gwt.props.ContainerContext;
+
+import biosim.client.Biosim;
+import biosim.client.BiosimUberContext;
 
 import com.google.gwt.json.client.JSONObject;
 
@@ -236,8 +240,13 @@ public abstract class Node {
 		}
 	}
 
+	public List<Node> getParents() {
+		return linkedNodes(Node.class, false);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends Node> List<T> linkedNodes(Class<T> clazz, boolean children) {
+		ContainerContext cc = BiosimUberContext.get().getContainerContext(clazz, true);
 		List<T> list = ListX.create();
 		Map<Node,List<Link>> links;
 		if ( children ) {
@@ -252,7 +261,7 @@ public abstract class Node {
 			} else {
 				n = l.getFromNode();
 			}
-			if ( n.getClass().equals(clazz)) {
+			if ( cc.isAssignable(n) ) {
 				list.add((T)n);
 			}
 		}

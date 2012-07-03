@@ -1,10 +1,13 @@
 package biosim.client;
 
 import static com.google.gwt.query.client.GQuery.$;
+
+import java.util.List;
+
 import m3.gwt.lang.LogTool;
 import biosim.client.messages.CreateNodes;
 import biosim.client.messages.RemoveNodes;
-import biosim.client.model.Alias;
+import biosim.client.model.Label;
 import biosim.client.model.Link;
 import biosim.client.model.Node;
 import biosim.client.model.Person;
@@ -324,9 +327,16 @@ public class Biosim implements EntryPoint {
 				}
 			}
 		}
+		Uid agentUid = getAgentUid();
 		for ( Node n : cn.getNodes() ) {
-			if ( n instanceof Alias ) {
-				_databaseAccessLayer.getLabelRoots().add(n);
+			if ( n instanceof Label ) {
+				List<Node> parents = n.getParents();
+				for ( Node p : parents ) {
+					if ( p.getUid().equals(agentUid)) {
+						_databaseAccessLayer.getLabelRoots().add(n);
+						break;
+					}
+				}
 			}
 		}
 		_databaseAccessLayer.fireRefreshContentPane();

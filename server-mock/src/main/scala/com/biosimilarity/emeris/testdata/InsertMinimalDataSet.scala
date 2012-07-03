@@ -1,7 +1,7 @@
 package com.biosimilarity.emeris.testdata;
 
 import com.biosimilarity.emeris.AgentDataSet
-import AgentDataSet.{ Alias, Blob, BlobRef, TextMessage, Image, Phone, Person, Node, Link, Label, Address, Uid }
+import AgentDataSet.{ Blob, BlobRef, TextMessage, Image, Phone, Person, Node, Link, Label, Address, Uid }
 import com.biosimilarity.emeris.JsonHelper.decompose
 import com.biosimilarity.emeris.KvdbFactory
 import net.liftweb.json.{ render, pretty }
@@ -62,8 +62,8 @@ object InsertMinimalDataSet extends App {
 //    val icon = newImageFromFile("../client/war/friends/cool-icon.png")
     val icon = newImage("defaultAliasIcon.png", base64DefaultIcon)
     
-    val alias = add(Alias("rootAlias", agent.uid, icon.blobRef.url))
-    addLink(agent, alias)
+    val rootLabel = add(Label("me", Some(icon.blobRef)))
+    addLink(agent, rootLabel)
 
     dataSet 
     

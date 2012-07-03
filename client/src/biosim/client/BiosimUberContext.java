@@ -24,7 +24,6 @@ public class BiosimUberContext extends m3.gwt.props.AbstractUberContext {
         addContainerContext(biosim.client.model.Offer.Context);
         addContainerContext(biosim.client.messages.UidAndName.Context);
         addContainerContext(biosim.client.model.TextMessage.Context);
-        addContainerContext(biosim.client.model.Alias.Context);
         addContainerContext(biosim.client.model.Need.Context);
         addContainerContext(biosim.client.messages.CreateNodes.Context);
         addContainerContext(biosim.client.model.Node.Context);

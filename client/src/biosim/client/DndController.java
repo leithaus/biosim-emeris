@@ -227,7 +227,6 @@ public class DndController {
 	
 	void inititlizeNodeChildCounters() {
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Address.class, "address"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Alias.class, "alias"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Image.class, "image"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Label.class, "label"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Link.class, "link"));

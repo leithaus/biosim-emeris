@@ -22,7 +22,6 @@ object AgentDataSet {
 
     def jsonTypes: List[Class[_]] = List(
         classOf[Address]
-        , classOf[Alias]
         , classOf[Blob]
         , classOf[BlobRef]
         , classOf[Label]
@@ -80,8 +79,6 @@ object AgentDataSet {
 	case class Uid(value: String = UUID.randomUUID.toString) {
 	  override def toString = value
 	}
-	
-	case class Alias(name: String, agent: Uid, iconUrl: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
 	
 	case class Address(value: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 

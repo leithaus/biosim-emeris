@@ -17,7 +17,6 @@ import org.vectomatic.file.events.LoadEndHandler;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
-import biosim.client.model.Alias;
 import biosim.client.model.Blob;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
@@ -303,9 +302,6 @@ public class LabelTreeBuilder {
 			@Override
 			public void visit(Node node) {
 				Person p = null;
-				if ( node instanceof Alias ) {
-					p = ((Alias)node).getAgentNode();
-				}
 			    if ( node instanceof Person ) {
 			    	p = (Person) node;
 			    }
