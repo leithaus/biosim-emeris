@@ -40,6 +40,7 @@ public class BlobRef {
 	        
 	}
 
+
 	// BEGIN_GENERATED_CODE
 	
 	public biosim.client.model.Uid getAgentUid() {

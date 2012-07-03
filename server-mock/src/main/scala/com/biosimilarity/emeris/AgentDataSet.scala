@@ -85,7 +85,7 @@ object AgentDataSet {
 	
 	case class Address(value: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 
-	case class Label(name: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
+	case class Label(name: String, iconRef:Option[BlobRef] = None, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
 
 	case class Link(from: Uid, to: Uid, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 	
