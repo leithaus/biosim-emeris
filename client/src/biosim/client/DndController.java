@@ -178,8 +178,11 @@ public class DndController {
 				
 				StringBuilder alertText = new StringBuilder();
 				alertText.append("Are you sure you want to delete ");
-				alertText.append(dropTarget.getName());
-				alertText.append("?");
+				if (dropTarget.getName() == null) {
+					alertText.append("this node?");
+				} else {
+					alertText.append(dropTarget.getName() + "?");
+				}
 				
 				List<String> strings = DndController.this.getNodeChildStrings();
 				
