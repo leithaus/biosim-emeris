@@ -18,13 +18,13 @@ import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.model.Blob;
+import biosim.client.model.Connection;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
 import biosim.client.model.Label;
 import biosim.client.model.Link;
 import biosim.client.model.Node;
 import biosim.client.model.NodeVisitor;
-import biosim.client.model.Person;
 import biosim.client.model.Uid;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
@@ -332,9 +332,9 @@ public class LabelTreeBuilder {
 		NodeVisitor visitor = new NodeVisitor() {
 			@Override
 			public void visit(Node node) {
-				Person p = null;
-			    if ( node instanceof Person ) {
-			    	p = (Person) node;
+				Connection p = null;
+			    if ( node instanceof Connection ) {
+			    	p = (Connection) node;
 			    }
 			    if ( p != null && p.getUid().equals(_agentUid) ) {
 					editable[0] = true;

@@ -1,7 +1,7 @@
 package com.biosimilarity.emeris.testdata;
 
 import com.biosimilarity.emeris.AgentDataSet
-import AgentDataSet.{ Blob, BlobRef, TextMessage, Image, Phone, Person, Node, Link, Label, Address, Uid }
+import AgentDataSet.{ Address, Agent, Blob, BlobRef, Connection, Image, Label, Link, Node, Phone, TextMessage, Uid }
 import com.biosimilarity.emeris.JsonHelper.decompose
 import com.biosimilarity.emeris.KvdbFactory
 import net.liftweb.json.{ render, pretty }
@@ -35,9 +35,9 @@ object InsertMinimalDataSet extends App {
 
 	def add[T<:Node](n: T) = dataSet.add(n)
 
-    lazy val agent = add(Person("me", uid=agentUid))
+    lazy val agent = add(Agent("me", uid=agentUid))
 
-    def newPerson(name: String) = dataSet.add(Person(name))
+    def newConnection(name: String) = dataSet.add(Connection(name))
     def newLabel(name: String) = dataSet.add(Label(name))
     def newAddress(address: String) = add(Address(address))
     def newPhone(phone: String) = add(Phone(phone))

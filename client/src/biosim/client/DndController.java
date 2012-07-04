@@ -10,10 +10,10 @@ import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
 import biosim.client.eventlist.ObservableList;
+import biosim.client.model.Connection;
 import biosim.client.model.Label;
 import biosim.client.model.Node;
 import biosim.client.model.NodeVisitor;
-import biosim.client.model.Person;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
@@ -96,26 +96,26 @@ public class DndController {
 		registerDropAction(DndType.Content, DndType.Label, labelAction);
 		registerDropAction(DndType.Label, DndType.Label, labelAction);
 		
-		DropAction<Node, Person> authorizeAction = new DropAction<Node, Person>() {
+		DropAction<Node, Connection> authorizeAction = new DropAction<Node, Connection>() {
 			@Override
-			public boolean canDrop(Node dragee, Person dropTarget) {
+			public boolean canDrop(Node dragee, Connection dropTarget) {
 				return !(dragee.equals(dropTarget) || dragee.canBeSeenBy(dropTarget) != null);
 			}
 			@Override
-			public void processDrop(Node dragee, Person dropTarget) {
+			public void processDrop(Node dragee, Connection dropTarget) {
 				databaseAccessLayer.addLink(dropTarget, dragee);
 			}
 		}; 
 		registerDropAction(DndType.Label, DndType.Connection, authorizeAction);
 		registerDropAction(DndType.Content, DndType.Connection, authorizeAction);
 		
-		DropAction<Person, Node> authorizeReverseDndAction = new DropAction<Person, Node>() {
+		DropAction<Connection, Node> authorizeReverseDndAction = new DropAction<Connection, Node>() {
 			@Override
-			public boolean canDrop(Person dragee, Node dropTarget) {
+			public boolean canDrop(Connection dragee, Node dropTarget) {
 				return !(dropTarget.equals(dragee) || dropTarget.canBeSeenBy(dragee) != null);
 			}
 			@Override
-			public void processDrop(Person dragee, Node dropTarget) {
+			public void processDrop(Connection dragee, Node dropTarget) {
 				databaseAccessLayer.addLink(dragee, dropTarget);
 			}
 		}; 
@@ -153,7 +153,7 @@ public class DndController {
 					return false;
 				} else if ( criteria.connections.size() > 0 ) {
 					boolean r = true;
-					for ( Person p : criteria.connections ) {
+					for ( Connection p : criteria.connections ) {
 						if ( !p.isParentOf(node) ) {
 							r = false;
 							break;
@@ -213,7 +213,7 @@ public class DndController {
 		DropAction<Node, Node> viewConnectionAction = new DropAction<Node, Node>() {
 			@Override
 			public boolean canDrop(Node dragee, Node dropTarget) {
-				return dragee instanceof Person;
+				return dragee instanceof Connection;
 			}
 			@Override
 			public void processDrop(Node dragee, Node dropTarget) {
@@ -238,7 +238,7 @@ public class DndController {
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Link.class, "link"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Need.class, "need"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Offer.class, "offer"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Person.class, "person"));
+		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Connection.class, "person"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Phone.class, "phone"));
 		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.TextMessage.class, "message"));
 	}

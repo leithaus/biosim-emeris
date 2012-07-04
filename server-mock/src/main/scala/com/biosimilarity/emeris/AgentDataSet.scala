@@ -22,14 +22,15 @@ object AgentDataSet {
 
     def jsonTypes: List[Class[_]] = List(
         classOf[Address]
+        , classOf[Agent]
         , classOf[Blob]
         , classOf[BlobRef]
+        , classOf[Connection]
         , classOf[Label]
         , classOf[Link]
         , classOf[NodeWrapper]
         , classOf[Need]
         , classOf[Offer]
-        , classOf[Person]
         , classOf[Phone]
         , classOf[Image]
         , classOf[TextMessage]
@@ -79,6 +80,8 @@ object AgentDataSet {
 	case class Uid(value: String = UUID.randomUUID.toString) {
 	  override def toString = value
 	}
+
+	case class Agent(name: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
 	
 	case class Address(value: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 
@@ -86,7 +89,7 @@ object AgentDataSet {
 
 	case class Link(from: Uid, to: Uid, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 	
-	case class Person(name: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
+	case class Connection(name: String, iconRef: Option[BlobRef] = None, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node
 	
 	case class Phone(value: String, created: DateTime = new DateTime(), uid: Uid = Uid()) extends Node 
 

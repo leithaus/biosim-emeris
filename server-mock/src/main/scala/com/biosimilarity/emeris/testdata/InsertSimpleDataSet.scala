@@ -1,6 +1,6 @@
 package com.biosimilarity.emeris.testdata;
 
-import com.biosimilarity.emeris.AgentDataSet.{ TextMessage, Image, Phone, Person, Node, Link, Label, Address }
+import com.biosimilarity.emeris.AgentDataSet.{ Address, Agent, Connection, Image, Label, Link, Node, Phone, TextMessage }
 import com.biosimilarity.emeris.JsonHelper.decompose
 import com.biosimilarity.emeris.AgentDataSet
 import com.biosimilarity.emeris.KvdbFactory
@@ -27,7 +27,8 @@ object InsertSimpleDataSet extends App {
   
   class SmallTestDataSet extends AgentDataSet(kvdb) {
 
-    def newPerson(name: String) = add(Person(name))
+    def newAgent(name: String) = add(Agent(name))
+    def newPerson(name: String) = add(Connection(name))
     def newLabel(name: String) = add(Label(name))
     def newAddress(address: String) = add(Address(address))
     def newPhone(phone: String) = add(Phone(phone))
@@ -47,7 +48,7 @@ object InsertSimpleDataSet extends App {
       addLink(home, newAddress("21 Jump St.\nBolton, PA 12653"))
       addLink(home, newMessage("A blatant demo message"))
 
-      nodes.collect { case p: Person => p }
+      nodes.collect { case p: Connection => p }
         .filter(_ != glen)
         .foreach(addLink(glen, _))
 

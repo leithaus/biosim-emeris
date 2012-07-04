@@ -1,6 +1,6 @@
 package com.biosimilarity.emeris.testdata;
 
-import com.biosimilarity.emeris.AgentDataSet.{ Blob, BlobRef, TextMessage, Image, Phone, Person, Node, Link, Label, Address, Uid }
+import com.biosimilarity.emeris.AgentDataSet._
 import com.biosimilarity.emeris.JsonHelper.decompose
 import com.biosimilarity.emeris.AgentDataSet
 import net.liftweb.json.{ render, pretty }
@@ -31,7 +31,7 @@ object CreateTestDataSet extends App {
 
   class SmallTestDataSet extends AgentDataSet(kvdb) {
 
-    def newPerson(name: String) = add(Person(name))
+    def newConnection(name: String) = add(Connection(name))
     def newLabel(name: String) = add(Label(name))
     def newAddress(address: String) = add(Address(address))
     def newPhone(phone: String) = add(Phone(phone))
@@ -41,7 +41,7 @@ object CreateTestDataSet extends App {
     init
 
     def init() = {
-      val glen = newPerson("glen")
+      val glen = newConnection("glen")
 //      val tracey = newPerson("tracey")
 //      val david = newPerson("david")
 
@@ -53,7 +53,7 @@ object CreateTestDataSet extends App {
       addLink(home, newAddress("21 Jump St.\nBolton, PA 12653"))
       addLink(home, newMessage("A blatant demo message"))
 
-      nodes.collect { case p: Person => p }
+      nodes.collect { case p: Connection => p }
         .filter(_ != glen)
         .foreach(addLink(glen, _))
 
@@ -65,8 +65,8 @@ object CreateTestDataSet extends App {
 
   class RichTestDataSet extends AgentDataSet(kvdb) {
 
-    def newPerson(name: String, createMessagesLink: Boolean = true) = {
-      val p = add(Person(name))
+    def newConnection(name: String, createMessagesLink: Boolean = true) = {
+      val p = add(Connection(name))
       addLink(p, newLabel("Offers"))
       addLink(p, newLabel("Needs"))
       if (createMessagesLink) addLink(p, newLabel("Messages"))
@@ -82,17 +82,17 @@ object CreateTestDataSet extends App {
     init
 
     def init() = {
-      val glen = newPerson("glen")
-      val david = newPerson("david")
-      val doreen = newPerson("doreen")
-      val hildreth = newPerson("hildreth")
-      val james = newPerson("james")
-      val kate = newPerson("kate")
-      val kenny = newPerson("kenny")
-      val lisa = newPerson("lisa")
-      val paul = newPerson("paul")
-      val tracey = newPerson("tracey")
-      val abundx = newPerson("AbundX", false)
+      val glen = newConnection("glen")
+      val david = newConnection("david")
+      val doreen = newConnection("doreen")
+      val hildreth = newConnection("hildreth")
+      val james = newConnection("james")
+      val kate = newConnection("kate")
+      val kenny = newConnection("kenny")
+      val lisa = newConnection("lisa")
+      val paul = newConnection("paul")
+      val tracey = newConnection("tracey")
+      val abundx = newConnection("AbundX", false)
 
       val business = newLabel("Business")
       val home = newLabel("Home")
@@ -109,7 +109,7 @@ object CreateTestDataSet extends App {
       addLink(home, newAddress("21 Jump St.\nBolton, PA 12653"))
       addLink(home, newMessage("A blatant demo message"))
 
-      nodes.collect { case p: Person => p }
+      nodes.collect { case p: Connection => p }
         .filter(_ != glen)
         .foreach(addLink(glen, _))
 

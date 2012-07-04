@@ -226,7 +226,7 @@ public abstract class Node {
 				if ( connectionsOnly[0] == null ) {
 					connectionsOnly[0] = true;
 				}
-				if ( !(node instanceof Person) ) {
+				if ( !(node instanceof Connection) ) {
 					connectionsOnly[0] = false;
 				}
 			}

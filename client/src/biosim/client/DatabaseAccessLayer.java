@@ -9,12 +9,12 @@ import biosim.client.eventlist.Observables;
 import biosim.client.messages.CreateNodes;
 import biosim.client.messages.RemoveNodes;
 import biosim.client.model.Address;
+import biosim.client.model.Connection;
 import biosim.client.model.DataSet;
 import biosim.client.model.Label;
 import biosim.client.model.Link;
 import biosim.client.model.Node;
 import biosim.client.model.NodeVisitor;
-import biosim.client.model.Person;
 import biosim.client.model.Phone;
 import biosim.client.model.TextMessage;
 import biosim.client.model.Uid;
@@ -28,13 +28,13 @@ public class DatabaseAccessLayer {
 	
 	final ObservableList<Node> _content = _dataSet.nodes.filter(new Function1<Node, Boolean>() {
 		public Boolean apply(Node node) {
-			return !(node instanceof Person);
+			return !(node instanceof Connection);
 		}
 	});
 
 	final ObservableList<Node> _connections = _dataSet.nodes.filter(new Function1<Node, Boolean>() {
 		public Boolean apply(Node node) {
-			return node instanceof Person && !_labelRoots.contains(node);
+			return node instanceof Connection && !_labelRoots.contains(node);
 		}
 	});
 

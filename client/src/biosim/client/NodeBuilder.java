@@ -12,12 +12,12 @@ import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.model.Address;
 import biosim.client.model.Blob;
+import biosim.client.model.Connection;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
 import biosim.client.model.Label;
 import biosim.client.model.Link;
 import biosim.client.model.Node;
-import biosim.client.model.Person;
 import biosim.client.model.Phone;
 import biosim.client.model.TextMessage;
 import biosim.client.utils.Base64;
@@ -35,11 +35,11 @@ public class NodeBuilder {
     
     final Popup _popup = new Popup();
     final Iterable<Label> _labels;
-    final Iterable<Person> _people;
+    final Iterable<Connection> _people;
 
     final DatabaseAccessLayer _databaseAccessLayer = Biosim.get().getDatabaseAccessLayer();
 
-    public NodeBuilder(Iterable<Label> labels, Iterable<Person> people) {
+    public NodeBuilder(Iterable<Label> labels, Iterable<Connection> people) {
 	    _labels = labels;
 	    _people = people;
 	}
@@ -66,7 +66,7 @@ public class NodeBuilder {
             Link link = parent.link(node);                     
             _databaseAccessLayer.addNode(link);
         }
-        for ( Person cnxn : _people ) {
+        for ( Connection cnxn : _people ) {
             _databaseAccessLayer.addLink(cnxn, node);
         }
         _databaseAccessLayer.fireRefreshContentPane();

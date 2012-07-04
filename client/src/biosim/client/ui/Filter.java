@@ -10,15 +10,15 @@ import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.MapX;
 import m3.gwt.lang.Utils;
+import biosim.client.model.Connection;
 import biosim.client.model.Label;
 import biosim.client.model.Node;
-import biosim.client.model.Person;
 import biosim.client.utils.SetX;
 
 public class Filter {
 
 	final List<Node> _nodes = ListX.create();
-	final List<Person> _people = ListX.create();
+	final List<Connection> _people = ListX.create();
 	final Set<biosim.client.model.Label> _labels = SetX.create();
 	final Map<biosim.client.model.Label, List<String>> _labelsAndChildren = MapX.create();
 	
@@ -38,8 +38,8 @@ public class Filter {
 					}
 				}
 				
-				if ( node instanceof Person ) {
-					_people.add((Person)node);
+				if ( node instanceof Connection ) {
+					_people.add((Connection)node);
 				}
 				if ( node instanceof biosim.client.model.Label ) {
 					biosim.client.model.Label label = (biosim.client.model.Label) node;
@@ -123,7 +123,7 @@ public class Filter {
 		boolean hasAllPeople = true; 
 		if ( hasAtLeastOneLabel ) {
 			// people are AND'ed
-			for ( Person p : _people ) {
+			for ( Connection p : _people ) {
 				String cbsb = node.canBeSeenBy(p);
 				if ( cbsb == null ) {
 					hasAllPeople = false;

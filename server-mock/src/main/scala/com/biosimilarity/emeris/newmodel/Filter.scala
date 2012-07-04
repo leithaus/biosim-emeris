@@ -41,8 +41,8 @@ case class Filter(labels: Iterable[Label], connections: Iterable[Connection], im
         FilterAcceptCriteria(
           node
           , labels.flatMap(labelsAndChildren.apply) 
-          , labels.map(_.uid)
-          , connections
+          , labels.map(_.tuid)
+          , connections.map(_.tuid)
         )
       )
     } else {

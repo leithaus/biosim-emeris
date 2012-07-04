@@ -7,10 +7,10 @@ import java.util.List;
 import m3.gwt.lang.LogTool;
 import biosim.client.messages.CreateNodes;
 import biosim.client.messages.RemoveNodes;
+import biosim.client.model.Connection;
 import biosim.client.model.Label;
 import biosim.client.model.Link;
 import biosim.client.model.Node;
-import biosim.client.model.Person;
 import biosim.client.model.Uid;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.CustomTabPanel;
@@ -62,7 +62,7 @@ public class Biosim implements EntryPoint {
 	
 	FilterBar _filtersBar = new FilterBar(this);
 
-	Person _selectedPerson;
+	Connection _selectedPerson;
 	
 	DndController _dndController;
 	
@@ -277,7 +277,7 @@ public class Biosim implements EntryPoint {
 			ContentCriteria ac = builder.getFilterAcceptCriteria();
 			
 			if ( ac.connections.size() > 0 ) {
-				for ( Person p : ac.connections ) {
+				for ( Connection p : ac.connections ) {
 					getDatabaseAccessLayer().removeLink(p, node);
 				}
 			} else {

@@ -6,14 +6,14 @@ import biosim.client.eventlist.Observables;
 import com.google.gwt.json.client.JSONObject;
 
 
-public class Person extends Node {
+public class Agent extends Node {
 
 	private String _name;
 
-	private Person() {
+	private Agent() {
 	}
 	
-	public Person(DataSet dataSet, Uid uid, String name) {
+	public Agent(DataSet dataSet, Uid uid, String name) {
 		super(dataSet, uid);
 		_name = name;
 	}
@@ -39,12 +39,12 @@ public class Person extends Node {
 		return getChildLabel("Offers");
 	}
 
-	public Person(DataSet dataSet, String name) {
+	public Agent(DataSet dataSet, String name) {
 		super(dataSet);
 		_name = name;
 	}
 
-	public Person(DataSet dataSet, JSONObject jo) {
+	public Agent(DataSet dataSet, JSONObject jo) {
 		super(dataSet, jo);
 		this._name = jo.get("name").isString().stringValue();
 	}
@@ -71,7 +71,7 @@ public class Person extends Node {
 		visitDescendants(new NodeVisitor() {
 			@Override
 			public void visit(Node node) {
-				if ( node instanceof Person && !list.contains(node) ) {
+				if ( node instanceof Agent && !list.contains(node) ) {
 					list.add(node);
 				}
 			}
@@ -84,7 +84,7 @@ public class Person extends Node {
 		visitDescendants(new NodeVisitor() {
 			@Override
 			public void visit(Node node) {
-				if ( !list.contains(node) && !(node instanceof Person) ) {
+				if ( !list.contains(node) && !(node instanceof Agent) ) {
 					list.add(node);
 				}
 			}
@@ -102,19 +102,19 @@ public class Person extends Node {
 	     _name = name0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.name, before, name0);
 	}
-	public static class PersonContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext name = new m3.gwt.props.impl.AbstractPropertyContext<Person,java.lang.String>(this, "name", java.lang.String.class, 0, null, false) {
-	    	    protected java.lang.String getImpl(Person bean) { return bean.getName(); }
-	    	    protected void setImpl(Person bean, java.lang.String value ) { bean.setName(value);}
+	public static class AgentContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
+	    public m3.gwt.props.PropertyContext name = new m3.gwt.props.impl.AbstractPropertyContext<Agent,java.lang.String>(this, "name", java.lang.String.class, 0, null, false) {
+	    	    protected java.lang.String getImpl(Agent bean) { return bean.getName(); }
+	    	    protected void setImpl(Agent bean, java.lang.String value ) { bean.setName(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = Node.Context.uid;
 	    public m3.gwt.props.PropertyContext created = Node.Context.created;
 	    public m3.gwt.props.PropertyContext dataSet = Node.Context.dataSet;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
-	        set = set.insert("biosim.client.model.Person");
 	        set = set.insert("java.lang.Object");
 	        set = set.insert("biosim.client.model.Node");
+	        set = set.insert("biosim.client.model.Agent");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
@@ -125,14 +125,14 @@ public class Person extends Node {
 	        list = list.cons(this.name);
 	        return list;
 	    }
-	    public Person newInstance() {
-	        return new Person();
+	    public Agent newInstance() {
+	        return new Agent();
 	    }
-	    PersonContainerContext(Class<?> actualClass) {
-	        super(biosim.client.model.Person.class, Person.Context);
+	    AgentContainerContext(Class<?> actualClass) {
+	        super(biosim.client.model.Agent.class, Agent.Context);
 	    }
 	}
-	public static final PersonContainerContext Context = new PersonContainerContext(Person.class);
+	public static final AgentContainerContext Context = new AgentContainerContext(Agent.class);
 
 	// END_GENERATED_CODE
 }

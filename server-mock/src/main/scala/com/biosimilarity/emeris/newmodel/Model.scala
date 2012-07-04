@@ -34,7 +34,8 @@ object Model {
 	    left.uid === right.uid 
 	  }
 	
-	  def uid: TUid[T]
+	  def uid: Uid
+	  def tuid: TUid[T] = uid.asTUid[T]
 	  
 	  def children(implicit ad: AgentDatabase) = ad.children(this)
 	
@@ -120,6 +121,8 @@ object Model {
 	
 	trait Label extends Node {
 	  
+	  type T = Label
+	  
 	  def name: String
 	  
 	  def childLabels(implicit ad: AgentDatabase): Iterable[Label] =
@@ -136,6 +139,7 @@ object Model {
 	
 	
 	trait Connection extends Node {
+	  type T = Connection
 	  def name: String
 	  def url: URL
 	}
