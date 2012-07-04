@@ -330,10 +330,11 @@ public class Biosim implements EntryPoint {
 		Uid agentUid = getAgentUid();
 		for ( Node n : cn.getNodes() ) {
 			if ( n instanceof Label ) {
+				Label label = (Label) n;
 				List<Node> parents = n.getParents();
 				for ( Node p : parents ) {
 					if ( p.getUid().equals(agentUid)) {
-						_databaseAccessLayer.getLabelRoots().add(n);
+						_databaseAccessLayer.getLabelRoots().add(label);
 						break;
 					}
 				}

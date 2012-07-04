@@ -38,12 +38,12 @@ public class DatabaseAccessLayer {
 		}
 	});
 
-	final ObservableList<Node> _labelRoots = Observables.create();
+	final ObservableList<Label> _labelRoots = Observables.create();
 	
 	{
-		_labelRoots.addListener(new ListListener<Node>() {
+		_labelRoots.addListener(new ListListener<Label>() {
 			@Override
-			public void event(ListEvent<Node> event) {
+			public void event(ListEvent<Label> event) {
 				_connections.reapply();
 			}
 		});
@@ -58,7 +58,7 @@ public class DatabaseAccessLayer {
 		_socket = socket;
 	}
 	
-	public ObservableList<Node> getLabelRoots() {
+	public ObservableList<Label> getLabelRoots() {
 		return _labelRoots;
 	}
 

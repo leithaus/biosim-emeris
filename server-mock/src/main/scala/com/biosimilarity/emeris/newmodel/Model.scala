@@ -26,13 +26,15 @@ object Model {
 	
 	
 	trait Node {
+	  
+	  type T <: Node
 	
 	  def ===(right: Node) = {
 	    val left = this
 	    left.uid === right.uid 
 	  }
 	
-	  def uid: Uid
+	  def uid: TUid[T]
 	  
 	  def children(implicit ad: AgentDatabase) = ad.children(this)
 	
@@ -133,7 +135,7 @@ object Model {
 	}
 	
 	
-	trait Connection extends Agent {
+	trait Connection extends Node {
 	  def name: String
 	  def url: URL
 	}
@@ -168,7 +170,7 @@ object Model {
 	trait AgentDAO {
 	  
 	  def query(labels: Iterable[Label], connections: Iterable[Connection]): Iterable[FilterAcceptCriteria]
-	  def labels: Iterable[Label]
+	  def childLabels(parent: Label): Iterable[Label]
 	  def connections: Iterable[Connection]
 	  
 	}

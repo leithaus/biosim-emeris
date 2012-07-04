@@ -10,6 +10,7 @@ import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
 import biosim.client.eventlist.ObservableList;
+import biosim.client.model.Label;
 import biosim.client.model.Node;
 import biosim.client.model.NodeVisitor;
 import biosim.client.model.Person;
@@ -25,6 +26,7 @@ import biosim.client.utils.SetX;
 import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
 import com.allen_sauer.gwt.dnd.client.drop.AbstractDropController;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -212,9 +214,10 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(Node dragee, Node dropTarget) {
-				ObservableList<Node> labelRoots = biosim.getDatabaseAccessLayer().getLabelRoots();
+				ObservableList<Label> labelRoots = biosim.getDatabaseAccessLayer().getLabelRoots();
 				if ( !labelRoots.contains(dragee) ) {
-					labelRoots.add(dragee);
+					Window.alert("not supported, aka re-implement me");
+//					labelRoots.add(dragee);
 				}
 			}
 		}; 

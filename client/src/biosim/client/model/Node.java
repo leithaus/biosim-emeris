@@ -9,8 +9,6 @@ import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.props.ApplyCodeGeneration;
 import m3.gwt.props.ContainerContext;
-
-import biosim.client.Biosim;
 import biosim.client.BiosimUberContext;
 
 import com.google.gwt.json.client.JSONObject;
@@ -45,9 +43,6 @@ public abstract class Node {
 	}
 	
 	public abstract String getName();
-	
-	public void setName(String name) {
-	}
 	
 	public Uid getUid() {
 		return _uid;

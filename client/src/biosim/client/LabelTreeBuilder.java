@@ -56,7 +56,7 @@ public class LabelTreeBuilder {
     
 //	final Popup _popup = new Popup();
     
-	final ObservableList<Node> _roots;
+	final ObservableList<Label> _roots;
 	final Tree _tree = new Tree();
 	final DndController _dndController;
 	final Uid _agentUid;
@@ -73,7 +73,7 @@ public class LabelTreeBuilder {
 		}
 	};
 	
-	LabelTreeBuilder(DataSet dataSet, Uid agentUid, ObservableList<Node> roots, DndController dndController) {
+	LabelTreeBuilder(DataSet dataSet, Uid agentUid, ObservableList<Label> roots, DndController dndController) {
 		_roots = roots;
 		_agentUid = agentUid;
 		_dndController = dndController;
@@ -93,34 +93,34 @@ public class LabelTreeBuilder {
 				removeLink(event.getElement());
 			}
 		});
-		roots.addListener(new FineGrainedListListener<Node>() {
+		roots.addListener(new FineGrainedListListener<Label>() {
 			@Override
-			public void added(ListEvent<Node> event) {
+			public void added(ListEvent<Label> event) {
 				addRootNode(event.getElement());
 			}
 			@Override
-			public void removed(ListEvent<Node> event) {
+			public void removed(ListEvent<Label> event) {
 			}
 		});
 	}
 	
-	TreeItem createTreeItem(TreeItem parent, final Node node, final Link link) {
-		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label); 
+	TreeItem createTreeItem(TreeItem parent, final Label label, final Link link) {
+		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
 		final FlowPanel w = nwbuilder.getWidget();
 		final TreeItem ti = new TreeItem(w);
 		if ( link != null ) {
 			_treeItemsByLink.get(link).add(ti);
 			ti.setUserObject(link);
 		} else {
-			ti.setUserObject(node);
+			ti.setUserObject(label);
 		}
-		_treeItemsByNode.get(node).add(ti);
+		_treeItemsByNode.get(label).add(ti);
 		
 		if ( parent != null ) {
 			parent.addItem(ti);
 		}
 		
-		if ( isEditable(node) ) {
+		if ( isEditable(label) ) {
 			
 			final Button add = new Button("+");
 			final Button edit = new Button("~");
@@ -131,14 +131,14 @@ public class LabelTreeBuilder {
 			add.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-				    addLeaf(node);
+				    addLeaf(label);
 //					_popup.show(node, event);
 				}
 			});
 			edit.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					editLabel(node);
+					editLabel(label);
 				}
 			});
 			
@@ -180,12 +180,12 @@ public class LabelTreeBuilder {
 		});
 	}
 	
-	void editLabel(final Node node) {
+	void editLabel(final Label label) {
 		final VerticalPanel panel = new VerticalPanel();
 		HTML l1 = new HTML("Name:");
 		panel.add(l1);
 		final TextBox textBox = new TextBox();
-		textBox.setText(node.getName());
+		textBox.setText(label.getName());
 		panel.add(textBox);
 		
 		HTML l2 = new HTML("Icon:");
@@ -197,7 +197,7 @@ public class LabelTreeBuilder {
 				if (p != null) {
 					// Set the new name the node, if it is set
 					if (!textBox.getText().isEmpty()) {
-						node.setName(textBox.getText());
+						label.setName(textBox.getText());
 					}
 					
 					// Get the files that were selected 
@@ -216,9 +216,9 @@ public class LabelTreeBuilder {
                                     Blob blob = new Blob(dataSet, Biosim.get().getAgentUid(), file.getName());
                                     blob.setDataInBase64(base64);
                                     image.setBlob(blob);
-                                    node.setIconRef(blob.getRef());
+                                    label.setIconRef(blob.getRef());
                                     Biosim.get().getDatabaseAccessLayer().addNode(blob);
-                                    Biosim.get().getDatabaseAccessLayer().addNode(image, node);
+                                    Biosim.get().getDatabaseAccessLayer().addNode(image, label);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -348,24 +348,25 @@ public class LabelTreeBuilder {
 
 	public void addLink(Link l) {
 		for ( TreeItem p_ti : _treeItemsByNode.get(l.getFromNode()) ) {
-			TreeItem ti = createTreeItem(p_ti, l.getToNode(), l);
+			TreeItem ti = createTreeItem(p_ti, (Label) l.getToNode(), l);
 			ti.getElement().getStyle().setProperty("display", "table-cell");
 		}
 	}
 
-	public void addRootNode(Node n) {
-		TreeItem ti = createTreeItem(null, n, null);
+	public void addRootNode(Label rootLabel) {
+		TreeItem ti = createTreeItem(null, rootLabel, null);
 		_tree.addItem(ti);
-		addChildren(n, ti);
+		addChildren(rootLabel, ti);
 	}
 	
-	void addChildren(Node parentNode, TreeItem parentTi) {
-		List<Link> outgoingLinks = parentNode.getOutgoingLinks();
+	void addChildren(Label parentLabel, TreeItem parentTi) {
+		List<Link> outgoingLinks = parentLabel.getOutgoingLinks();
 		for ( Link l : outgoingLinks ) {
 			Node to = l.getToNode();
 			if ( to instanceof Label ) {
-				TreeItem ti = createTreeItem(parentTi, l.getToNode(), l);
-				addChildren(l.getToNode(), ti);
+				Label toLabel = (Label)l.getToNode();
+				TreeItem ti = createTreeItem(parentTi, toLabel, l);
+				addChildren(toLabel, ti);
 			}
 		}
 	}

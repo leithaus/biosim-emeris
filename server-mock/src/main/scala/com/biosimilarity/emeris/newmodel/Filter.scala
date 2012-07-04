@@ -6,8 +6,8 @@ import Model._
 case class FilterAcceptCriteria(
     node: Node
 	, paths: Iterable[String]
-	, labels: Iterable[Label]
-	, connections: Iterable[Connection]
+	, labels: Iterable[TUid[Label]]
+	, connections: Iterable[TUid[Connection]]
 )
 
 
@@ -41,7 +41,7 @@ case class Filter(labels: Iterable[Label], connections: Iterable[Connection], im
         FilterAcceptCriteria(
           node
           , labels.flatMap(labelsAndChildren.apply) 
-          , labels
+          , labels.map(_.uid)
           , connections
         )
       )
