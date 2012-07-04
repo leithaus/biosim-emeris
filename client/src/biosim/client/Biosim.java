@@ -5,6 +5,7 @@ import static com.google.gwt.query.client.GQuery.$;
 import java.util.List;
 
 import m3.gwt.lang.LogTool;
+import biosim.client.eventlist.ObservableList;
 import biosim.client.messages.CreateNodes;
 import biosim.client.messages.RemoveNodes;
 import biosim.client.model.Connection;
@@ -312,16 +313,27 @@ public class Biosim implements EntryPoint {
 	}
 	
 	void processCreateNodes(CreateNodes cn) {
+		ObservableList<Node> nodes = _databaseAccessLayer.getNodes();
 		for ( Node n : cn.getNodes() ) {
 			if ( !(n instanceof Link) ) {
-				_databaseAccessLayer.getNodes().add(n);
+				if ( _databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid() ) ) {
+					int i = nodes.indexOf(n);
+					nodes.set(i, n);
+				} else {
+					nodes.add(n);
+				}
 			}
 		}
 		for ( Node n : cn.getNodes() ) {
 			if ( n instanceof Link ) {
 				Link l = (Link) n;
 				if ( l.getFromNode() != null && l.getToNode() != null ) {
-					_databaseAccessLayer.getNodes().add(n);
+					if ( _databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid() ) ) {
+						int i = nodes.indexOf(n);
+						nodes.set(i, n);
+					} else {
+						nodes.add(n);
+					}
 				} else {
 					LogTool.warn("link has missing nodes " + l.getUid() + " from=" + l.getFrom() + " to=" + l.getTo());
 				}
