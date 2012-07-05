@@ -46,25 +46,26 @@ public class FilterBar {
 		_panel.add(new ClearBothDiv());
 		_panel.getElement().getStyle().setPosition(Position.RELATIVE);
 		
-        _addContent.setStylePrimaryName("ui-button");
-        _addContent.setStyleName("ui-corner-all ui-widget-content ui-state-default", true);
+		_buttons.addStyleName("filter-bar");
 		
-		_clear.setStylePrimaryName("ui-button");
-		_clear.setStyleName("ui-corner-all ui-widget-content ui-state-default", true);
-		
-		_addToScore.setStylePrimaryName("ui-button");
-		_addToScore.setStyleName("ui-corner-all ui-widget-content ui-state-default", true);
-				
-		_buttons.add(_addContent);
-		_buttons.add(_clear);
-		_buttons.add(_addToScore);
-		
-		Style style = _buttons.getElement().getStyle();
-		style.setPosition(Position.ABSOLUTE);
-		style.setBottom(.3, Unit.EM);
-		style.setRight(.3, Unit.EM);
-		style.setPadding(.5, Unit.EM);
-		style.setDisplay(Display.NONE);
+		initializeButton(_addContent, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                addContent(event);
+            }
+        });
+		initializeButton(_clear, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				clearFilters();
+			}
+		});
+		initializeButton(_addToScore, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent e) {
+				_biosim.getEventScore().addStream(_filter);
+			}
+		});
 		
 //		$(clear.getElement()).hover(new Function() {
 //			@Override
@@ -87,28 +88,16 @@ public class FilterBar {
 //			}
 //		});
 		
-		_panel.add(_buttons);
-		_clear.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				clearFilters();
-			}
-		});
-		
-		_addToScore.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent e) {
-				_biosim.getEventScore().addStream(_filter);
-			}
-		});
-		
-		_addContent.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                addContent(event);
-            }
-        });
-		
+		_buttons.getElement().getStyle().setDisplay(Display.NONE);
+		_panel.add(_buttons);		
+	}
+	
+	void initializeButton(Button b, ClickHandler c) {
+		b.setStylePrimaryName("filter-bar-button");
+		b.setStyleName("ui-button ui-corner-all ui-widget-content ui-state-default", true);
+		b.addClickHandler(c);
+				
+		_buttons.add(b);
 	}
 
     void addContent(ClickEvent event) {

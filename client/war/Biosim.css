@@ -140,3 +140,22 @@ html,body {
 	background: #2779AA;
 	color: white;
 }
+
+.filter-bar {
+	position: absolute;
+	bottom: .3em;
+	right: .5em;
+	padding: .5em;
+}
+
+.filter-bar-button {
+	padding: 3px 5px !important;
+	margin-right: 4px !important;
+}
+
+.node-icon {
+	border: 1px solid #dddddd;
+	border-radius: 3px;
+	height: 42px;
+	width: 42px;
+}

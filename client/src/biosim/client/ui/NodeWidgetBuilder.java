@@ -59,6 +59,7 @@ public class NodeWidgetBuilder {
 
 		if ( _node.getIconUrl() != null ) {
 			_icon = new Image(_node.getIconUrl());
+			_icon.addStyleName("node-icon");
 			_widget.add(_icon);
 			dndController.makeDraggable(_dndType, _node, _widget, _icon);
 		}
