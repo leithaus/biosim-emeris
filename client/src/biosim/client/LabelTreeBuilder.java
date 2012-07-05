@@ -334,7 +334,7 @@ public class LabelTreeBuilder {
 			public void visit(Node node) {
 			    if (node instanceof Agent) {
 			    	Agent a = (Agent) node;
-				    if (p.getUid().equals(_agentUid)) {
+				    if (a.getUid().equals(_agentUid)) {
 						editable[0] = true;
 				    }
 			    }
