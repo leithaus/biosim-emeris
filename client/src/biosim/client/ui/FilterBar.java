@@ -34,6 +34,8 @@ public class FilterBar {
     Button _addContent = new Button("Add Content");
 	Button _clear = new Button("Clear");
 	Button _addToScore = new Button("Add to Event Score");
+	Button _addConnection = new Button("Add Connection");
+	
 	HorizontalPanel _buttons = new HorizontalPanel();
 	
 	
@@ -54,9 +56,13 @@ public class FilterBar {
 		_addToScore.setStylePrimaryName("ui-button");
 		_addToScore.setStyleName("ui-corner-all ui-widget-content ui-state-default", true);
 		
+		_addConnection.setStylePrimaryName("ui-button");
+		_addConnection.setStyleName("ui-corner-all ui-widget-content ui-state-default", true);
+		
 		_buttons.add(_addContent);
 		_buttons.add(_clear);
 		_buttons.add(_addToScore);
+		_buttons.add(_addConnection);
 		
 		Style style = _buttons.getElement().getStyle();
 		style.setPosition(Position.ABSOLUTE);
@@ -102,6 +108,13 @@ public class FilterBar {
 		});
 		
 		_addContent.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                addContent(event);
+            }
+        });
+		
+		_addConnection.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 addContent(event);

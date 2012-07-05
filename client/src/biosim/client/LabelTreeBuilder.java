@@ -332,12 +332,11 @@ public class LabelTreeBuilder {
 		NodeVisitor visitor = new NodeVisitor() {
 			@Override
 			public void visit(Node node) {
-				Connection p = null;
-			    if ( node instanceof Connection ) {
-			    	p = (Connection) node;
-			    }
-			    if ( p != null && p.getUid().equals(_agentUid) ) {
-					editable[0] = true;
+			    if (node instanceof Connection) {
+			    	Connection p = (Connection) node;
+				    if (p.getUid().equals(_agentUid)) {
+						editable[0] = true;
+				    }
 			    }
 			}
 		};

@@ -10,6 +10,7 @@ import org.vectomatic.file.FileUploadExt;
 import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
+import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.model.Address;
 import biosim.client.model.Blob;
 import biosim.client.model.Connection;
@@ -25,15 +26,42 @@ import biosim.client.utils.DialogHelper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class NodeBuilder {
     
-    final Popup _popup = new Popup();
+    final PopupMenu _popup = new PopupMenu();
+    {
+    	_popup.addOption("Add Info", new Function0<Void>() {
+            @Override
+            public Void apply() {
+                addAddress();
+                return null;
+            }
+        });
+    	_popup.addOption("Add Label", new Function0<Void>() {
+            @Override
+            public Void apply() {
+                addLeaf();
+                return null;
+            }
+        });
+    	_popup.addOption("Add Message", new Function0<Void>() {
+            @Override
+            public Void apply() {
+                addTextMessage();
+                return null;
+            }
+        });
+    	_popup.addOption("Add Photo", new Function0<Void>() {
+            @Override
+            public Void apply() {
+                addPhoto();
+                return null;
+            }
+        });
+    }
+
     final Iterable<Label> _labels;
     final Iterable<Connection> _people;
 
@@ -157,97 +185,4 @@ public class NodeBuilder {
 	public void showPopupMenu(ClickEvent event) {
 	    _popup.show(event);
 	}
-
-    class Popup {
-        DecoratedPopupPanel _popup = new DecoratedPopupPanel(true);
-        VerticalPanel _panel = new VerticalPanel();
-        {
-            _popup.ensureDebugId("cwBasicPopup-simplePopup");
-            _popup.setWidth("150px");
-            _popup.setWidget(_panel);
-        }
-        Popup() {
-            addOption("Add Info", new Function0<Void>() {
-                @Override
-                public Void apply() {
-                    addAddress();
-                    return null;
-                }
-            });
-            addOption("Add Label", new Function0<Void>() {
-                @Override
-                public Void apply() {
-                    addLeaf();
-                    return null;
-                }
-            });
-            addOption("Add Message", new Function0<Void>() {
-                @Override
-                public Void apply() {
-                    addTextMessage();
-                    return null;
-                }
-            });
-//          addOption("Add Need", new Function0<Void>() {
-//              @Override
-//              public Void apply() {
-//                  addNode(_currentNode, "Describe the need.", "300px 400px", new Function1<String, Node>() {
-//                      @Override
-//                      public Node apply(String s) {
-//                          return new Need(Biosim.get().getDatabaseAccessLayer().getDataSet(), s);
-//                      }
-//                  });
-//                  return null;
-//              }
-//          });
-//          addOption("Add Offer", new Function0<Void>() {
-//              @Override
-//              public Void apply() {
-//                  addNode(_currentNode, "Describe the offer.", "300px 400px", new Function1<String, Node>() {
-//                      @Override
-//                      public Node apply(String s) {
-//                          return new Offer(Biosim.get().getDatabaseAccessLayer().getDataSet(), s);
-//                      }
-//                  });
-//                  return null;
-//              }
-//          });
-//          addOption("Add Phone", new Function0<Void>() {
-//              @Override
-//              public Void apply() {
-//                  addPhone(_currentNode);
-//                  return null;
-//              }
-//          });
-            addOption("Add Photo", new Function0<Void>() {
-                @Override
-                public Void apply() {
-                    addPhoto();
-                    return null;
-                }
-            });
-        }
-
-        void show(ClickEvent event) {
-            // Reposition the popup relative to the button
-            Widget source = (Widget) event.getSource();
-            int left = source.getAbsoluteLeft() + 10;
-            int top = source.getAbsoluteTop() + 10;
-            _popup.setPopupPosition(left, top);
-            // Show the popup
-            _popup.show();
-        }
-        
-        void addOption(String name, final Function0<Void> handler) {
-            Button b = new Button(name);
-            _panel.add(b);
-            b.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent arg0) {
-                    _popup.hide();
-                    handler.apply();
-                }
-            });
-        }
-    }
 }
