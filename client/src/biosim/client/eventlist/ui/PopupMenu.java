@@ -14,7 +14,7 @@ public class PopupMenu {
     VerticalPanel _panel = new VerticalPanel();
     {
         _popup.ensureDebugId("cwBasicPopup-simplePopup");
-        _popup.setWidth("150px");
+        _popup.addStyleName("biosim-popup-menu");
         _popup.setWidget(_panel);
     }
     
@@ -35,6 +35,7 @@ public class PopupMenu {
     
     public void addOption(String name, final Function0<Void> handler) {
         Button b = new Button(name);
+        b.addStyleName("biosim-popup-menu-item");
         _panel.add(b);
         b.addClickHandler(new ClickHandler() {
             @Override

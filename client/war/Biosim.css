@@ -124,3 +124,19 @@ html,body {
 #tags .biosimbox {
 	display: table-cell;
 }
+
+/* Popup menu */
+.biosim-popup-menu {
+	
+}
+.biosim-popup-menu-item {
+    width: 100% !important;
+    text-align: left !important;
+    padding: 2px !important;
+    border: none !important;
+}
+
+.biosim-popup-menu-item:hover {
+	background: #2779AA;
+	color: white;
+}

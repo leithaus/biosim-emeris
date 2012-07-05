@@ -17,6 +17,7 @@ import org.vectomatic.file.events.LoadEndHandler;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
+import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.model.Agent;
 import biosim.client.model.Blob;
 import biosim.client.model.DataSet;
@@ -42,19 +43,15 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 @SuppressWarnings("serial")
 public class LabelTreeBuilder {
-    
-//	final Popup _popup = new Popup();
     
 	final ObservableList<Label> _roots;
 	final Tree _tree = new Tree();
@@ -108,6 +105,8 @@ public class LabelTreeBuilder {
 		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
 		final FlowPanel w = nwbuilder.getWidget();
 		final TreeItem ti = new TreeItem(w);
+		final PopupMenu popup = new PopupMenu();
+		
 		if ( link != null ) {
 			_treeItemsByLink.get(link).add(ti);
 			ti.setUserObject(link);
@@ -120,50 +119,54 @@ public class LabelTreeBuilder {
 			parent.addItem(ti);
 		}
 		
-		if ( isEditable(label) ) {
-			
-			final Button add = new Button("+");
-			final Button edit = new Button("~");
-			
-			w.add(add);
-			w.add(edit);
-			
-			add.addClickHandler(new ClickHandler() {
+		if ( isEditable(label) ) {	
+			final Button pop = new Button("&raquo;");			
+			w.add(pop);
+			pop.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
+				    popup.show(event);
+				}
+			});
+			popup.addOption("Add Child Label...", new Function0<Void>() {
+	            @Override
+	            public Void apply() {
 				    addLeaf(label);
-//					_popup.show(node, event);
-				}
-			});
-			edit.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					editLabel(label);
-				}
-			});
+	                return null;
+	            }
+	        });
+
+			popup.addOption("Edit...", new Function0<Void>() {
+	            @Override
+	            public Void apply() {
+				    editLabel(label);
+	                return null;
+	            }
+	        });
+			
+			popup.addOption("Add Connection...", new Function0<Void>() {
+	            @Override
+	            public Void apply() {
+				    addLeaf(label);
+	                return null;
+	            }
+	        });
 			
 			w.addDomHandler(new MouseOutHandler() {
 				@Override
 				public void onMouseOut(MouseOutEvent event) {
-					GqueryUtils.setVisibility(add.getElement(), Visibility.HIDDEN);
-					GqueryUtils.setVisibility(edit.getElement(), Visibility.HIDDEN);
-//					add.setVisible(false);
+					GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
 				}
 			},  MouseOutEvent.getType());
 			
 			w.addDomHandler(new MouseOverHandler() {
 				@Override
 				public void onMouseOver(MouseOverEvent event) {
-					GqueryUtils.setVisibility(add.getElement(), Visibility.VISIBLE);
-					GqueryUtils.setVisibility(edit.getElement(), Visibility.VISIBLE);
-//					add.setVisible(true);
+					GqueryUtils.setVisibility(pop.getElement(), Visibility.VISIBLE);
 				}
 			},  MouseOverEvent.getType());
 			
-//			add.setVisible(false);
-			GqueryUtils.setVisibility(add.getElement(), Visibility.HIDDEN);
-			GqueryUtils.setVisibility(edit.getElement(), Visibility.HIDDEN);
-			
+			GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
 		}
 		
 		return ti;
@@ -381,101 +384,4 @@ public class LabelTreeBuilder {
 		}
 		_treeItemsByLink.remove(l);
 	}
-	
-	
-	class Popup {
-		DecoratedPopupPanel _popup = new DecoratedPopupPanel(true);
-		VerticalPanel _panel = new VerticalPanel();
-		Node _currentNode;
-		{
-			_popup.ensureDebugId("cwBasicPopup-simplePopup");
-			_popup.setWidth("150px");
-			_popup.setWidget(_panel);
-		}
-		Popup() {
-			addOption("Add Info", new Function0<Void>() {
-				@Override
-				public Void apply() {
-					addAddress(_currentNode);
-					return null;
-				}
-			});
-			addOption("Add Label", new Function0<Void>() {
-				@Override
-				public Void apply() {
-					addLeaf(_currentNode);
-					return null;
-				}
-			});
-			addOption("Add Message", new Function0<Void>() {
-				@Override
-				public Void apply() {
-					addTextMessage(_currentNode);
-					return null;
-				}
-			});
-//			addOption("Add Need", new Function0<Void>() {
-//				@Override
-//				public Void apply() {
-//					addNode(_currentNode, "Describe the need.", "300px 400px", new Function1<String, Node>() {
-//						@Override
-//						public Node apply(String s) {
-//							return new Need(Biosim.get().getDatabaseAccessLayer().getDataSet(), s);
-//						}
-//					});
-//					return null;
-//				}
-//			});
-//			addOption("Add Offer", new Function0<Void>() {
-//				@Override
-//				public Void apply() {
-//					addNode(_currentNode, "Describe the offer.", "300px 400px", new Function1<String, Node>() {
-//						@Override
-//						public Node apply(String s) {
-//							return new Offer(Biosim.get().getDatabaseAccessLayer().getDataSet(), s);
-//						}
-//					});
-//					return null;
-//				}
-//			});
-//			addOption("Add Phone", new Function0<Void>() {
-//				@Override
-//				public Void apply() {
-//					addPhone(_currentNode);
-//					return null;
-//				}
-//			});
-			addOption("Add Photo", new Function0<Void>() {
-				@Override
-				public Void apply() {
-				    addPhoto(_currentNode);
-					return null;
-				}
-			});
-		}
-
-		void show(Node node, ClickEvent event) {
-			_currentNode = node;
-            // Reposition the popup relative to the button
-            Widget source = (Widget) event.getSource();
-            int left = source.getAbsoluteLeft() + 10;
-            int top = source.getAbsoluteTop() + 10;
-            _popup.setPopupPosition(left, top);
-            // Show the popup
-            _popup.show();
-		}
-		
-		void addOption(String name, final Function0<Void> handler) {
-			Button b = new Button(name);
-			_panel.add(b);
-			b.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent arg0) {
-					_popup.hide();
-					handler.apply();
-				}
-			});
-		}
-	}
-	
 }

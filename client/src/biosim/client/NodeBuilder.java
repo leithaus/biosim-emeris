@@ -32,28 +32,28 @@ public class NodeBuilder {
     
     final PopupMenu _popup = new PopupMenu();
     {
-    	_popup.addOption("Add Info", new Function0<Void>() {
+    	_popup.addOption("Add Info...", new Function0<Void>() {
             @Override
             public Void apply() {
                 addAddress();
                 return null;
             }
         });
-    	_popup.addOption("Add Label", new Function0<Void>() {
+    	_popup.addOption("Add Label...", new Function0<Void>() {
             @Override
             public Void apply() {
                 addLeaf();
                 return null;
             }
         });
-    	_popup.addOption("Add Message", new Function0<Void>() {
+    	_popup.addOption("Add Message...", new Function0<Void>() {
             @Override
             public Void apply() {
                 addTextMessage();
                 return null;
             }
         });
-    	_popup.addOption("Add Photo", new Function0<Void>() {
+    	_popup.addOption("Add Photo...", new Function0<Void>() {
             @Override
             public Void apply() {
                 addPhoto();
