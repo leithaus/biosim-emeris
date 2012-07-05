@@ -226,6 +226,7 @@ public class LabelTreeBuilder {
                         });
                         reader.readAsBinaryString(file);
                     }
+                    Biosim.get().getDatabaseAccessLayer().addNode(label);
 
 				}
 				return null;
@@ -347,8 +348,7 @@ public class LabelTreeBuilder {
 
 	public void addLink(Link l) {
 		for ( TreeItem p_ti : _treeItemsByNode.get(l.getFromNode()) ) {
-			TreeItem ti = createTreeItem(p_ti, (Label) l.getToNode(), l);
-			ti.getElement().getStyle().setProperty("display", "table-cell");
+			createTreeItem(p_ti, (Label) l.getToNode(), l);
 		}
 	}
 
