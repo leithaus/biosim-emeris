@@ -57,7 +57,7 @@ public class DeveloperPanel {
 	    _mainPanel.add(
 	    		new Anchor(
 	    				"Download Data Set"
-	    				, getUrl("/dumpDataSet?agentUid=" + agentUid)
+	    				, getUrl("/api/dumpDataSet?agentUid=" + agentUid)
 	    		)
 	    );
 	    
