@@ -17,8 +17,8 @@ import org.vectomatic.file.events.LoadEndHandler;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
+import biosim.client.model.Agent;
 import biosim.client.model.Blob;
-import biosim.client.model.Connection;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
 import biosim.client.model.Label;
@@ -332,8 +332,8 @@ public class LabelTreeBuilder {
 		NodeVisitor visitor = new NodeVisitor() {
 			@Override
 			public void visit(Node node) {
-			    if (node instanceof Connection) {
-			    	Connection p = (Connection) node;
+			    if (node instanceof Agent) {
+			    	Agent a = (Agent) node;
 				    if (p.getUid().equals(_agentUid)) {
 						editable[0] = true;
 				    }
