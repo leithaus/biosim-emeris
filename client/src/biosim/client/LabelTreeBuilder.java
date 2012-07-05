@@ -201,6 +201,7 @@ public class LabelTreeBuilder {
 					// Set the new name the node, if it is set
 					if (!textBox.getText().isEmpty()) {
 						label.setName(textBox.getText());
+	                    Biosim.get().getDatabaseAccessLayer().addNode(label);
 					}
 					
 					// Get the files that were selected 
@@ -215,13 +216,11 @@ public class LabelTreeBuilder {
                                     String buffer = reader.getStringResult();
                                     String base64 = Base64.toBase64(buffer);
                                     DataSet dataSet = Biosim.get().getDatabaseAccessLayer().getDataSet();
-									Image image = new Image(dataSet);
                                     Blob blob = new Blob(dataSet, Biosim.get().getAgentUid(), file.getName());
                                     blob.setDataInBase64(base64);
-                                    image.setBlob(blob);
                                     label.setIconRef(blob.getRef());
                                     Biosim.get().getDatabaseAccessLayer().addNode(blob);
-                                    Biosim.get().getDatabaseAccessLayer().addNode(image, label);
+                                    Biosim.get().getDatabaseAccessLayer().addNode(label);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -229,8 +228,6 @@ public class LabelTreeBuilder {
                         });
                         reader.readAsBinaryString(file);
                     }
-                    Biosim.get().getDatabaseAccessLayer().addNode(label);
-
 				}
 				return null;
 			}
