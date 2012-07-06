@@ -1,11 +1,13 @@
 package biosim.client;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
+import m3.gwt.lang.Pair;
 
 import org.vectomatic.file.File;
 import org.vectomatic.file.FileList;
@@ -58,15 +60,15 @@ public class LabelTreeBuilder {
 	final DndController _dndController;
 	final Uid _agentUid;
 	
-	Map<Link,List<TreeItem>> _treeItemsByLink = new GeneratorMap<Link, List<TreeItem>>() {
-		public java.util.List<TreeItem> generate(Link k) {
-			return new ArrayList<TreeItem>();
+	Map<Link,Set<TreeItem>> _treeItemsByLink = new GeneratorMap<Link, Set<TreeItem>>() {
+		public Set<TreeItem> generate(Link k) {
+			return new HashSet<TreeItem>();
 		}
 	};
 
-	Map<Node,List<TreeItem>> _treeItemsByNode = new GeneratorMap<Node, List<TreeItem>>() {
-		public java.util.List<TreeItem> generate(Node k) {
-			return new ArrayList<TreeItem>();
+	Map<Node,Set<TreeItem>> _treeItemsByNode = new GeneratorMap<Node, Set<TreeItem>>() {
+		public Set<TreeItem> generate(Node k) {
+			return new HashSet<TreeItem>();
 		}
 	};
 	
@@ -90,6 +92,17 @@ public class LabelTreeBuilder {
 				removeLink(event.getElement());
 			}
 		});
+		dataSet.nodes.addListener(new FineGrainedListListener<Node>() {
+			@Override
+			public void changed(ListEvent<Node> event) {
+				Set<TreeItem> l = _treeItemsByNode.get(event.getElement());
+				if ( l != null ) {
+					for ( TreeItem ti : l ) {
+						updateTreeItem(ti);
+					}
+				}
+			}
+		});
 		roots.addListener(new FineGrainedListListener<Label>() {
 			@Override
 			public void added(ListEvent<Label> event) {
@@ -101,24 +114,30 @@ public class LabelTreeBuilder {
 		});
 	}
 	
-	TreeItem createTreeItem(TreeItem parent, final Label label, final Link link) {
-		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
-		final FlowPanel w = nwbuilder.getWidget();
-		final TreeItem ti = new TreeItem(w);
-		final PopupMenu popup = new PopupMenu();
-		
-		if ( link != null ) {
-			_treeItemsByLink.get(link).add(ti);
-			ti.setUserObject(link);
-		} else {
-			ti.setUserObject(label);
-		}
-		_treeItemsByNode.get(label).add(ti);
-		
+	TreeItem createTreeItem(TreeItem parent, Label label, Link link) {
+		TreeItem ti = new TreeItem();
 		if ( parent != null ) {
 			parent.addItem(ti);
 		}
-		
+		ti.setUserObject(Pair.create(label, link));
+		updateTreeItem(ti);
+		return ti;
+	}
+	
+    void updateTreeItem(TreeItem ti) {
+    	Pair<Label,Link> pair = getUserObject(ti);
+		final Label label = pair.getLeft();
+		final Link link = pair.getRight();
+		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
+		final FlowPanel w = nwbuilder.getWidget();
+		final PopupMenu popup = new PopupMenu();
+		ti.setWidget(w);
+		if ( link != null ) {
+			_treeItemsByLink.get(link).add(ti);
+		}
+		ti.setUserObject(Pair.create(label, link));
+		_treeItemsByNode.get(label).add(ti);
+				
 		if ( isEditable(label) ) {	
 			final Button pop = new Button("&raquo;");			
 			w.add(pop);
@@ -169,7 +188,6 @@ public class LabelTreeBuilder {
 			GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
 		}
 		
-		return ti;
 	}
 	
 	void addLeaf(final Node node) {
@@ -325,7 +343,17 @@ public class LabelTreeBuilder {
 		while (pr.getParentItem() != null) {
 			pr = pr.getParentItem();
 		}
-		return (Node) pr.getUserObject();
+		Pair<Label,Link> p = getUserObject(ti);
+		if ( p.getRight() == null ) {
+			return p.getLeft();
+		} else {
+			return p.getRight();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	Pair<Label,Link> getUserObject(TreeItem ti) {
+		return (Pair<Label,Link>) ti.getUserObject();		
 	}
 	
 	boolean isEditable(Node n) {
@@ -371,7 +399,7 @@ public class LabelTreeBuilder {
 	}
 
 	public void removeLink(Link l) {
-		List<TreeItem> nodeList = _treeItemsByNode.get(l.getToNode());
+		Set<TreeItem> nodeList = _treeItemsByNode.get(l.getToNode());
 		for ( TreeItem ti : _treeItemsByLink.get(l) ) {
 			ti.getParentItem().removeItem(ti);
 			nodeList.remove(ti);
