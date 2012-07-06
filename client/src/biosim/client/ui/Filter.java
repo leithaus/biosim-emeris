@@ -146,7 +146,7 @@ public class Filter {
 	}
 	
 	public String getDescription() {
-		return Utils.join(_nodes, ":", new Function1<Node, String>() {
+		return Utils.join(_nodes, " : ", new Function1<Node, String>() {
 			@Override
 			public String apply(Node node) {
 				return node.getName();

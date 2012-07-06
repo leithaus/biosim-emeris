@@ -143,7 +143,7 @@ public abstract class Node {
 			list.addAll(s);
 			list.add(n);
 			java.util.Collections.reverse(list);
-			return ListX.join(list, ":");
+			return ListX.join(list, " : ");
 		} else {
 			return null;
 		}
