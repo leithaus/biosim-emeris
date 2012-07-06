@@ -23,11 +23,14 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class NodeWidgetBuilder {
 
 	CustomFlowPanel _widget = new CustomFlowPanel();
+	SimplePanel _wrapper = new SimplePanel();
+	
 	Node _node;
 	Image _icon;
 	Widget _content;
@@ -35,11 +38,19 @@ public class NodeWidgetBuilder {
 	List<Widget> _sourceLabelWidgets = ListX.create();
 	DndType _dndType;
 	ContentCriteria _filterAcceptCriteria;
+	DndController _dndController;
 
 	public NodeWidgetBuilder(Node node, DndController dndController, DndType dndType) {
+		_node = node;
 		_dndType = dndType;
 		_node = node;
+		_dndController = dndController;
+		rebuild();
+	}
+	
+	public void rebuild() {
 		
+		_widget = new CustomFlowPanel();
 		_widget.setStyleName(Biosim._boxStyle, true);
 		
 		HTMLPanel dragHandle = new HTMLPanel("div", "");
@@ -55,23 +66,23 @@ public class NodeWidgetBuilder {
 //		textureStyle.setMarginBottom(-3, Unit.PX);
 		dragHandle.add(dragTexture);
 		_widget.add(dragHandle, "vertFill fleft ui-corner-tl ui-corner-bl");
-		dndController.makeDraggable(_dndType, _node, _widget, dragTexture);
+		_dndController.makeDraggable(_dndType, _node, _widget, dragTexture);
 
 		if ( _node.getIconUrl() != null ) {
 			_icon = new Image(_node.getIconUrl());
 			_icon.addStyleName("node-icon");
 			_widget.add(_icon);
-			dndController.makeDraggable(_dndType, _node, _widget, _icon);
+			_dndController.makeDraggable(_dndType, _node, _widget, _icon);
 		}
 		
-		if ( node instanceof biosim.client.model.Image ) {
+		if ( _node instanceof biosim.client.model.Image ) {
 			
 			// Create a FlexTable into which the image will be displayed
 			HorizontalPanel p = new HorizontalPanel();
 			p.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 			
 			// Create the image element
-			final String imageURL = ((biosim.client.model.Image)node).getBlobRef().getUrl();
+			final String imageURL = ((biosim.client.model.Image)_node).getBlobRef().getUrl();
 			Image i = new Image(imageURL);
 			if (i.getHeight() > i.getWidth()) {
 				i.setHeight("150px");
@@ -91,20 +102,20 @@ public class NodeWidgetBuilder {
 			
 			_content = p;
 			_widget.setHeight("175px");
-		} else if ( node.toHtmlString() != null ) {
-			_content = new HTML(node.toHtmlString());
+		} else if ( _node.toHtmlString() != null ) {
+			_content = new HTML(_node.toHtmlString());
 			_widget.setHeight("70px");
 		}
 
 		if ( _content != null ) {
 			_widget.add(_content);
-			dndController.makeDraggable(_dndType, _node, _widget, _content);
+			_dndController.makeDraggable(_dndType, _node, _widget, _content);
 		}
 		
 //		dndController.makeDraggable(_dndType, _node, _widget, _widget.getClearPanel());
-		dndController.makeDraggable(_dndType, _node, _widget, _widget);
+		_dndController.makeDraggable(_dndType, _node, _widget, _widget);
 		
-		dndController.registerDropSite(_dndType, _node, _widget);
+		_dndController.registerDropSite(_dndType, _node, _widget);
 		
 		_widget.add(_sourceLabels);
 		
@@ -121,6 +132,8 @@ public class NodeWidgetBuilder {
 		} else {
 			toString();
 		}
+		
+		_wrapper.setWidget(_widget);
 		
 	}
 	
@@ -150,11 +163,11 @@ public class NodeWidgetBuilder {
 		return _icon;
 	}
 	
-	public Widget getContent() {
-		return _content;
+	public Widget getPanel() {
+		return _wrapper;
 	}
 	
-	public FlowPanel getWidget() {
+	public FlowPanel getFlowPanel() {
 		return _widget;
 	}
 

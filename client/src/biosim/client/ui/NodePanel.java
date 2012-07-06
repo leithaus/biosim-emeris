@@ -19,7 +19,7 @@ public class NodePanel<T extends Node> extends SimplePanel {
 		_widgetBuilder = new WidgetBuilder<T>(nodes, _delegatePanel) {
 			
 			public Widget buildWidget(T t) {
-				return new NodeWidgetBuilder(t, dndController, type).getWidget();
+				return new NodeWidgetBuilder(t, dndController, type).getFlowPanel();
 			}
 			
 		};

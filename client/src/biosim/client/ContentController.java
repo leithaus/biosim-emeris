@@ -57,16 +57,20 @@ public class ContentController {
 			@Override
 			public void added(ListEvent<Node> event) {
 				NodeWidgetBuilder nwb = new NodeWidgetBuilder(event.getElement(), dndController, DndType.Content);
-				_contentPanel.add(nwb.getWidget());
-				nwb.getWidget().setVisible(false);
+				_contentPanel.add(nwb.getPanel());
+				nwb.getPanel().setVisible(false);
 				_nodeToWidgetBuilderMap.put(event.getElement(), nwb);
+			}
+			public void changed(biosim.client.eventlist.ListEvent<Node> event) {
+				NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
+				nwb.rebuild();
 			}
 			@Override
 			public void removed(ListEvent<Node> event) {
 				final NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
 				hide(nwb, new Function() {
 					public void f() {
-						_contentPanel.remove(nwb.getWidget());							
+						_contentPanel.remove(nwb.getPanel());							
 					}
 				});
 			}
@@ -95,7 +99,7 @@ public class ContentController {
 	}
 	
 	void show(NodeWidgetBuilder nwb, Function completionCallback) {
-		Widget widget = nwb.getWidget();
+		Widget widget = nwb.getPanel();
 		if ( completionCallback == null ) {
 			completionCallback = _nullCompletionCallback;
 		}
@@ -115,7 +119,7 @@ public class ContentController {
 
 	void hide(NodeWidgetBuilder nwb, Function completionCallback) {
 		nwb.setFilterAcceptCriteria(null);
-		Widget widget = nwb.getWidget();
+		Widget widget = nwb.getPanel();
 		if ( completionCallback == null ) {
 			completionCallback = _nullCompletionCallback;
 		}
