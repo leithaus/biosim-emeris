@@ -4,6 +4,7 @@ import static com.google.gwt.query.client.GQuery.$;
 
 import java.util.List;
 
+import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.messages.CreateNodes;
@@ -313,6 +314,14 @@ public class Biosim implements EntryPoint {
 	}
 	
 	void processCreateNodes(CreateNodes cn) {
+		
+		List<Label> newLabels = ListX.create();
+		for ( Node n : cn.getNodes() ) {
+			if ( n instanceof Label && !_databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid()) ) {
+				newLabels.add((Label) n);
+			}
+		}
+		
 		ObservableList<Node> nodes = _databaseAccessLayer.getNodes();
 		for ( Node n : cn.getNodes() ) {
 			if ( !(n instanceof Link) ) {
@@ -340,15 +349,12 @@ public class Biosim implements EntryPoint {
 			}
 		}
 		Uid agentUid = getAgentUid();
-		for ( Node n : cn.getNodes() ) {
-			if ( n instanceof Label && !_databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid()) ) {
-				Label label = (Label) n;
-				List<Node> parents = n.getParents();
-				for ( Node p : parents ) {
-					if ( p.getUid().equals(agentUid)) {
-						_databaseAccessLayer.getLabelRoots().add(label);
-						break;
-					}
+		for ( Label label : newLabels ) {
+			List<Node> parents = label.getParents();
+			for ( Node p : parents ) {
+				if ( p.getUid().equals(agentUid)) {
+					_databaseAccessLayer.getLabelRoots().add(label);
+					break;
 				}
 			}
 		}
