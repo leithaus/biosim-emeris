@@ -35,6 +35,7 @@
 /server-mock/KVDBLogs*.log*
 /server-mock/.scala_dependencies
 /server-mock/database/
+/server-mock/loadDataSet-*
 
 # /server-mock/src/main/webapp/WEB-INF/
 /server-mock/src/main/webapp/WEB-INF/source-jsp
