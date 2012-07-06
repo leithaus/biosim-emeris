@@ -54,7 +54,7 @@ public class Label extends Node {
 					paths = ListX.create();
 					map.put(label, paths);
 				}
-				paths.add( ListX.join(path, ":") );
+				paths.add( ListX.join(path, " : ") );
 				label.addChildLabels(map, path);
 				path.pop();
 			}
