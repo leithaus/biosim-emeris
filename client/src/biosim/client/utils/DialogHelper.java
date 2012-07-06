@@ -49,6 +49,17 @@ public class DialogHelper {
 		});
 	}
 	
+	public static void alert (String text) {
+		final HTML widget = new HTML(text);
+		String size = new String("300px 50px");
+		showWidgetPromptWithButtons("Alert", widget, size, new Function1<Label, Void>() {
+			@Override
+	    	public Void apply(Label t) {
+	    		return null;
+	    	}
+		}, "OK", "");
+	}
+	
 	public static void confirm (String prompt, final Function1<String,Void> handler) {
 		final HTML widget = new HTML(prompt);
 		String size = new String("300px 50px");
@@ -69,10 +80,14 @@ public class DialogHelper {
 			w.setSize(parts[0], parts[1]);
 		}
 	}
-	
-	// TODO:  Setting the button text for these dialog boxes via optional parameter
+
 	public static <T extends Widget> void showWidgetPrompt(String prompt, final T widget, String size, 
 			final Function1<T,Void> handler ) {
+		showWidgetPromptWithButtons(prompt, widget, size, handler, "OK", "Cancel");
+	}
+
+	public static <T extends Widget> void showWidgetPromptWithButtons(String prompt, final T widget, String size, 
+			final Function1<T,Void> handler, String okText, String cancelText ) {
 		final DialogBox dialogBox = new DialogBox();
 	    dialogBox.ensureDebugId("cwDialogBox");
 	    dialogBox.setText(prompt);
@@ -88,25 +103,30 @@ public class DialogHelper {
 	    dialogContents.setCellHorizontalAlignment(widget, HasHorizontalAlignment.ALIGN_CENTER);
 
 	    HorizontalPanel buttons = new HorizontalPanel();
-	    Button okay = new Button("Okay");
-	    okay.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent e) {
-				handler.apply(widget);
-				dialogBox.hide();
-			}
-		});
-	    Button cancel = new Button("Cancel");
-	    cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent e) {
-				handler.apply(null);
-				dialogBox.hide();
-			}
-		});
-
-	    buttons.add(cancel);
-	    buttons.add(okay);
+	    if (!cancelText.isEmpty()) {
+		    Button cancel = new Button(cancelText);
+		    cancel.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent e) {
+					handler.apply(null);
+					dialogBox.hide();
+				}
+			});
+		    buttons.add(cancel);
+	    }
+	    
+	    if (!okText.isEmpty()) {
+		    Button okay = new Button(okText);
+		    okay.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent e) {
+					handler.apply(widget);
+					dialogBox.hide();
+				}
+			});
+		    buttons.add(okay);
+	    }
+	    
 	    
 	    dialogContents.add(buttons);
 	    dialogContents.setCellHorizontalAlignment(buttons, HasHorizontalAlignment.ALIGN_RIGHT);

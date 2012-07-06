@@ -219,7 +219,7 @@ public class DndController {
 			public void processDrop(Node dragee, Node dropTarget) {
 				ObservableList<Label> labelRoots = biosim.getDatabaseAccessLayer().getLabelRoots();
 				if ( !labelRoots.contains(dragee) ) {
-					Window.alert("not supported, aka re-implement me");
+					DialogHelper.alert("not supported, aka re-implement me");
 //					labelRoots.add(dragee);
 				}
 			}

@@ -22,6 +22,7 @@ import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.ui.score.EventScoreBuilder;
 import biosim.client.utils.BiosimWebSocket;
+import biosim.client.utils.DialogHelper;
 import biosim.client.utils.GqueryUtils;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -265,7 +266,7 @@ public class Biosim implements EntryPoint {
 		
 		wsUrl += "?agentUid=" + getAgentUid().asString();
 
-//		Window.alert("using wsUrl = " + wsUrl);
+//		DialogHelper.alert("using wsUrl = " + wsUrl);
 		
 		_socket = new BiosimWebSocket(wsUrl, _messageHandler);
 		
@@ -375,7 +376,7 @@ public class Biosim implements EntryPoint {
 		String agentUid = Window.Location.getParameter("agentUid");
 		if ( agentUid == null ) {
 			String msg = "agentUid url parm is required";
-			Window.alert(msg);
+			DialogHelper.alert(msg);
 			throw new RuntimeException(msg);
 		} else {
 			return new Uid(agentUid);

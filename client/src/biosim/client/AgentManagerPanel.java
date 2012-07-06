@@ -7,6 +7,7 @@ import m3.gwt.lang.HttpHelper;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import biosim.client.model.Uid;
+import biosim.client.utils.DialogHelper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -55,7 +56,7 @@ public class AgentManagerPanel {
 	    }));
 	    form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
 	      public void onSubmitComplete(SubmitCompleteEvent event) {
-	        Window.alert("Multi Agent Data Set has been loaded");
+	        DialogHelper.alert("Multi Agent Data Set has been loaded");
 	      }
 	    });
 	    
@@ -145,9 +146,12 @@ public class AgentManagerPanel {
 			delete.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					if ( Window.confirm("Are you sure you want to delete " + agentName) ) {
-						deleteAgent(agentUid);
-					}
+					DialogHelper.confirm("Are you sure you want to delete " + agentName, new Function1<String,Void>() {
+						public Void apply(String s) {
+							deleteAgent(agentUid);
+							return null;
+						}
+					});
 				}
 			});
 			
@@ -236,7 +240,7 @@ public class AgentManagerPanel {
 	    }));
 	    form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
 	      public void onSubmitComplete(SubmitCompleteEvent event) {
-	        Window.alert("Data Set for Agent " + uid.asString() + " has been loaded");
+	        DialogHelper.alert("Data Set for Agent " + uid.asString() + " has been loaded");
 	      }
 	    });
 	    
