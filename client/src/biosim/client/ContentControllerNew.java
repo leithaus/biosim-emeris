@@ -38,7 +38,7 @@ public class ContentControllerNew {
 		_listPanelAdapter = new ObservableListPanelAdapter<NodeWidgetBuilder>(nwbList, new FlowPanelBuilder(), new Function1<NodeWidgetBuilder, Widget>() {
 			@Override
 			public Widget apply(NodeWidgetBuilder nwb) {
-				return nwb.getWidget();
+				return nwb.getPanel();
 			}
 		});
 	}
@@ -63,7 +63,7 @@ public class ContentControllerNew {
 
 	void hide(NodeWidgetBuilder nwb, Function completionCallback) {
 		nwb.setFilterAcceptCriteria(null);
-		Widget widget = nwb.getWidget();
+		Widget widget = nwb.getPanel();
 		if ( completionCallback == null ) {
 			completionCallback = _nullCompletionCallback;
 		}

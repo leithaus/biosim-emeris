@@ -129,7 +129,7 @@ public class LabelTreeBuilder {
 		final Label label = pair.getLeft();
 		final Link link = pair.getRight();
 		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
-		final FlowPanel w = nwbuilder.getWidget();
+		final FlowPanel w = nwbuilder.getFlowPanel();
 		final PopupMenu popup = new PopupMenu();
 		ti.setWidget(w);
 		if ( link != null ) {
