@@ -1,10 +1,10 @@
 package biosim.client;
 
-import biosim.client.model.Label;
-import biosim.client.model.Node;
-import biosim.client.model.Connection;
 import m3.fj.F1;
 import m3.fj.data.FList;
+import biosim.client.model.Connection;
+import biosim.client.model.Label;
+import biosim.client.model.Node;
 
 public interface ServerSideServices {
 

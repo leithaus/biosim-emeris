@@ -9,10 +9,8 @@ import net.liftweb.json.JsonDSL._
 import com.google.inject.Inject
 import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
-import com.biosimilarity.emeris.KvdbFactory
-import com.biosimilarity.emeris.AgentDataSet
-import AgentDataSet.Uid
-import com.biosimilarity.emeris.DataSetManager
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
+import com.biosimilarity.emeris.newmodel.Model._
 
 class DumpDataSet @Inject() (
     response: HttpServletResponse
@@ -27,11 +25,8 @@ class DumpDataSet @Inject() (
     response.setContentType("application/json")
     response.setHeader("Content-disposition", "attachment; filename=" + filename)
     
-    val dataSet = DataSetManager(Uid(agentUid))
-    val createNodes = dataSet.asCreateNodes
-    val json = pretty(render(createNodes.createMessage.asJValue))
-    
-    response.getWriter.write(json)
+    val db = DatabaseFactory.database(Uid(agentUid))
+    response.getWriter.write(db.asJsonStr)
     response.getWriter.flush
     
   }

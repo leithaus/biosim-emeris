@@ -9,17 +9,12 @@ import net.liftweb.json.JsonDSL._
 import com.google.inject.Inject
 import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
-import com.biosimilarity.emeris.AgentDataSet.Uid
-import com.biosimilarity.emeris.AgentDataSet.Image
-import com.biosimilarity.emeris.AgentDataSet.Blob
 import net.model3.util.Base64
 import net.model3.servlet.HttpStatusCodes
 import javax.servlet.http.HttpServletRequest
-import com.biosimilarity.emeris.AgentDataSet
+import com.biosimilarity.emeris.newmodel.Model._
 import m3.predef._
-import com.biosimilarity.emeris.AgentDataSet.Node
-import com.biosimilarity.emeris.AgentDataSet.NodeWrapper
-import com.biosimilarity.emeris.KvdbFactory
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
 
 object ImageData {
   
@@ -55,13 +50,13 @@ class ImageData @Inject() (
     logger.debug("getting blob data for {}", blobUid)
 
     val db = 
-      KvdbFactory.
+      DatabaseFactory.
         database(agentUid)
     
     val blobOpt = 
-     KvdbFactory.
+     DatabaseFactory.
       database(agentUid).
-      fetchOne[Node](blobUid)
+      fetch[Node](blobUid)
     
     val kvdb = blobOpt match {
 	  case Some(blob: Blob) => {

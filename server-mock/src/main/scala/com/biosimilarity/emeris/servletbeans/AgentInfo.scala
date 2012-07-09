@@ -9,8 +9,7 @@ import net.liftweb.json.JsonDSL._
 import com.google.inject.Inject
 import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
-import com.biosimilarity.emeris.AgentDataSet.Uid
-import com.biosimilarity.emeris.KvdbFactory
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
 
 class AgentInfo @Inject() (
     response: HttpServletResponse
@@ -20,7 +19,7 @@ class AgentInfo @Inject() (
 
     response.setContentType("application/json")
     
-    val agents = KvdbFactory.databases.map { db => db.agentUid.value }
+    val agents = DatabaseFactory.databases.map { db => db.uid.value }
     
     val json = pretty(render(agents))
         

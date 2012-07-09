@@ -11,13 +11,13 @@ import javax.servlet.http.HttpServletRequest
 import net.model3.servlet.upload.DefaultFileUploadDriver
 import scala.collection.JavaConverters._
 import net.model3.servlet.upload.UploadedFile
-import com.biosimilarity.emeris.SocketProtocol.ClearDataSet
 import net.model3.servlet.upload.CommonsFileUploadDriver
 import net.model3.newfile.Directory
 import com.biosimilarity.emeris.SocketManager
 import com.biosimilarity.emeris.Socket
-import com.biosimilarity.emeris.AgentDataSet.Uid
 import scala.reflect.BeanProperty
+import com.biosimilarity.emeris.newmodel.Model._
+
 
 object LoadDataSet {
   val multipartDriver = new CommonsFileUploadDriver
@@ -50,9 +50,6 @@ class LoadDataSet @Inject() (
     	val userName = "bob"
     	def rawSend(data: String) = {}
     }
-
-    SocketManager.switchBoard.onJsonMessage(tempSocket, ClearDataSet().createMessage.asJsonStr)
-    SocketManager.switchBoard.onJsonMessage(tempSocket, jsonMessage)
     
   }
   

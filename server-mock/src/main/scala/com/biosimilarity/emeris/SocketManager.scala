@@ -1,28 +1,29 @@
 package com.biosimilarity.emeris
 
 
-import com.biosimilarity.emeris.SocketProtocol.Message
-import com.biosimilarity.emeris.SocketProtocol.CreateNodes
-import m3.LockFreeMap
-import AgentDataSet.Uid
 import m3.predef._
+import com.biosimilarity.emeris.newmodel.Model._
+import biosim.client.messages.protocol.Request
+import biosim.client.messages.protocol.QueryRequest
+import biosim.client.messages.protocol.ConnectionsRequest
+import biosim.client.messages.protocol.ConnectionsResponse
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
 
 object SocketManager extends Logging{
-  
+    
   var sockets = List[Socket]()
-  
-  val switchBoard = new ModelMutatingSwitchBoard {
-    def getDataSet(socket: Socket) = DataSetManager(socket.agentUid)
-    override def onTypedMessage(source: Socket, msg: Message) = {
-      super.onTypedMessage(source, msg)
-    }
-
-  }
+  var socketsByAgentUid = Map[Uid,Vector[Socket]]()
   
   def create(agentUid: Uid) = {
-    val s = new WebSocketImpl(agentUid, switchBoard)
+    val s = new WebSocketImpl(agentUid)
 	synchronized { 
 	  sockets ::= s 
+	  socketsByAgentUid += 
+	    (  agentUid ->
+	       (s +: socketsByAgentUid.
+	        get(agentUid).
+	        getOrElse(Vector()))
+	    )
 	}
     s
   }
@@ -34,7 +35,7 @@ object SocketManager extends Logging{
   }
   
   def messageReceived(s: Socket, json: String) = try {
-    switchBoard.onJsonMessage(s, json)
+    SwitchBoard.onJsonMessage(s, json)
   } catch {
     case th => logger.warn("error with {}\n{}", s.agentUid, json, th)
   }

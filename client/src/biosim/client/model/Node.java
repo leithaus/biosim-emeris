@@ -11,8 +11,6 @@ import m3.gwt.props.ApplyCodeGeneration;
 import m3.gwt.props.ContainerContext;
 import biosim.client.BiosimUberContext;
 
-import com.google.gwt.json.client.JSONObject;
-
 
 @ApplyCodeGeneration
 public abstract class Node {
@@ -36,11 +34,6 @@ public abstract class Node {
 		_uid = uid;
 		_created = new Date();
 	}
-
-	protected Node(DataSet dataSet, JSONObject jo) {
-		_dataSet = dataSet;
-		_uid = new Uid(jo.get("uid").isString().stringValue());
-	}
 	
 	public abstract String getName();
 	
@@ -60,7 +53,7 @@ public abstract class Node {
 		return null;
 	}
 	
-	public void setIconRef(biosim.client.model.BlobRef iconRef0) {
+	public void setIconRef(biosim.client.messages.model.BlobRef iconRef0) {
 	}
 	
 	public Link link(Node to) {

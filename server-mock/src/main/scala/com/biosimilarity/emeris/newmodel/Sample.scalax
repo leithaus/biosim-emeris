@@ -1,0 +1,80 @@
+package com.biosimilarity.emeris.newmodel
+
+import Model._
+
+object Sample {
+
+  implicit object database extends AgentDatabase {
+
+    val uid = Uid("sample")
+    
+    var _nodes = Vector[Node]()
+
+    def link(from: Node, to: Node) = 
+      insert(Link(from.uid, to.uid))
+    
+    override def insert[T <: Node](n: T) = {
+      _nodes +:= n
+      n
+    }
+    
+    override def delete(uid: Uid) = {
+      _nodes = _nodes.filterNot(_.uid == uid)
+    }
+    
+    override def dropDatabase() = {
+      _nodes = Vector()
+    }
+    
+    override def fetch[T <: Node](uid: Uid)(implicit mf: Manifest[T]) = 
+      nodes.
+        find(_.uid == uid).
+        collect { 
+          case n if mf.erasure.isAssignableFrom(n.getClass) => n.asInstanceOf[T] 
+        }
+    
+    val agent = insert(Agent("glen"))
+    val rootAlias = insert(Label("glen"))
+    
+    link(agent, rootAlias)
+    
+    object connections {
+      lazy val bob = insert(Connection("Bob"))
+      lazy val bill = insert(Connection("Bill"))
+    }
+    
+    object labels {
+      
+      lazy val one = insert(Label("one"))
+      lazy val oneA = insert(Label("A"))
+      lazy val oneB = insert(Label("B"))
+      lazy val two = insert(Label("two"))
+      lazy val twoX = insert(Label("X"))
+      lazy val twoY = insert(Label("Y"))
+
+      lazy val linkup = {
+        link(rootAlias, one)
+        link(rootAlias, two)
+
+        link(one, oneA)
+        link(one, oneB)
+
+        link(two, twoX)
+        link(two, twoY)
+      }
+      
+    }
+    
+    lazy val initialize = {
+      labels.linkup
+      link(connections.bob, labels.one)
+    }
+    
+    def nodes = {
+      initialize
+      _nodes
+    }
+    
+  }
+
+}

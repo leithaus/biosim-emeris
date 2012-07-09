@@ -3,8 +3,6 @@ package biosim.client.model;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
 
-import com.google.gwt.json.client.JSONObject;
-
 
 public class Agent extends Node {
 
@@ -42,11 +40,6 @@ public class Agent extends Node {
 	public Agent(DataSet dataSet, String name) {
 		super(dataSet);
 		_name = name;
-	}
-
-	public Agent(DataSet dataSet, JSONObject jo) {
-		super(dataSet, jo);
-		this._name = jo.get("name").isString().stringValue();
 	}
 
 	public String getVisualId() {

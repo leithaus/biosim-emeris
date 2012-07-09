@@ -1,12 +1,7 @@
 package com.biosimilarity.emeris
 
 import SocketProtocol._
-import AgentDataSet._
 import net.liftweb.json.JsonAST.JString
-import SocketProtocol._
-import AgentDataSet._
-import net.liftweb.json.JsonAST.JString
-import com.biosimilarity.emeris.testdata.InsertMinimalDataSet
 
 trait ModelMutatingSwitchBoard extends Object with TypedSwitchBoard with PubSubSwitchBoard {
 

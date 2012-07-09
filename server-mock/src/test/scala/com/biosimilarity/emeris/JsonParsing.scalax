@@ -1,7 +1,6 @@
 package com.biosimilarity.emeris
 
 object JsonParsing extends App {
-
   
   val m2 = SocketProtocol.parseJson("""
       {

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import biosim.client.messages.model.BlobRef;
+
 import m3.gwt.lang.ListX;
 
 public class Label extends Node {
@@ -12,7 +14,7 @@ public class Label extends Node {
 	private String _name;
 	private BlobRef _iconRef;
 
-	private Label() {
+	public Label() {
 	}
 
 	public Label(DataSet dataSet, String name) {
@@ -80,14 +82,14 @@ public class Label extends Node {
 	     _name = name0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.name, before, name0);
 	}
-	public biosim.client.model.BlobRef getIconRef() {
+	public biosim.client.messages.model.BlobRef getIconRef() {
 	    return _iconRef;
 	}
-	public void setIconRef(biosim.client.model.BlobRef iconRef0) {
+	public void setIconRef(biosim.client.messages.model.BlobRef iconRef0) {
 	    _setIconRef(iconRef0);
 	}
-	protected void _setIconRef(biosim.client.model.BlobRef iconRef0) {
-	    biosim.client.model.BlobRef before = _iconRef;
+	protected void _setIconRef(biosim.client.messages.model.BlobRef iconRef0) {
+	    biosim.client.messages.model.BlobRef before = _iconRef;
 	     _iconRef = iconRef0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.iconRef, before, iconRef0);
 	}
@@ -96,9 +98,9 @@ public class Label extends Node {
 	    	    protected java.lang.String getImpl(Label bean) { return bean.getName(); }
 	    	    protected void setImpl(Label bean, java.lang.String value ) { bean.setName(value);}
 	    };
-	    public m3.gwt.props.PropertyContext iconRef = new m3.gwt.props.impl.AbstractPropertyContext<Label,biosim.client.model.BlobRef>(this, "iconRef", biosim.client.model.BlobRef.class, 1, null, false) {
-	    	    protected biosim.client.model.BlobRef getImpl(Label bean) { return bean.getIconRef(); }
-	    	    protected void setImpl(Label bean, biosim.client.model.BlobRef value ) { bean.setIconRef(value);}
+	    public m3.gwt.props.PropertyContext iconRef = new m3.gwt.props.impl.AbstractPropertyContext<Label,biosim.client.messages.model.BlobRef>(this, "iconRef", biosim.client.messages.model.BlobRef.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.BlobRef getImpl(Label bean) { return bean.getIconRef(); }
+	    	    protected void setImpl(Label bean, biosim.client.messages.model.BlobRef value ) { bean.setIconRef(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = Node.Context.uid;
 	    public m3.gwt.props.PropertyContext created = Node.Context.created;

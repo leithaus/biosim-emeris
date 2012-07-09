@@ -1,4 +1,4 @@
-package biosim.client.messages;
+package biosim.client.messages.model;
 
 import m3.gwt.props.ApplyCodeGeneration;
 import biosim.client.model.Uid;
@@ -8,6 +8,14 @@ public class UidAndName {
 
 	private Uid _uid;
 	private String _name;
+	
+	public UidAndName() {
+	}
+	
+	public UidAndName(Uid uid, String name) {
+		_uid = uid;
+		_name = name;
+	}
 	
 	// BEGIN_GENERATED_CODE
 	
@@ -48,8 +56,8 @@ public class UidAndName {
 	    };
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
-	        set = set.insert("biosim.client.messages.UidAndName");
 	        set = set.insert("java.lang.Object");
+	        set = set.insert("biosim.client.messages.model.UidAndName");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
@@ -62,7 +70,7 @@ public class UidAndName {
 	        return new UidAndName();
 	    }
 	    UidAndNameContainerContext(Class<?> actualClass) {
-	        super(biosim.client.messages.UidAndName.class);
+	        super(biosim.client.messages.model.UidAndName.class);
 	    }
 	}
 	public static final UidAndNameContainerContext Context = new UidAndNameContainerContext(UidAndName.class);

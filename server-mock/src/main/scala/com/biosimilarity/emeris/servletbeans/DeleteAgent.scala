@@ -9,8 +9,8 @@ import net.liftweb.json.JsonDSL._
 import com.google.inject.Inject
 import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
-import com.biosimilarity.emeris.AgentDataSet.Uid
-import com.biosimilarity.emeris.KvdbFactory
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
+import com.biosimilarity.emeris.newmodel.Model.Uid
 
 class DeleteAgent @Inject() (
     response: HttpServletResponse
@@ -22,7 +22,7 @@ class DeleteAgent @Inject() (
   def doGet: Unit = {
 
     if ( agentUid == null ) sys.error("uid is required")
-    KvdbFactory.database(Uid(agentUid)).dropDatabase
+    DatabaseFactory.database(Uid(agentUid)).dropDatabase
 
   }
   

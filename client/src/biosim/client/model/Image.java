@@ -1,5 +1,7 @@
 package biosim.client.model;
 
+import biosim.client.messages.model.BlobRef;
+
 
 
 public class Image extends Node {
@@ -33,14 +35,14 @@ public class Image extends Node {
 	}
 	// BEGIN_GENERATED_CODE
 	
-	public biosim.client.model.BlobRef getBlobRef() {
+	public biosim.client.messages.model.BlobRef getBlobRef() {
 	    return _blobRef;
 	}
-	public void setBlobRef(biosim.client.model.BlobRef blobRef0) {
+	public void setBlobRef(biosim.client.messages.model.BlobRef blobRef0) {
 	    _setBlobRef(blobRef0);
 	}
-	protected void _setBlobRef(biosim.client.model.BlobRef blobRef0) {
-	    biosim.client.model.BlobRef before = _blobRef;
+	protected void _setBlobRef(biosim.client.messages.model.BlobRef blobRef0) {
+	    biosim.client.messages.model.BlobRef before = _blobRef;
 	     _blobRef = blobRef0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.blobRef, before, blobRef0);
 	}
@@ -49,9 +51,9 @@ public class Image extends Node {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class ImageContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext blobRef = new m3.gwt.props.impl.AbstractPropertyContext<Image,biosim.client.model.BlobRef>(this, "blobRef", biosim.client.model.BlobRef.class, 0, null, false) {
-	    	    protected biosim.client.model.BlobRef getImpl(Image bean) { return bean.getBlobRef(); }
-	    	    protected void setImpl(Image bean, biosim.client.model.BlobRef value ) { bean.setBlobRef(value);}
+	    public m3.gwt.props.PropertyContext blobRef = new m3.gwt.props.impl.AbstractPropertyContext<Image,biosim.client.messages.model.BlobRef>(this, "blobRef", biosim.client.messages.model.BlobRef.class, 0, null, false) {
+	    	    protected biosim.client.messages.model.BlobRef getImpl(Image bean) { return bean.getBlobRef(); }
+	    	    protected void setImpl(Image bean, biosim.client.messages.model.BlobRef value ) { bean.setBlobRef(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = Node.Context.uid;
 	    public m3.gwt.props.PropertyContext created = Node.Context.created;

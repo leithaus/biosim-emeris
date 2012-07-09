@@ -1,7 +1,7 @@
 package com.biosimilarity.emeris
 
-import com.biosimilarity.emeris.AgentDataSet.Uid
 import java.util.UUID
+import com.biosimilarity.emeris.newmodel.Model.Uid
 
 trait Socket {
 

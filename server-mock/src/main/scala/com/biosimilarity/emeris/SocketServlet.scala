@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse
 import org.eclipse.jetty.websocket.WebSocketServlet
 import m3.predef._
 import org.eclipse.jetty.websocket.WebSocket
-import com.biosimilarity.emeris.AgentDataSet.Uid
+import com.biosimilarity.emeris.newmodel.Model.Uid
 
 class SocketServlet extends org.eclipse.jetty.websocket.WebSocketServlet with Logging {
 

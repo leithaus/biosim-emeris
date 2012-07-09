@@ -4,9 +4,7 @@ import m3.gwt.props.json.JsonReader;
 import m3.gwt.props.json.JsonSerializer;
 import m3.gwt.props.json.JsonWriter;
 import m3.gwt.props.json.SingleTypeHandler;
-import biosim.client.Biosim;
 import biosim.client.BiosimUberContext;
-import biosim.client.model.Node;
 import biosim.client.model.Uid;
 
 public class BiosimSerializer extends JsonSerializer {
@@ -16,7 +14,7 @@ public class BiosimSerializer extends JsonSerializer {
 		return _instance;
 	}
 	
-	private BiosimSerializer() {
+	public BiosimSerializer() {
 		super(BiosimUberContext.get());
 		
 		add(new SingleTypeHandler(Uid.class) {
@@ -35,9 +33,6 @@ public class BiosimSerializer extends JsonSerializer {
 	
 	@Override
 	public Object postJsonLoad(Object o) {
-		if ( o instanceof Node ) {
-			Node.Context.dataSet.setValue(o, Biosim.get().getDatabaseAccessLayer().getDataSet());
-		}
 		return o;
 	}
 	

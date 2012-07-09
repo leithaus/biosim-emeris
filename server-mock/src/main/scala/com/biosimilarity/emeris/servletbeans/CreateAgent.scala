@@ -9,9 +9,9 @@ import net.liftweb.json.JsonDSL._
 import com.google.inject.Inject
 import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
-import com.biosimilarity.emeris.AgentDataSet.Uid
-import com.biosimilarity.emeris.KvdbFactory
-import com.biosimilarity.emeris.testdata.InsertMinimalDataSet
+import com.biosimilarity.emeris.newmodel.testdata.InsertMinimalDataSet
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
+import com.biosimilarity.emeris.newmodel.Model.Uid
 
 class CreateAgent @Inject() (
     response: HttpServletResponse
@@ -24,7 +24,7 @@ class CreateAgent @Inject() (
 
     if ( agentUid == null ) sys.error("uid is required")
     val uid = Uid(agentUid)
-    KvdbFactory.createDatabase(uid)
+    DatabaseFactory.createDatabase(uid)
     InsertMinimalDataSet.apply(uid)
     
   }

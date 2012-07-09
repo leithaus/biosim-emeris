@@ -1,50 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-  <classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
-  <classpathentry kind="var" path="M2_REPO/javax/inject/javax.inject/1.0/javax.inject-1.0.jar"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-fileupload/commons-fileupload/1.2.2/commons-fileupload-1.2.2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/4.10/junit-4.10.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/net/model3/jetty-runner/8.0-SNAPSHOT/jetty-runner-8.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/jetty-runner/src/main/java"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/com.sun.el/2.2.0.v201108011116/com.sun.el-2.2.0.v201108011116.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.el/2.2.0.v201108011116/javax.el-2.2.0.v201108011116.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet.jsp/2.2.0.v201112011158/javax.servlet.jsp-2.2.0.v201112011158.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/org.apache.jasper.glassfish/2.2.2.v201112011158/org.apache.jasper.glassfish-2.2.2.v201112011158.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/org.apache.taglibs.standard.glassfish/1.2.0.v201112081803/org.apache.taglibs.standard.glassfish-1.2.0.v201112081803.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet.jsp.jstl/1.2.0.v201105211821/javax.servlet.jsp.jstl-1.2.0.v201105211821.jar"/>
-  <classpathentry kind="var" path="M2_REPO/net/model3/m3-proxy-filter/1.0-SNAPSHOT/m3-proxy-filter-1.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/proxy/filter/src/main/java"/>
-  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.6.4/jcl-over-slf4j-1.6.4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/net/model3/model3/3.5-SNAPSHOT/model3-3.5-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/core/src/main/java"/>
-  <classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice/3.0/guice-3.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice-multibindings/3.0/guice-multibindings-3.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-http/8.0.4.v20111024/jetty-http-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-io/8.0.4.v20111024/jetty-io-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-util/8.0.4.v20111024/jetty-util-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-server/8.0.4.v20111024/jetty-server-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-continuation/8.0.4.v20111024/jetty-continuation-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-servlets/8.0.4.v20111024/jetty-servlets-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-client/8.0.4.v20111024/jetty-client-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-webapp/8.0.4.v20111024/jetty-webapp-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-xml/8.0.4.v20111024/jetty-xml-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-servlet/8.0.4.v20111024/jetty-servlet-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-security/8.0.4.v20111024/jetty-security-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice-servlet/3.0/guice-servlet-3.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/net/model3/m3-scala/1.0-SNAPSHOT/m3-scala-1.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/scala/src/main/scala"/>
-  <classpathentry kind="var" path="M2_REPO/net/model3/m3-servlet/1.0-SNAPSHOT/m3-servlet-1.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/servlet/core/src/main/scala"/>
-  <classpathentry kind="var" path="M2_REPO/net/model3/model3-json/1.5-SNAPSHOT/model3-json-1.5-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/json/src/main"/>
-  <classpathentry kind="var" path="M2_REPO/beanprops/beanprops/2.0-SNAPSHOT/beanprops-2.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/beanprops/src/main/java"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-websocket/8.0.4.v20111024/jetty-websocket-8.0.4.v20111024.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/freemarker/freemarker/2.3.18/freemarker-2.3.18.jar"/>
-  <classpathentry kind="var" path="M2_REPO/net/liftweb/lift-json_2.9.0/2.4-M5/lift-json_2.9.0-2.4-M5.jar"/>
-  <classpathentry kind="src" path="src/main/scala"/>
-  <classpathentry kind="src" path="src/test/scala"/>
-  <classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-  <classpathentry kind="output" path="target/classes"/>
+	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="var" path="M2_REPO/javax/inject/javax.inject/1.0/javax.inject-1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-fileupload/commons-fileupload/1.2.2/commons-fileupload-1.2.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/4.10/junit-4.10.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/model3/jetty-runner/8.0-SNAPSHOT/jetty-runner-8.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/jetty-runner/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/com.sun.el/2.2.0.v201108011116/com.sun.el-2.2.0.v201108011116.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.el/2.2.0.v201108011116/javax.el-2.2.0.v201108011116.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet.jsp/2.2.0.v201112011158/javax.servlet.jsp-2.2.0.v201112011158.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/org.apache.jasper.glassfish/2.2.2.v201112011158/org.apache.jasper.glassfish-2.2.2.v201112011158.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/org.apache.taglibs.standard.glassfish/1.2.0.v201112081803/org.apache.taglibs.standard.glassfish-1.2.0.v201112081803.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/orbit/javax.servlet.jsp.jstl/1.2.0.v201105211821/javax.servlet.jsp.jstl-1.2.0.v201105211821.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/model3/m3-proxy-filter/1.0-SNAPSHOT/m3-proxy-filter-1.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/proxy/filter/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.6.4/jcl-over-slf4j-1.6.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/model3/model3/3.5-SNAPSHOT/model3-3.5-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/core/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice/3.0/guice-3.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice-multibindings/3.0/guice-multibindings-3.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-http/8.0.4.v20111024/jetty-http-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-io/8.0.4.v20111024/jetty-io-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-util/8.0.4.v20111024/jetty-util-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-server/8.0.4.v20111024/jetty-server-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-continuation/8.0.4.v20111024/jetty-continuation-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-servlets/8.0.4.v20111024/jetty-servlets-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-client/8.0.4.v20111024/jetty-client-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-webapp/8.0.4.v20111024/jetty-webapp-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-xml/8.0.4.v20111024/jetty-xml-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-servlet/8.0.4.v20111024/jetty-servlet-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-security/8.0.4.v20111024/jetty-security-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/google/code/guice/guice-servlet/3.0/guice-servlet-3.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/model3/m3-scala/1.0-SNAPSHOT/m3-scala-1.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/scala/src/main/scala"/>
+	<classpathentry kind="var" path="M2_REPO/net/model3/m3-servlet/1.0-SNAPSHOT/m3-servlet-1.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/servlet/core/src/main/scala"/>
+	<classpathentry kind="var" path="M2_REPO/net/model3/model3-json/1.5-SNAPSHOT/model3-json-1.5-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/json/src/main"/>
+	<classpathentry kind="var" path="M2_REPO/beanprops/beanprops/2.0-SNAPSHOT/beanprops-2.0-SNAPSHOT.jar" sourcepath="/CODE_HOME/model3/beanprops/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-websocket/8.0.4.v20111024/jetty-websocket-8.0.4.v20111024.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/freemarker/freemarker/2.3.18/freemarker-2.3.18.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/liftweb/lift-json_2.9.0/2.4-M5/lift-json_2.9.0-2.4-M5.jar"/>
+	<classpathentry kind="src" path="src/main/scala"/>
+	<classpathentry kind="src" path="src/test/scala"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/biosim-gwt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/m3-gwt"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

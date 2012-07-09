@@ -1,5 +1,7 @@
 package biosim.client.model;
 
+import biosim.client.messages.model.BlobRef;
+
 
 public class Blob extends Node {
 
@@ -43,14 +45,14 @@ public class Blob extends Node {
 	     _dataInBase64 = dataInBase640;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.dataInBase64, before, dataInBase640);
 	}
-	public biosim.client.model.BlobRef getRef() {
+	public biosim.client.messages.model.BlobRef getRef() {
 	    return _ref;
 	}
-	public void setRef(biosim.client.model.BlobRef ref0) {
+	public void setRef(biosim.client.messages.model.BlobRef ref0) {
 	    _setRef(ref0);
 	}
-	protected void _setRef(biosim.client.model.BlobRef ref0) {
-	    biosim.client.model.BlobRef before = _ref;
+	protected void _setRef(biosim.client.messages.model.BlobRef ref0) {
+	    biosim.client.messages.model.BlobRef before = _ref;
 	     _ref = ref0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.ref, before, ref0);
 	}
@@ -63,9 +65,9 @@ public class Blob extends Node {
 	    	    protected java.lang.String getImpl(Blob bean) { return bean.getDataInBase64(); }
 	    	    protected void setImpl(Blob bean, java.lang.String value ) { bean.setDataInBase64(value);}
 	    };
-	    public m3.gwt.props.PropertyContext ref = new m3.gwt.props.impl.AbstractPropertyContext<Blob,biosim.client.model.BlobRef>(this, "ref", biosim.client.model.BlobRef.class, 1, null, false) {
-	    	    protected biosim.client.model.BlobRef getImpl(Blob bean) { return bean.getRef(); }
-	    	    protected void setImpl(Blob bean, biosim.client.model.BlobRef value ) { bean.setRef(value);}
+	    public m3.gwt.props.PropertyContext ref = new m3.gwt.props.impl.AbstractPropertyContext<Blob,biosim.client.messages.model.BlobRef>(this, "ref", biosim.client.messages.model.BlobRef.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.BlobRef getImpl(Blob bean) { return bean.getRef(); }
+	    	    protected void setImpl(Blob bean, biosim.client.messages.model.BlobRef value ) { bean.setRef(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = Node.Context.uid;
 	    public m3.gwt.props.PropertyContext created = Node.Context.created;

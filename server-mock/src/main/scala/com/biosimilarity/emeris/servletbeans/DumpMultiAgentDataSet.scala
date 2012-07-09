@@ -9,12 +9,7 @@ import net.liftweb.json.JsonDSL._
 import com.google.inject.Inject
 import com.biosimilarity.emeris.SocketManager
 import scala.reflect.BeanProperty
-import com.biosimilarity.emeris.KvdbFactory
-import com.biosimilarity.emeris.AgentDataSet
-import AgentDataSet.Uid
-import com.biosimilarity.emeris.DataSetManager
-//import com.google.gson.JsonSerializer
-import com.biosimilarity.emeris.JsonHelper
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
 
 class DumpMultiAgentDataSet @Inject() (
     response: HttpServletResponse
@@ -28,12 +23,9 @@ class DumpMultiAgentDataSet @Inject() (
 
     val out = response.getWriter
     
-    val createNodes = KvdbFactory.databases.map { db =>
-      val dataSet = new AgentDataSet(db)
-      dataSet.asCreateNodes.asJValue
-    }
+    val data = DatabaseFactory.databases.map(_.asJValue)
 
-    val json = pretty(render(createNodes))
+    val json = pretty(render(data))
 
     response.getWriter.write(json)
     response.getWriter.flush

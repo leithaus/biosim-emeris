@@ -1,8 +1,10 @@
-package biosim.client.model;
-
-import com.google.gwt.core.client.GWT;
+package biosim.client.messages.model;
 
 import m3.gwt.props.ApplyCodeGeneration;
+
+import biosim.client.model.Uid;
+
+import com.google.gwt.core.client.GWT;
 
 @ApplyCodeGeneration
 public class BlobRef {
@@ -95,8 +97,8 @@ public class BlobRef {
 	    };
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
-	        set = set.insert("biosim.client.model.BlobRef");
 	        set = set.insert("java.lang.Object");
+	        set = set.insert("biosim.client.messages.model.BlobRef");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
@@ -110,7 +112,7 @@ public class BlobRef {
 	        return new BlobRef();
 	    }
 	    BlobRefContainerContext(Class<?> actualClass) {
-	        super(biosim.client.model.BlobRef.class);
+	        super(biosim.client.messages.model.BlobRef.class);
 	    }
 	}
 	public static final BlobRefContainerContext Context = new BlobRefContainerContext(BlobRef.class);

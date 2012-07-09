@@ -4,10 +4,10 @@ import scala.collection.immutable.Stack
 import Model._
 
 case class FilterAcceptCriteria(
-    node: Node
+    node: Uid
 	, paths: Iterable[String]
-	, labels: Iterable[TUid[Label]]
-	, connections: Iterable[TUid[Connection]]
+	, labels: Iterable[Uid]
+	, connections: Iterable[Uid]
 )
 
 
@@ -27,7 +27,7 @@ case class Filter(labels: Iterable[Label], connections: Iterable[Connection], im
     labels.foldLeft(Map[Label,List[String]]())((acc,l) => addLabelsAndChildren(l, Stack(), acc))
   }
   
-  def accept(node: Node): Option[FilterAcceptCriteria] = {
+  def accept(node: Node): List[FilterAcceptCriteria] = {
 
     // labels are OR'ed and no label filters means show anything
     val labelPass = labels.isEmpty || node.parentLabels.exists(labelsAndChildren.contains)
@@ -37,16 +37,16 @@ case class Filter(labels: Iterable[Label], connections: Iterable[Connection], im
       
     if ( labelPass && connectionPass ) {
       val labels = node.parentLabels.filter(labelsAndChildren.contains)
-      Some(
+      List(
         FilterAcceptCriteria(
-          node
+          node.uid
           , labels.flatMap(labelsAndChildren.apply) 
-          , labels.map(_.tuid)
-          , connections.map(_.tuid)
+          , labels.map(_.uid)
+          , connections.map(_.uid)
         )
       )
     } else {
-      None
+      Nil
     } 
     
   }

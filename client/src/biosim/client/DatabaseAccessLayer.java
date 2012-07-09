@@ -6,8 +6,8 @@ import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
-import biosim.client.messages.CreateNodes;
-import biosim.client.messages.RemoveNodes;
+import biosim.client.messages.protocol.CreateNodesRequest;
+import biosim.client.messages.protocol.RemoveNodesRequest;
 import biosim.client.model.Address;
 import biosim.client.model.Connection;
 import biosim.client.model.DataSet;
@@ -65,7 +65,7 @@ public class DatabaseAccessLayer {
 	public void addChildLabel(Node parent, String childName) {
 		Label label = new Label(_dataSet, childName);
 		Link link = parent.link(label);
-		_socket.send(new CreateNodes(label, link));
+		_socket.send(new CreateNodesRequest(label, link));
 		fireRefreshContentPane();
 	}
 	
@@ -81,7 +81,7 @@ public class DatabaseAccessLayer {
 
 	public void removeLink(Link link) {
 		_dataSet.nodes.remove(link);
-		_socket.send(new RemoveNodes(link));
+		_socket.send(new RemoveNodesRequest(link));
 		NodeVisitor visitor = new NodeVisitor() {
 			@Override
 			public void visit(Node node) {
@@ -95,7 +95,7 @@ public class DatabaseAccessLayer {
 
 	public void addLink(Node from, Node to) {
 		Link link = new Link(_dataSet, from.getUid(), to.getUid());
-		_socket.send(new CreateNodes(link));
+		_socket.send(new CreateNodesRequest(link));
 	}
 
 	public Node getNode(Uid nodeId) {
@@ -142,7 +142,7 @@ public class DatabaseAccessLayer {
 	public void addTextMessage(Node parent, String text) {
 		TextMessage message = new TextMessage(_dataSet, text);
 		Link link = parent.link(message);
-		_socket.send(new CreateNodes(message, link));
+		_socket.send(new CreateNodesRequest(message, link));
 		fireRefreshContentPane();		
 	}
 
@@ -153,11 +153,11 @@ public class DatabaseAccessLayer {
 
 	public void addNode(Node nodeToAdd, Node parent) {
 		Link link = parent.link(nodeToAdd);
-		_socket.send(new CreateNodes(nodeToAdd, link));
+		_socket.send(new CreateNodesRequest(nodeToAdd, link));
 	}
 
     public void addNode(Node nodeToAdd) {
-        _socket.send(new CreateNodes(nodeToAdd));
+        _socket.send(new CreateNodesRequest(nodeToAdd));
     }
 
 	public void addAddress(Node parent, String address) {

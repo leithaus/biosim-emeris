@@ -1,6 +1,5 @@
 package biosim.client.model;
 
-import com.google.gwt.json.client.JSONObject;
 
 public class Phone extends Node {
 	
@@ -12,11 +11,6 @@ public class Phone extends Node {
 	public Phone(DataSet dataSet, String value) {
 		super(dataSet);
 		this._value = value;
-	}
-	
-	public Phone(DataSet dataSet, JSONObject jo) {
-		super(dataSet, jo);
-		this._value = jo.get("value").isString().stringValue();
 	}
 	
 	@Override

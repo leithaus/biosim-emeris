@@ -1,13 +1,11 @@
 package com.biosimilarity.emeris.testdata
 
 
-import com.biosimilarity.emeris.AgentDataSet.Label
-import com.biosimilarity.emeris.KvdbFactory
-import com.biosimilarity.emeris.AgentDataSet.Uid
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
 
 object RoundTripDataTest extends App {
 
-  val kvdb = KvdbFactory.database(Uid("agent_one"))
+  val kvdb = DatabaseFactory.database(Uid("agent_one"))
 
   try {
       println("------ putting record -------")

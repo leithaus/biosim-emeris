@@ -31,19 +31,19 @@ public class NodeWidgetBuilder {
 	CustomFlowPanel _widget = new CustomFlowPanel();
 	SimplePanel _wrapper = new SimplePanel();
 	
-	Node _node;
+	final Node _node;
+	final DndType _dndType;
+	final DndController _dndController;
+	
 	Image _icon;
 	Widget _content;
 	CustomFlowPanel _sourceLabels = new CustomFlowPanel();
 	List<Widget> _sourceLabelWidgets = ListX.create();
-	DndType _dndType;
 	ContentCriteria _filterAcceptCriteria;
-	DndController _dndController;
 
 	public NodeWidgetBuilder(Node node, DndController dndController, DndType dndType) {
 		_node = node;
 		_dndType = dndType;
-		_node = node;
 		_dndController = dndController;
 		rebuild();
 	}

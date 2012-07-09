@@ -2,8 +2,7 @@ package biosim.client.model;
 
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
-
-import com.google.gwt.json.client.JSONObject;
+import biosim.client.messages.model.BlobRef;
 
 
 public class Connection extends Node {
@@ -43,11 +42,6 @@ public class Connection extends Node {
 	public Connection(DataSet dataSet, String name) {
 		super(dataSet);
 		_name = name;
-	}
-
-	public Connection(DataSet dataSet, JSONObject jo) {
-		super(dataSet, jo);
-		this._name = jo.get("name").isString().stringValue();
 	}
 
 	public String getVisualId() {
@@ -103,14 +97,14 @@ public class Connection extends Node {
 	     _name = name0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.name, before, name0);
 	}
-	public biosim.client.model.BlobRef getIconRef() {
+	public biosim.client.messages.model.BlobRef getIconRef() {
 	    return _iconRef;
 	}
-	public void setIconRef(biosim.client.model.BlobRef iconRef0) {
+	public void setIconRef(biosim.client.messages.model.BlobRef iconRef0) {
 	    _setIconRef(iconRef0);
 	}
-	protected void _setIconRef(biosim.client.model.BlobRef iconRef0) {
-	    biosim.client.model.BlobRef before = _iconRef;
+	protected void _setIconRef(biosim.client.messages.model.BlobRef iconRef0) {
+	    biosim.client.messages.model.BlobRef before = _iconRef;
 	     _iconRef = iconRef0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.iconRef, before, iconRef0);
 	}
@@ -119,9 +113,9 @@ public class Connection extends Node {
 	    	    protected java.lang.String getImpl(Connection bean) { return bean.getName(); }
 	    	    protected void setImpl(Connection bean, java.lang.String value ) { bean.setName(value);}
 	    };
-	    public m3.gwt.props.PropertyContext iconRef = new m3.gwt.props.impl.AbstractPropertyContext<Connection,biosim.client.model.BlobRef>(this, "iconRef", biosim.client.model.BlobRef.class, 1, null, false) {
-	    	    protected biosim.client.model.BlobRef getImpl(Connection bean) { return bean.getIconRef(); }
-	    	    protected void setImpl(Connection bean, biosim.client.model.BlobRef value ) { bean.setIconRef(value);}
+	    public m3.gwt.props.PropertyContext iconRef = new m3.gwt.props.impl.AbstractPropertyContext<Connection,biosim.client.messages.model.BlobRef>(this, "iconRef", biosim.client.messages.model.BlobRef.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.BlobRef getImpl(Connection bean) { return bean.getIconRef(); }
+	    	    protected void setImpl(Connection bean, biosim.client.messages.model.BlobRef value ) { bean.setIconRef(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = Node.Context.uid;
 	    public m3.gwt.props.PropertyContext created = Node.Context.created;

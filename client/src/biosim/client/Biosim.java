@@ -1,17 +1,9 @@
 package biosim.client;
 
 import static com.google.gwt.query.client.GQuery.$;
-
-import java.util.List;
-
-import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
-import biosim.client.eventlist.ObservableList;
-import biosim.client.messages.CreateNodes;
-import biosim.client.messages.RemoveNodes;
+import biosim.client.messages.protocol.MessageHandler;
 import biosim.client.model.Connection;
-import biosim.client.model.Label;
-import biosim.client.model.Link;
 import biosim.client.model.Node;
 import biosim.client.model.Uid;
 import biosim.client.ui.ContentCriteria;
@@ -79,21 +71,9 @@ public class Biosim implements EntryPoint {
 	
 	AgentManagerPanel _agentManagerPanel;
 	
-	EventScoreBuilder _eventScore;
+	LabelTreeBuilder _labelTreeBuilder;
 	
-	biosim.client.messages.MessageHandler _messageHandler = new biosim.client.messages.MessageHandler() {
-		public void processCreateNodes(CreateNodes cn) {
-			Biosim.this.processCreateNodes(cn);
-		}
-		public void processRemoveNodes(RemoveNodes rn) {
-			Biosim.this.processRemoveNodes(rn);
-		}
-		public void processClearDataSet() {
-			Biosim.this.processClearDataSet();
-		}
-		public void connect() {
-		}
-	};
+	EventScoreBuilder _eventScore;
 	
 	public Biosim() {
 	}
@@ -102,6 +82,8 @@ public class Biosim implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		
+		BiosimUberContext.get();
 		
 	    GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
             @Override
@@ -183,14 +165,13 @@ public class Biosim implements EntryPoint {
 			
 			connectionsSectionContent.add(NodePanel.create(getDatabaseAccessLayer().getConnections(), _dndController, DndType.Connection));
 			
-			labelsSectionContent.add(
+			_labelTreeBuilder = 
 					new LabelTreeBuilder(
-							_databaseAccessLayer._dataSet
-							, getAgentUid()
-							, getDatabaseAccessLayer().getLabelRoots()
+							getAgentUid()
+							, _databaseAccessLayer
 							, _dndController
-					).getTree()
-			);
+					);
+			labelsSectionContent.add(_labelTreeBuilder.getTree());
 			
 			labelsSectionContent.add(new ConnectionViewDropSiteBuilder(_dndController).getWidget());
 			
@@ -268,7 +249,7 @@ public class Biosim implements EntryPoint {
 
 //		DialogHelper.alert("using wsUrl = " + wsUrl);
 		
-		_socket = new BiosimWebSocket(wsUrl, _messageHandler);
+		_socket = new BiosimWebSocket(wsUrl, new MessageHandler());
 		
 		_databaseAccessLayer.setSocket(_socket);
 		
@@ -313,64 +294,6 @@ public class Biosim implements EntryPoint {
 	public DatabaseAccessLayer getDatabaseAccessLayer() {
 		return _databaseAccessLayer;
 	}
-	
-	void processCreateNodes(CreateNodes cn) {
-		
-		List<Label> newLabels = ListX.create();
-		for ( Node n : cn.getNodes() ) {
-			if ( n instanceof Label && !_databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid()) ) {
-				newLabels.add((Label) n);
-			}
-		}
-		
-		ObservableList<Node> nodes = _databaseAccessLayer.getNodes();
-		for ( Node n : cn.getNodes() ) {
-			if ( !(n instanceof Link) ) {
-				if ( _databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid() ) ) {
-					int i = nodes.indexOf(n);
-					nodes.set(i, n);
-				} else {
-					nodes.add(n);
-				}
-			}
-		}
-		for ( Node n : cn.getNodes() ) {
-			if ( n instanceof Link ) {
-				Link l = (Link) n;
-				if ( l.getFromNode() != null && l.getToNode() != null ) {
-					if ( _databaseAccessLayer.getDataSet().nodesByUid.containsKey(n.getUid() ) ) {
-						int i = nodes.indexOf(n);
-						nodes.set(i, n);
-					} else {
-						nodes.add(n);
-					}
-				} else {
-					LogTool.warn("link has missing nodes " + l.getUid() + " from=" + l.getFrom() + " to=" + l.getTo());
-				}
-			}
-		}
-		Uid agentUid = getAgentUid();
-		for ( Label label : newLabels ) {
-			List<Node> parents = label.getParents();
-			for ( Node p : parents ) {
-				if ( p.getUid().equals(agentUid)) {
-					_databaseAccessLayer.getLabelRoots().add(label);
-					break;
-				}
-			}
-		}
-		_databaseAccessLayer.fireRefreshContentPane();
-	}
-	
-	void processRemoveNodes(RemoveNodes rn) {
-		for ( Uid uid : rn.getUidList() ) {
-			_databaseAccessLayer.removeNode(uid);
-		}
-	}
-
-	void processClearDataSet() {
-		_databaseAccessLayer.getDataSet().clear();
-	}
 
 	public Uid getAgentUid() {
 		String agentUid = Window.Location.getParameter("agentUid");
@@ -381,6 +304,10 @@ public class Biosim implements EntryPoint {
 		} else {
 			return new Uid(agentUid);
 		}
+	}
+	
+	public LabelTreeBuilder getLabelTreeBuilder() {
+		return _labelTreeBuilder;
 	}
 	
 	public Uid getSenderUid() {
