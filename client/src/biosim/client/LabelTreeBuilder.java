@@ -73,7 +73,6 @@ public class LabelTreeBuilder {
 				
 			}
 		});
-	}
 	
 		_remoteServices = remoteServices;
 		_socket = socket;
