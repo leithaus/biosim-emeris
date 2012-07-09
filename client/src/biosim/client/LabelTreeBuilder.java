@@ -3,6 +3,7 @@ package biosim.client;
 import m3.fj.F1;
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
+import m3.gwt.props.ChangeEvent;
 
 import org.vectomatic.file.File;
 import org.vectomatic.file.FileList;
@@ -57,6 +58,16 @@ public class LabelTreeBuilder {
 		_agentUid = agentUid;
 		_databaseAccessLayer = databaseAccessLayer;
 		_dndController = dndController;
+		MLabel.Context.addListener(new m3.gwt.props.ChangeListener(){
+			@Override
+			public boolean async() {
+				return true;
+			}
+			@Override
+			public void change(ChangeEvent ce) {
+				
+			}
+		});
 	}
 	
 	public void setSocket(BiosimWebSocket socket) {
