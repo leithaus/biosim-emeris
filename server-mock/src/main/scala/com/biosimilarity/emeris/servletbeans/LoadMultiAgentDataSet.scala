@@ -38,7 +38,8 @@ class LoadMultiAgentDataSet @Inject() (
   
   def doPost = {
     
-    val attributes = request.getAttributeNames.asScala.map(attr=>request.getAttribute(attr)) toList
+    val attributes = List[Object]()
+//    val attributes = request.getAttributeNames.asScala.map(attr=>request.getAttribute(attr)) toList
     val uploadedFile = attributes collect { case uf: UploadedFile  => uf } head
     
     val jsonMessage = uploadedFile.getTempFile.readText
