@@ -5,8 +5,6 @@ import m3.predef._
 import com.biosimilarity.emeris.newmodel.Model._
 import biosim.client.messages.protocol.Request
 import biosim.client.messages.protocol.QueryRequest
-import biosim.client.messages.protocol.ConnectionsRequest
-import biosim.client.messages.protocol.ConnectionsResponse
 import com.biosimilarity.emeris.newmodel.DatabaseFactory
 
 object SocketManager extends Logging{

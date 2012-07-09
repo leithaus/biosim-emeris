@@ -8,8 +8,6 @@ import net.liftweb.json.JsonDSL._
 import com.biosimilarity.emeris.newmodel.DatabaseFactory
 import biosim.client.messages.protocol.Request
 import biosim.client.messages.protocol.QueryRequest
-import biosim.client.messages.protocol.ConnectionsRequest
-import biosim.client.messages.protocol.ConnectionsResponse
 import com.biosimilarity.emeris.newmodel.Model.Node
 import biosim.client.model.{ 
    Connection => ClientConnection, 
@@ -25,10 +23,12 @@ import biosim.client.messages.protocol.CreateNodesRequest
 import biosim.client.messages.protocol.Response
 import predef._
 import com.biosimilarity.emeris.newmodel.Model._
-import biosim.client.messages.protocol.LabelRequest
-import biosim.client.messages.protocol.LabelResponse
 import biosim.client.messages.model.MConnection
 import biosim.client.messages.model.MLabel
+import biosim.client.messages.protocol.FetchRequest
+import biosim.client.messages.protocol.FetchResponse
+import biosim.client.messages.protocol.SelectRequest
+import biosim.client.messages.protocol.SelectResponse
 
 object SwitchBoard extends Logging {
 
@@ -50,15 +50,15 @@ object SwitchBoard extends Logging {
     val db = DatabaseFactory.database(socket.agentUid)
     val dao = db.dao
     val responseBody = request.getRequestBody match {
-      case req: LabelRequest => {
-        val body = new LabelResponse
-        val parent = db.fetch[Node](req.getParent).get
+      case req: FetchRequest => {
+        val body = new FetchResponse
+        val node = db.fetch[Node](req.getUid).get
         val l = new MLabel
         val children = dao.
-          childLabels(parent).
+          childLabels(node).
           map(cl=>toClientUid(cl.uid)).
           toList
-        parent match {
+        node match {
           case label: Label => {
             l.setName(label.name)
             l.setUid(label.uid)
@@ -68,21 +68,31 @@ object SwitchBoard extends Logging {
             l.setName(agent.name)
             l.setUid(agent.uid)
           }
-          case _ => sys.error("don't know how to handle type " + parent)
+          case _ => sys.error("don't know how to handle type " + node)
         }
         l.setChildren(children.asJava)
         
-        body.setLabel(l)
+        body.setNode(l)
         Some(body)
       }
       case qr: QueryRequest => None
-      case cr: ConnectionsRequest => {
-        val connections = dao.connections.map { c =>
-          val cc = new MConnection(c.uid, c.name)
-          c.icon.foreach(i=>cc.setIcon(i))
-          cc
+      case sr: SelectRequest => {
+        sr.getShortClassname match {
+          case "MConnection" => {
+            val connections = db.
+              nodes.
+              collect{case c: Connection => c}.
+              map { c =>
+                val cc = new MConnection(c.uid, c.name)
+                c.icon.foreach(i=>cc.setIcon(i))
+                cc              
+              }
+            val resp = new SelectResponse
+            resp.setNodes(connections.toList)
+            Some(resp)
+          }
+          case _ => sys.error("don't know how to handle " + sr.getShortClassname)
         }
-        Some(new ConnectionsResponse(connections.toList))
       }
       case cnr: CreateNodesRequest => {
         cnr.getNodes.asScala.map {

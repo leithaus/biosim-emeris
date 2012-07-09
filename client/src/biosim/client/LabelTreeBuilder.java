@@ -1,6 +1,5 @@
 package biosim.client;
 
-import m3.fj.F1;
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 import m3.gwt.props.ChangeEvent;
@@ -14,8 +13,7 @@ import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.MLabel;
-import biosim.client.messages.protocol.LabelRequest;
-import biosim.client.messages.protocol.LabelResponse;
+import biosim.client.messages.model.RemoteServices;
 import biosim.client.model.Blob;
 import biosim.client.model.DataSet;
 import biosim.client.model.Image;
@@ -51,13 +49,20 @@ public class LabelTreeBuilder {
 	final Uid _agentUid;
 	final DatabaseAccessLayer _databaseAccessLayer;
 	final DndController _dndController;
+	final RemoteServices _remoteServices;	
+	final BiosimWebSocket _socket;
 	
-	BiosimWebSocket _socket;
-	
-	LabelTreeBuilder(Uid agentUid, DatabaseAccessLayer databaseAccessLayer, DndController dndController) {
+	LabelTreeBuilder(
+			Uid agentUid, 
+			DatabaseAccessLayer databaseAccessLayer, 
+			DndController dndController, 
+			RemoteServices remoteServices,
+			BiosimWebSocket socket
+	) {
 		_agentUid = agentUid;
 		_databaseAccessLayer = databaseAccessLayer;
 		_dndController = dndController;
+
 		MLabel.Context.addListener(new m3.gwt.props.ChangeListener(){
 			@Override
 			public boolean async() {
@@ -70,7 +75,7 @@ public class LabelTreeBuilder {
 		});
 	}
 	
-	public void setSocket(BiosimWebSocket socket) {
+		_remoteServices = remoteServices;
 		_socket = socket;
 		addRootLabelsForAgent(_agentUid);
 	}
@@ -295,13 +300,13 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
-		_socket.send(new LabelRequest(agentUid), new F1<LabelResponse, Void>() {
+		_remoteServices.fetch(agentUid, new Function1<MLabel,Void>() {
 			@Override
-			public Void f(LabelResponse a) {
-				addChildren(a.getLabel(), null);
+			public Void apply(MLabel label) {
+				addChildren(label, null);
 				return null;
 			}
-		});		
+		});
 	}
 
 	MLabel getUserObject(TreeItem ti) {
@@ -316,14 +321,14 @@ public class LabelTreeBuilder {
 	void addChildren(final biosim.client.messages.model.MLabel parent, final TreeItem parentTi) {
 		for ( Uid ch0 : parent.getChildren() ) {
 			final Uid ch = ch0;
-			_socket.send(new LabelRequest(ch), new F1<LabelResponse, Void>() {
+			_remoteServices.fetch(ch, new Function1<MLabel,Void>() {
 				@Override
-				public Void f(LabelResponse a) {
-					TreeItem ti = createTreeItem(parentTi, a.getLabel());
+				public Void apply(MLabel label) {
+					TreeItem ti = createTreeItem(parentTi, label);
 					if ( parentTi == null ) {
 						_tree.addItem(ti);
 					}
-					addChildren(a.getLabel(), ti);
+					addChildren(label, ti);
 					return null;
 				}
 			});
