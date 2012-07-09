@@ -1,7 +1,11 @@
 package biosim.client;
 
 import static com.google.gwt.query.client.GQuery.$;
+import m3.gwt.lang.Function1;
 import m3.gwt.lang.LogTool;
+import biosim.client.messages.model.NodeContainer;
+import biosim.client.messages.model.RemoteServices;
+import biosim.client.messages.model.RemoteServicesImpl;
 import biosim.client.messages.protocol.MessageHandler;
 import biosim.client.model.Connection;
 import biosim.client.model.Node;
@@ -53,6 +57,8 @@ public class Biosim implements EntryPoint {
 	CustomTabPanel _contentSection = new CustomTabPanel();
 	CustomTabPanel _connectionsSection = new CustomTabPanel();
 
+	FlowPanel _labelsSectionContent;
+	
 	ContentController _contentController;
 	
 	FilterBar _filtersBar = new FilterBar(this);
@@ -68,6 +74,7 @@ public class Biosim implements EntryPoint {
 	Uid _senderUid = Uid.random();
 	
 	BiosimWebSocket _socket;
+	RemoteServices _remoteServices;
 	
 	AgentManagerPanel _agentManagerPanel;
 	
@@ -136,7 +143,7 @@ public class Biosim implements EntryPoint {
 			_labelsSection.setSize("100%", "100%");
 			_labelsSection.setTabStyleNames("ui-state-default ui-corner-top");
 			_labelsSection.setSelectedTabStyleNames("ui-state-active ui-corner-top");
-			FlowPanel labelsSectionContent = _labelsSection.createTab("Labels");
+			_labelsSectionContent = _labelsSection.createTab("Labels");
 			_labelsSection.selectTab(0);
 			
 			_contentSection.setSize("100%", "100%");
@@ -164,16 +171,6 @@ public class Biosim implements EntryPoint {
 			contentSectionContent.add(_contentController._contentPanel);
 			
 			connectionsSectionContent.add(NodePanel.create(getDatabaseAccessLayer().getConnections(), _dndController, DndType.Connection));
-			
-			_labelTreeBuilder = 
-					new LabelTreeBuilder(
-							getAgentUid()
-							, _databaseAccessLayer
-							, _dndController
-					);
-			labelsSectionContent.add(_labelTreeBuilder.getTree());
-			
-			labelsSectionContent.add(new ConnectionViewDropSiteBuilder(_dndController).getWidget());
 			
 			_contentController.refilterContent();
 			
@@ -249,10 +246,30 @@ public class Biosim implements EntryPoint {
 
 //		DialogHelper.alert("using wsUrl = " + wsUrl);
 		
-		_socket = new BiosimWebSocket(wsUrl, new MessageHandler());
-		
-		_databaseAccessLayer.setSocket(_socket);
-		
+		_socket = new BiosimWebSocket(wsUrl, new MessageHandler(), new Function1<Void, Void>() {
+			
+			@Override
+			public Void apply(Void t) {
+				_remoteServices = new RemoteServicesImpl(_socket, NodeContainer.get());
+				
+				_databaseAccessLayer.setSocket(_socket);
+				
+				_labelTreeBuilder = 
+						new LabelTreeBuilder(
+								getAgentUid()
+								, _databaseAccessLayer
+								, _dndController
+								, _remoteServices
+								, _socket
+						);
+				_labelsSectionContent.add(_labelTreeBuilder.getTree());
+				
+				_labelsSectionContent.add(new ConnectionViewDropSiteBuilder(_dndController).getWidget());
+				
+				return null;
+			}
+		});
+
 	}
 
 	void removeContentLinks(Node node) {

@@ -1,6 +1,5 @@
 package biosim.client.messages.protocol;
 
-import biosim.client.Biosim;
 import biosim.client.utils.BiosimWebSocket;
 
 
@@ -17,7 +16,6 @@ public class MessageHandler {
 	}
 	
 	public void connect(BiosimWebSocket socket) {
-		Biosim.get().getLabelTreeBuilder().setSocket(socket);
 	}
 	
 }

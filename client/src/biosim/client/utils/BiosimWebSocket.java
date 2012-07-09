@@ -3,6 +3,7 @@ package biosim.client.utils;
 import java.util.Map;
 
 import m3.fj.F1;
+import m3.gwt.lang.Function1;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
 import m3.gwt.websocket.SimpleWebSocketFactory;
@@ -21,7 +22,7 @@ public class BiosimWebSocket {
     WebSocket _impl;
     Map<Uid,F1<Object,Object>> _responseHandlers = MapX.create();
 
-    public BiosimWebSocket(String url, final MessageHandler messageHandler) {
+    public BiosimWebSocket(String url, final MessageHandler messageHandler, final Function1<Void,Void> onConnect) {
         _impl = new SimpleWebSocketFactory().create(url, new WebSocket.AbstractHandler() {
         	@Override
             public void onError(String msg) {
@@ -31,6 +32,7 @@ public class BiosimWebSocket {
             public void onOpen() {
                 GWT.log("websocket openned");
                 messageHandler.connect(BiosimWebSocket.this);
+                onConnect.apply(null);
             }
             @Override
             public IncomingMessage deserialize(String jsonMsg) {
@@ -52,9 +54,9 @@ public class BiosimWebSocket {
     }
 
     @SuppressWarnings("unchecked")
-	public void send(final RequestBody body, F1<?,?> responseHandler) {
+	public void send(final RequestBody body, Function1<?,?> responseHandler) {
     	Request request = send(body);
-    	_responseHandlers.put(request.getUid(), (F1<Object,Object>) responseHandler);
+    	_responseHandlers.put(request.getUid(), (Function1<Object,Object>) responseHandler);
     }
 
     public Request send(final RequestBody body) {
