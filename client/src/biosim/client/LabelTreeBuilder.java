@@ -136,7 +136,7 @@ public class LabelTreeBuilder {
 		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					Biosim.get().getRemoteServices().insertChild(parent, new MLabel(t));
+					_remoteServices.insertChild(parent, new MLabel(t));
 				}
 				return null;
 			}
