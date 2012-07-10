@@ -1,9 +1,5 @@
 package biosim.client.messages.model;
 
-
-
-
-
 public class MLink extends MNode {
 
 	private Uid _from;
@@ -25,7 +21,7 @@ public class MLink extends MNode {
 	public String toString() {
 		return "Link(" + _from + ", " + _to + ")";
 	}
-	
+
 	// BEGIN_GENERATED_CODE
 	
 	public biosim.client.messages.model.Uid getFrom() {
