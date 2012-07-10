@@ -10,12 +10,15 @@ import org.vectomatic.file.FileUploadExt;
 import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
+import biosim.client.eventlist.ListEvent;
+import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.MBlob;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
 import biosim.client.messages.model.MNode;
+import biosim.client.messages.model.NodeContainer;
 import biosim.client.messages.model.RemoteServices;
 import biosim.client.messages.model.Uid;
 import biosim.client.ui.NodeWidgetBuilder;
@@ -58,9 +61,37 @@ public class LabelTreeBuilder {
 	) {
 		_agentUid = agentUid;
 		_dndController = dndController;
+
+		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
+			@Override
+			public void event(ListEvent<MNode> event) {
+				if (event.getElement() instanceof MLabel) {
+					MLabel label = (MLabel)event.getElement();
+					for (int i = 0; i < _tree.getItemCount(); i += 1) {
+						TreeItem ti = _tree.getItem(i);
+						updateTreeItemOnChange(ti, label);
+					}
+				} else if (event.getElement() instanceof MLink) {
+					
+				}
+			}
+		});
+	
 		_remoteServices = remoteServices;
 		_socket = socket;
 		addRootLabelsForAgent(_agentUid);
+	}
+	
+	void updateTreeItemOnChange(TreeItem ti, MLabel label) {
+		MLabel ml = getUserObject(ti);
+		if (ml.getUid() == label.getUid()) {
+			ti.setText(label.getName());
+		} else {
+			for (int j = 0; j < ti.getChildCount(); j += 1) {
+				TreeItem t2 = ti.getChild(j);
+				this.updateTreeItemOnChange(t2, label);
+			}
+		}
 	}
 	
 	TreeItem createTreeItem(TreeItem parent, MLabel label) {
