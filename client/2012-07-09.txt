@@ -1,0 +1,20 @@
+
+
+
+* label tree builder
+    * catch changes to MLabel and those changes reflect in the tree 
+        * changes to name
+        * changes to icon
+        * changes to children
+    * use MLabel.Context.addListener() to listen for changes to ALL MLabel instances        
+    * download children on demand
+    * root nodes are a special case (the parent in that case isn't a label it is an Agent and it is just made to behave/mock like a label)
+    * use cases worth noting
+        * a child can have multiple parents
+        * a parent can have multiple children
+    * TBD
+        * handling server side pushes of changes    
+        
+      
+* remote model
+    * move away from using biosim.client.model      
