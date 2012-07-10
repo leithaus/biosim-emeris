@@ -14,6 +14,7 @@ import biosim.client.model.{
    Blob => ClientBlob, 
    Label => ClientLabel, 
    Link => ClientLink, 
+   Node => ClientNode,
    Uid => ClientUid
    }
 import biosim.client.messages.model.{ BlobRef => ClientBlobRef }
@@ -25,10 +26,12 @@ import predef._
 import com.biosimilarity.emeris.newmodel.Model._
 import biosim.client.messages.model.MConnection
 import biosim.client.messages.model.MLabel
+import biosim.client.messages.model.MNode
 import biosim.client.messages.protocol.FetchRequest
 import biosim.client.messages.protocol.FetchResponse
 import biosim.client.messages.protocol.SelectRequest
 import biosim.client.messages.protocol.SelectResponse
+import biosim.client.messages.protocol.CreateNodesResponse
 
 object SwitchBoard extends Logging {
 
@@ -52,27 +55,8 @@ object SwitchBoard extends Logging {
     val responseBody = request.getRequestBody match {
       case req: FetchRequest => {
         val body = new FetchResponse
-        val node = db.fetch[Node](req.getUid).get
-        val l = new MLabel
-        val children = dao.
-          childLabels(node).
-          map(cl=>toClientUid(cl.uid)).
-          toList
-        node match {
-          case label: Label => {
-            l.setName(label.name)
-            l.setUid(label.uid)
-            l.setIcon(label.icon)
-          }
-          case agent: Agent => {
-            l.setName(agent.name)
-            l.setUid(agent.uid)
-          }
-          case _ => sys.error("don't know how to handle type " + node)
-        }
-        l.setChildren(children.asJava)
-        
-        body.setNode(l)
+        val serverNode = db.fetch[Node](req.getUid).get
+        body.setNode(toClientNode(serverNode, dao))
         Some(body)
       }
       case qr: QueryRequest => None
@@ -82,11 +66,7 @@ object SwitchBoard extends Logging {
             val connections = db.
               nodes.
               collect{case c: Connection => c}.
-              map { c =>
-                val cc = new MConnection(c.uid, c.name)
-                c.icon.foreach(i=>cc.setIcon(i))
-                cc              
-              }
+              map(c=>toClientNode(c, dao))
             val resp = new SelectResponse
             resp.setNodes(connections.toList)
             Some(resp)
@@ -95,22 +75,70 @@ object SwitchBoard extends Logging {
         }
       }
       case cnr: CreateNodesRequest => {
-        cnr.getNodes.asScala.map {
-          case b: ClientBlob => Blob(b.getRef.getAgentUid, b.getRef.getFilename, b.getDataInBase64, b.getUid)
-          case l: ClientLabel => Label(l.getName, l.getIconRef, l.getUid)
-          case l: ClientLink => Link(l.getFrom, l.getTo)
-        } foreach (n => db.insert(n))
+        val nodes = cnr.
+          getNodes.
+          asScala.
+          map(toServerNode)
+        nodes.
+          foreach(n => db.insert(n))
+        
+        val response = new CreateNodesResponse
+        response.setNodes(
+            cnr.
+              getNodes.
+              asScala.
+              filterNot(_.isInstanceOf[ClientBlob]).
+              asJava
+        )
+        SocketManager.
+          socketsByAgentUid(socket.agentUid).
+          foreach(_.send(response))
+          
         None
       }
       case _ => sys.error("don't know how to handle type " + request.getClass)
     }
-    responseBody.foreach { body =>
-      val response = new Response
-      response.setRequestUid(request.getUid)
-      response.setResponseBody(body)
-      val jsonResponse = BiosimServerSerializer.toJson(response, response.getClass)
-      socket.rawSend(jsonResponse)
+    responseBody.foreach(rb=>socket.send(rb, request))
+  }
+  
+  def toClientNode(sn: Node, dao: AgentDAO): MNode = {
+    sn match {
+      case sa: Agent => { // hack to make agent look like a set of labels since that is the idiom we use to get the root labels 
+        val l = new MLabel
+        val children = dao.
+          childLabels(sn).
+          map(cl => toClientUid(cl.uid)).
+          toList
+        l.setName(sa.name)
+        l.setUid(sa.uid)
+        l.setChildren(children)
+        l
+      }
+      case label: Label => {
+        val l = new MLabel
+        l.setName(label.name)
+        l.setUid(label.uid)
+        l.setIcon(label.icon)
+        val children = dao.
+          childLabels(sn).
+          map(cl => toClientUid(cl.uid)).
+          toList
+        l.setChildren(children)
+        l
+      }
+      case conn: Connection => 
+        new MConnection(conn.uid, conn.name, conn.icon)
+        
+      case _ => sys.error("don't know how to handle type " + sn)
+      
     }
+  }
+  
+  def toServerNode(cn: ClientNode): Node = cn match {
+    case b: ClientBlob => Blob(b.getRef.getAgentUid, b.getRef.getFilename, b.getDataInBase64, b.getUid)
+    case l: ClientLabel => Label(l.getName, l.getIconRef, l.getUid)
+    case l: ClientLink => Link(l.getFrom, l.getTo)
+    case _ => sys.error("don't know how to handle type " + cn)
   }
   
 }

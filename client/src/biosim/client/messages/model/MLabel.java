@@ -1,13 +1,12 @@
 package biosim.client.messages.model;
 
-import java.util.List;
-
+import m3.fj.data.FList;
 import biosim.client.model.Uid;
 
 public class MLabel extends MNode {
 
 	private BlobRef _icon;
-	private List<Uid> _children;
+	private FList<Uid> _children;
 	
 	// BEGIN_GENERATED_CODE
 	
@@ -22,14 +21,14 @@ public class MLabel extends MNode {
 	     _icon = icon0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.icon, before, icon0);
 	}
-	public java.util.List<biosim.client.model.Uid> getChildren() {
+	public m3.fj.data.FList<biosim.client.model.Uid> getChildren() {
 	    return _children;
 	}
-	public void setChildren(java.util.List<biosim.client.model.Uid> children0) {
+	public void setChildren(m3.fj.data.FList<biosim.client.model.Uid> children0) {
 	    _setChildren(children0);
 	}
-	protected void _setChildren(java.util.List<biosim.client.model.Uid> children0) {
-	    java.util.List<biosim.client.model.Uid> before = _children;
+	protected void _setChildren(m3.fj.data.FList<biosim.client.model.Uid> children0) {
+	    m3.fj.data.FList<biosim.client.model.Uid> before = _children;
 	     _children = children0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.children, before, children0);
 	}
@@ -42,9 +41,9 @@ public class MLabel extends MNode {
 	    	    protected biosim.client.messages.model.BlobRef getImpl(MLabel bean) { return bean.getIcon(); }
 	    	    protected void setImpl(MLabel bean, biosim.client.messages.model.BlobRef value ) { bean.setIcon(value);}
 	    };
-	    public m3.gwt.props.PropertyContext children = new m3.gwt.props.impl.AbstractPropertyContext<MLabel,java.util.List<biosim.client.model.Uid>>(this, "children", java.util.List.class, 1, biosim.client.model.Uid.class, false) {
-	    	    protected java.util.List<biosim.client.model.Uid> getImpl(MLabel bean) { return bean.getChildren(); }
-	    	    protected void setImpl(MLabel bean, java.util.List<biosim.client.model.Uid> value ) { bean.setChildren(value);}
+	    public m3.gwt.props.PropertyContext children = new m3.gwt.props.impl.AbstractPropertyContext<MLabel,m3.fj.data.FList<biosim.client.model.Uid>>(this, "children", m3.fj.data.FList.class, 1, biosim.client.model.Uid.class, false) {
+	    	    protected m3.fj.data.FList<biosim.client.model.Uid> getImpl(MLabel bean) { return bean.getChildren(); }
+	    	    protected void setImpl(MLabel bean, m3.fj.data.FList<biosim.client.model.Uid> value ) { bean.setChildren(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = MNode.Context.uid;
 	    public m3.gwt.props.PropertyContext name = MNode.Context.name;

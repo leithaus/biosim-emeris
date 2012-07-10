@@ -30,7 +30,7 @@ object InsertMinimalDataSet extends App {
 
     lazy val agent = add(Agent("me", uid=agentUid))
 
-    def newConnection(name: String) = add(Connection(name))
+//    def newConnection(name: String) = add(Connection(name))
     def newLabel(name: String, icon: BlobRef) = add(Label(name, icon))
     def newAddress(address: String) = add(Address(address))
     def newPhone(phone: String) = add(Phone(phone))
