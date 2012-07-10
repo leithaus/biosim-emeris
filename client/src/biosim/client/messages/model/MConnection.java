@@ -1,10 +1,11 @@
 package biosim.client.messages.model;
 
 
-public class MConnection extends MNamedNode {
+public class MConnection extends MNode {
 
 	private BlobRef _icon;
 	private Uid _remoteAgent;
+	private String _name;
 	
 	public MConnection() {
 	}
@@ -12,6 +13,11 @@ public class MConnection extends MNamedNode {
 	public MConnection(Uid _uid, String _name, BlobRef _icon, Uid _remoteAgent) {
 		this._icon = _icon;
 		this._remoteAgent = _remoteAgent;
+	}
+	
+	@Override
+	public String toHtmlString() {
+		return getName();
 	}
 	
 	// BEGIN_GENERATED_CODE
@@ -38,6 +44,17 @@ public class MConnection extends MNamedNode {
 	     _remoteAgent = remoteAgent0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.remoteAgent, before, remoteAgent0);
 	}
+	public java.lang.String getName() {
+	    return _name;
+	}
+	public void setName(java.lang.String name0) {
+	    _setName(name0);
+	}
+	protected void _setName(java.lang.String name0) {
+	    java.lang.String before = _name;
+	     _name = name0;
+	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.name, before, name0);
+	}
 	@Override
 	public String toString() {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
@@ -51,20 +68,24 @@ public class MConnection extends MNamedNode {
 	    	    protected biosim.client.messages.model.Uid getImpl(MConnection bean) { return bean.getRemoteAgent(); }
 	    	    protected void setImpl(MConnection bean, biosim.client.messages.model.Uid value ) { bean.setRemoteAgent(value);}
 	    };
-	    public m3.gwt.props.PropertyContext name = MNamedNode.Context.name;
+	    public m3.gwt.props.PropertyContext name = new m3.gwt.props.impl.AbstractPropertyContext<MConnection,java.lang.String>(this, "name", java.lang.String.class, 2, null, false) {
+	    	    protected java.lang.String getImpl(MConnection bean) { return bean.getName(); }
+	    	    protected void setImpl(MConnection bean, java.lang.String value ) { bean.setName(value);}
+	    };
+	    public m3.gwt.props.PropertyContext uid = MNode.Context.uid;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
 	        set = set.insert("biosim.client.messages.model.MConnection");
-	        set = set.insert("java.lang.Object");
 	        set = set.insert("biosim.client.messages.model.MNode");
-	        set = set.insert("biosim.client.messages.model.MNamedNode");
+	        set = set.insert("java.lang.Object");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
-	        list = list.cons(this.name);
+	        list = list.cons(this.uid);
 	        list = list.cons(this.icon);
 	        list = list.cons(this.remoteAgent);
+	        list = list.cons(this.name);
 	        return list;
 	    }
 	    public MConnection newInstance() {

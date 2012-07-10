@@ -76,8 +76,8 @@ public class RemoteServicesImpl implements RemoteServices {
 	}
 	
 	@Override
-	public void insertOrUpdate(MNode...node) {
-		_socket.send(new CreateNodesRequest(node));
+	public void insertOrUpdate(MNode...nodes) {
+		_socket.send(new CreateNodesRequest(nodes));
 	}
 	
 	@Override

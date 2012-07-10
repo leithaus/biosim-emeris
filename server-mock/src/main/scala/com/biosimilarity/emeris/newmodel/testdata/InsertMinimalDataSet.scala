@@ -31,7 +31,7 @@ object InsertMinimalDataSet extends App {
     lazy val agent = add(Agent("me", uid=agentUid))
 
 //    def newConnection(name: String) = add(Connection(name))
-    def newLabel(name: String, icon: BlobRef) = add(Label(name, icon))
+    def newLabel(name: String, icon: Option[BlobRef]) = add(Label(name, icon))
     def newAddress(address: String) = add(Address(address))
     def newPhone(phone: String) = add(Phone(phone))
     def newMessage(msg: String) = add(TextMessage(msg))
@@ -54,13 +54,13 @@ object InsertMinimalDataSet extends App {
 //    val icon = newImageFromFile("../client/war/friends/cool-icon.png")
     val icon = newImage("aliasIcon.png", base64DefaultIcon)
     
-    val rootLabel = add(Label("me", icon.blobRef))
+    val rootLabel = add(Label("me", Some(icon.blobRef)))
     addLink(agent, rootLabel)
 
-    val aa = add(Label("aa", icon.blobRef))
+    val aa = add(Label("aa", Some(icon.blobRef)))
     addLink(rootLabel, aa)
     
-    val bb = add(Label("bb", icon.blobRef))
+    val bb = add(Label("bb", Some(icon.blobRef)))
     addLink(aa, bb)
     
   }

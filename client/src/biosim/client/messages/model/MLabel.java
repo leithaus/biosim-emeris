@@ -2,20 +2,36 @@ package biosim.client.messages.model;
 
 import m3.fj.data.FList;
 
-public class MLabel extends MNamedNode {
+public class MLabel extends MNode {
 
 	private BlobRef _icon;
 	private FList<Uid> _children;
+	private String _name;
 	
 	public MLabel() {
 	}
 
 	public MLabel(String _name) {
+		this._name = _name;
 	}
 
 	@Override
+	public String toHtmlString() {
+		return _name;
+	}
+	
+	@Override
+	public String getName() {
+		return _name;
+	}
+	
+	@Override
 	public String getIconUrl() {
-		return _icon.getUrl();
+		if ( _icon == null ) {
+			return "/images/tag.png";
+		} else {
+			return _icon.getUrl();
+		}
 	}
 	
 	// BEGIN_GENERATED_CODE
@@ -42,6 +58,14 @@ public class MLabel extends MNamedNode {
 	     _children = children0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.children, before, children0);
 	}
+	public void setName(java.lang.String name0) {
+	    _setName(name0);
+	}
+	protected void _setName(java.lang.String name0) {
+	    java.lang.String before = _name;
+	     _name = name0;
+	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.name, before, name0);
+	}
 	@Override
 	public String toString() {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
@@ -55,20 +79,24 @@ public class MLabel extends MNamedNode {
 	    	    protected m3.fj.data.FList<biosim.client.messages.model.Uid> getImpl(MLabel bean) { return bean.getChildren(); }
 	    	    protected void setImpl(MLabel bean, m3.fj.data.FList<biosim.client.messages.model.Uid> value ) { bean.setChildren(value);}
 	    };
-	    public m3.gwt.props.PropertyContext name = MNamedNode.Context.name;
+	    public m3.gwt.props.PropertyContext name = new m3.gwt.props.impl.AbstractPropertyContext<MLabel,java.lang.String>(this, "name", java.lang.String.class, 2, null, false) {
+	    	    protected java.lang.String getImpl(MLabel bean) { return bean.getName(); }
+	    	    protected void setImpl(MLabel bean, java.lang.String value ) { bean.setName(value);}
+	    };
+	    public m3.gwt.props.PropertyContext uid = MNode.Context.uid;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
-	        set = set.insert("java.lang.Object");
 	        set = set.insert("biosim.client.messages.model.MNode");
+	        set = set.insert("java.lang.Object");
 	        set = set.insert("biosim.client.messages.model.MLabel");
-	        set = set.insert("biosim.client.messages.model.MNamedNode");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
-	        list = list.cons(this.name);
+	        list = list.cons(this.uid);
 	        list = list.cons(this.icon);
 	        list = list.cons(this.children);
+	        list = list.cons(this.name);
 	        return list;
 	    }
 	    public MLabel newInstance() {

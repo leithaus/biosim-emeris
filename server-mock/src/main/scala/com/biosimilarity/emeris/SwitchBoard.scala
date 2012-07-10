@@ -35,8 +35,14 @@ object SwitchBoard extends Logging {
   implicit def toServerUid(clientUid: ClientUid) = Uid(clientUid.getValue)
   implicit def toClientUid(serverUid: Uid) = new ClientUid(serverUid.value)
   
-  implicit def toServerBlobRef(cbr: ClientBlobRef) = BlobRef(cbr.getAgentUid, cbr.getBlobUid, cbr.getFilename)
-  implicit def toClientBlobRef(br: BlobRef) = new ClientBlobRef(br.agentUid, br.blobUid, br.filename)
+  implicit def toServerBlobRef(cbr: ClientBlobRef) = cbr match {
+    case null => None
+    case _ => Some(BlobRef(cbr.getAgentUid, cbr.getBlobUid, cbr.getFilename))
+  }
+  implicit def toClientBlobRef(bro: Option[BlobRef]) = bro match {
+    case None => null
+    case Some(br) =>new ClientBlobRef(br.agentUid, br.blobUid, br.filename)
+  }
 
   def onConnect(socket: Socket) = {}
   
@@ -87,10 +93,7 @@ object SwitchBoard extends Logging {
               filterNot(_.isInstanceOf[MBlob]).
               asJava
         )
-        SocketManager.
-          socketsByAgentUid(socket.agentUid).
-          foreach(_.send(response))
-          
+        SocketManager.broadcast(socket.agentUid, response)
         None
       }
       case _ => sys.error("don't know how to handle type " + request.getClass)
