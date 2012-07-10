@@ -2,12 +2,12 @@ package biosim.client.messages.model;
 
 import java.util.Map;
 
+import m3.gwt.lang.Function1;
 import m3.gwt.lang.MapX;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
-import biosim.client.model.Uid;
 
 public class NodeContainer {
 
@@ -36,12 +36,35 @@ public class NodeContainer {
 			}
 		});
 	}
+
+	public final ObservableList<MConnection> connections = nodes.
+			filter(new Function1<MNode, Boolean>() {
+				@Override
+				public Boolean apply(MNode t) {
+					return t instanceof MConnection;
+				}
+			}).
+			map(new Function1<MNode,MConnection>() {
+				public MConnection apply(MNode t) {
+					return (MConnection) t;
+				}
+			});
 	
 	public final Map<Uid,MNode> nodesByUid = MapX.create();
 
 	private NodeContainer() {
 	}
 
+	public void insertOrUpdate(MNode node) {
+		MNode localNode = nodesByUid.get(node.getUid());
+		if ( localNode == null ) {
+			nodes.add(node);
+		} else {
+			int i = nodes.indexOf(localNode);
+			nodes.set(i, node);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T extends MNode> T fetch(Uid uid) {
 		return (T) nodesByUid.get(uid);

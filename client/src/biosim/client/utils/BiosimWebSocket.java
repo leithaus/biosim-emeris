@@ -9,11 +9,11 @@ import m3.gwt.lang.MapX;
 import m3.gwt.websocket.SimpleWebSocketFactory;
 import m3.gwt.websocket.WebSocket;
 import m3.gwt.websocket.WebSocket.IncomingMessage;
+import biosim.client.messages.model.Uid;
 import biosim.client.messages.protocol.MessageHandler;
 import biosim.client.messages.protocol.Request;
 import biosim.client.messages.protocol.RequestBody;
 import biosim.client.messages.protocol.Response;
-import biosim.client.model.Uid;
 
 import com.google.gwt.core.client.GWT;
 

@@ -1,6 +1,5 @@
 package biosim.client;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,11 +8,10 @@ import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
-import biosim.client.eventlist.ObservableList;
-import biosim.client.model.Connection;
-import biosim.client.model.Label;
-import biosim.client.model.Node;
-import biosim.client.model.NodeVisitor;
+import biosim.client.messages.model.MConnection;
+import biosim.client.messages.model.MLabel;
+import biosim.client.messages.model.MLink;
+import biosim.client.messages.model.MNode;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
@@ -42,22 +40,19 @@ public class DndController {
 	
 	final Map<Pair<DndType,DndType>, DropAction<?, ?>> _actionGrid = MapX.create();
 	
-	final DropAction<Node, Node> _nullDropAction = new DropAction<Node, Node>() {
+	final DropAction<MNode, MNode> _nullDropAction = new DropAction<MNode, MNode>() {
 		@Override
-		public boolean canDrop(Node dragee, Node dropTarget) {
+		public boolean canDrop(MNode dragee, MNode dropTarget) {
 			return false;
 		}
 		@Override
-		public void processDrop(Node draggee, Node dropTarget) {
+		public void processDrop(MNode draggee, MNode dropTarget) {
 			throw new RuntimeException("this should never happen");
 		}
 	};
 	
-	final ArrayList<NodeChildCounter> _nodeChildCounters = new ArrayList<NodeChildCounter>();
-
 	
 	public DndController(final Biosim biosim, AbsolutePanel boundaryPanel) {
-		final DatabaseAccessLayer databaseAccessLayer = biosim.getDatabaseAccessLayer();
 		_delegate = new MyDragController(boundaryPanel, false) {
 			public void dragStart() {
 			    LogTool.debug("dragStart() override start");
@@ -82,63 +77,62 @@ public class DndController {
 		_delegate.setBehaviorDragProxy(true);
 		_delegate.setBehaviorMultipleSelection(false);
 
-		DropAction<Node, biosim.client.model.Label> labelAction = new DropAction<Node, biosim.client.model.Label>() {
+		DropAction<MNode, MLabel> labelAction = new DropAction<MNode, MLabel>() {
 			@Override
-			public boolean canDrop(Node dragee, biosim.client.model.Label dropTarget) {
+			public boolean canDrop(MNode dragee, MLabel dropTarget) {
 				return !(dragee.equals(dropTarget) || dropTarget.hasChild(dragee));
 			}
 			@Override
-			public void processDrop(Node dragee, biosim.client.model.Label dropTarget) {
-				databaseAccessLayer.addLink(dropTarget, dragee);
+			public void processDrop(MNode dragee, MLabel dropTarget) {
+				Biosim.get().getRemoteServices().insertOrUpdate(new MLink(dropTarget, dragee));
 			}
 		}; 
 		registerDropAction(DndType.Content, DndType.Label, labelAction);
 		registerDropAction(DndType.Label, DndType.Label, labelAction);
 		
-		DropAction<Node, Connection> authorizeAction = new DropAction<Node, Connection>() {
+		DropAction<MNode, MConnection> authorizeAction = new DropAction<MNode, MConnection>() {
 			@Override
-			public boolean canDrop(Node dragee, Connection dropTarget) {
+			public boolean canDrop(MNode dragee, MConnection dropTarget) {
 				return !(dragee.equals(dropTarget) || dragee.canBeSeenBy(dropTarget) != null);
 			}
 			@Override
-			public void processDrop(Node dragee, Connection dropTarget) {
-				databaseAccessLayer.addLink(dropTarget, dragee);
+			public void processDrop(MNode dragee, MConnection dropTarget) {
+				Biosim.get().getRemoteServices().insertOrUpdate(new MLink(dropTarget, dragee));
 			}
 		}; 
 		registerDropAction(DndType.Label, DndType.Connection, authorizeAction);
 		registerDropAction(DndType.Content, DndType.Connection, authorizeAction);
 		
-		DropAction<Connection, Node> authorizeReverseDndAction = new DropAction<Connection, Node>() {
+		DropAction<MConnection, MNode> authorizeReverseDndAction = new DropAction<MConnection, MNode>() {
 			@Override
-			public boolean canDrop(Connection dragee, Node dropTarget) {
+			public boolean canDrop(MConnection dragee, MNode dropTarget) {
 				return !(dropTarget.equals(dragee) || dropTarget.canBeSeenBy(dragee) != null);
 			}
 			@Override
-			public void processDrop(Connection dragee, Node dropTarget) {
-				databaseAccessLayer.addLink(dragee, dropTarget);
+			public void processDrop(MConnection dragee, MNode dropTarget) {
+				Biosim.get().getRemoteServices().insertOrUpdate(new MLink(dragee, dropTarget));
 			}
 		}; 
 		registerDropAction(DndType.Connection, DndType.Label, authorizeReverseDndAction);
 		registerDropAction(DndType.Connection, DndType.Content, authorizeReverseDndAction);
 		
-		DropAction<Node, Node> addToFilterAction = new DropAction<Node, Node>() {
+		DropAction<MNode, MNode> addToFilterAction = new DropAction<MNode, MNode>() {
 			@Override
-			public boolean canDrop(Node dragee, Node dropTarget) {
+			public boolean canDrop(MNode dragee, MNode dropTarget) {
 				return biosim._filtersBar.getFilter().canAddFilter(dragee);
 			}
 			@Override
-			public void processDrop(Node dragee, Node dropTarget) {
+			public void processDrop(MNode dragee, MNode dropTarget) {
 				biosim._filtersBar.addToFilter(dragee);
-				databaseAccessLayer.fireRefreshContentPane();
 			}
 		}; 
 		registerDropAction(DndType.Label, DndType.Filter, addToFilterAction);
 		registerDropAction(DndType.Connection, DndType.Filter, addToFilterAction);
 		
-		DropAction<Node, Node> scissorsAction = new DropAction<Node, Node>() {
+		DropAction<MNode, MNode> scissorsAction = new DropAction<MNode, MNode>() {
 			@Override
-			public boolean canDrop(Node dragee, Node dropTarget) {
-				Node node;
+			public boolean canDrop(MNode dragee, MNode dropTarget) {
+				MNode node;
 				if ( dragee != null ) {
 					node = dragee;
 				} else {
@@ -152,7 +146,7 @@ public class DndController {
 					return false;
 				} else if ( criteria.connections.size() > 0 ) {
 					boolean r = true;
-					for ( Connection p : criteria.connections ) {
+					for ( MConnection p : criteria.connections ) {
 						if ( !p.isParentOf(node) ) {
 							r = false;
 							break;
@@ -164,18 +158,9 @@ public class DndController {
 				}
 			}
 			@Override
-			public void processDrop(Node dragee, Node dropTarget) {
-				final Node DRAGEE = dragee;
-				final Node DROP_TARGET = dropTarget;
-				
-				DndController.this.resetNodeChileCounters();
-				
-				dropTarget.visitDescendants(new NodeVisitor() {
-					@Override
-					public void visit(Node node) {
-						DndController.this.checkNode(node);
-					}
-				});
+			public void processDrop(MNode dragee, MNode dropTarget) {
+				final MNode DRAGEE = dragee;
+				final MNode DROP_TARGET = dropTarget;
 				
 				StringBuilder alertText = new StringBuilder();
 				alertText.append("Are you sure you want to delete ");
@@ -184,8 +169,11 @@ public class DndController {
 				} else {
 					alertText.append(dropTarget.getName() + "?");
 				}
-				
-				List<String> strings = DndController.this.getNodeChildStrings();
+
+				if ( Boolean.TRUE ) {
+					throw new RuntimeException("implement a proper algorithm to determine if we create any orphans with this action");
+				}
+				List<String> strings = ListX.create(); //DndController.this.getNodeChildStrings();
 				
 				if (strings.size() > 0) {
 					alertText.append("<br/>This action will also delete: ");
@@ -209,64 +197,22 @@ public class DndController {
 		registerDropAction(DndType.Content, DndType.Scissors, scissorsAction);
 		registerDropAction(DndType.Scissors, DndType.Content, scissorsAction);
 
-		DropAction<Node, Node> viewConnectionAction = new DropAction<Node, Node>() {
+		DropAction<MNode, MNode> viewConnectionAction = new DropAction<MNode, MNode>() {
 			@Override
-			public boolean canDrop(Node dragee, Node dropTarget) {
-				return dragee instanceof Connection;
+			public boolean canDrop(MNode dragee, MNode dropTarget) {
+				return dragee instanceof MConnection;
 			}
 			@Override
-			public void processDrop(Node dragee, Node dropTarget) {
-				ObservableList<Label> labelRoots = biosim.getDatabaseAccessLayer().getLabelRoots();
-				if ( !labelRoots.contains(dragee) ) {
-					DialogHelper.alert("not supported, aka re-implement me");
-//					labelRoots.add(dragee);
-				}
+			public void processDrop(MNode dragee, MNode dropTarget) {
+				DialogHelper.alert("not supported, aka re-implement me");
 			}
 		}; 
 		registerDropAction(DndType.Connection, DndType.ViewConnection, viewConnectionAction);
 		
 		registerDropSite(DndType.Filter, null, biosim._filtersBar.getPanel());
-		this.inititlizeNodeChildCounters();
 	}
 	
-	
-	void inititlizeNodeChildCounters() {
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Address.class, "address"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Image.class, "image"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Label.class, "label"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Link.class, "link"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Need.class, "need"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Offer.class, "offer"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Connection.class, "person"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.Phone.class, "phone"));
-		_nodeChildCounters.add(new NodeChildCounter(biosim.client.model.TextMessage.class, "message"));
-	}
-	
-	List<String> getNodeChildStrings() {
-		ArrayList<String> ret = new ArrayList<String>();
-		
-		for (int i = 0; i < _nodeChildCounters.size(); i += 1){
-			if (!_nodeChildCounters.get(i).toString().isEmpty()) {
-				ret.add(_nodeChildCounters.get(i).toString());
-			}
-		}
-		
-		return ret;
-	}
-	
-	void resetNodeChileCounters() {
-		for (int i = 0; i < _nodeChildCounters.size(); i += 1){
-			_nodeChildCounters.get(i).count = 0;
-		}
-	}
-	
-	void checkNode(Node node) {
-		for (int i = 0; i < _nodeChildCounters.size(); i += 1){
-			_nodeChildCounters.get(i).incrementIfOfType(node);
-		}		
-	}
-	
-	Node node(DragContext dc) {
+	MNode node(DragContext dc) {
 		return dragSite(dc).node;
 	}
 	
@@ -276,7 +222,7 @@ public class DndController {
 	
 	boolean canDrop(DragContext context, DropSite dropSite) {
 		try {
-			DropAction<Node, Node> dropAction = dropAction(context, dropSite);
+			DropAction<MNode, MNode> dropAction = dropAction(context, dropSite);
 			return dropAction.canDrop(node(context), dropSite.node);
 		} catch ( ClassCastException e ) {
 			return false;
@@ -284,16 +230,16 @@ public class DndController {
 	}
 
 	@SuppressWarnings("unchecked")
-	DropAction<Node,Node> dropAction(DragContext dc, DropSite dropSite) {
+	DropAction<MNode,MNode> dropAction(DragContext dc, DropSite dropSite) {
 		Pair<DndType, DndType> key = Pair.create(dragSite(dc).type, dropSite.type);
-		DropAction<Node,Node> da = (DropAction<Node,Node>) _actionGrid.get(key);
+		DropAction<MNode,MNode> da = (DropAction<MNode,MNode>) _actionGrid.get(key);
 		if ( da == null ) {
 			da = _nullDropAction;
 		}
 		return da;
 	}
 
-	public void makeDraggable(final DndType type, Node node, Widget draggable, Widget dragHandle) {
+	public void makeDraggable(final DndType type, MNode node, Widget draggable, Widget dragHandle) {
 		DragSite dragSite = new DragSite(type, node, draggable, dragHandle) ;
 		_widgetToDragSiteMap.put(draggable, dragSite);
 		_widgetToDragSiteMap.put(dragHandle, dragSite);
@@ -305,7 +251,7 @@ public class DndController {
 		_actionGrid.put(Pair.create(dragType, dropType), dropAction);
 	}
 
-	public void registerDropSite(final DndType dropType, Node dropTargetNode, Widget dropTargetWidget) {
+	public void registerDropSite(final DndType dropType, MNode dropTargetNode, Widget dropTargetWidget) {
 		final DropSite dropSite = new DropSite(dropType, dropTargetNode, dropTargetWidget);
 		_dropSites.add(dropSite);
 		_delegate.registerDropController(new AbstractDropController(dropTargetWidget) {
@@ -353,11 +299,11 @@ public class DndController {
 	class DragSite {
 		
 		final DndType type;
-		final Node node;
+		final MNode node;
 		final Widget draggable;
 		final Widget dragHandle;
 		
-		public DragSite(DndType type, Node node, Widget draggable, Widget dragHandle) {
+		public DragSite(DndType type, MNode node, Widget draggable, Widget dragHandle) {
 			this.type = type;
 			this.node = node;
 			this.draggable = draggable;
@@ -366,7 +312,7 @@ public class DndController {
 
 		@SuppressWarnings("unchecked")
 		public boolean isDroppable(DropSite dropSite) {
-			DropAction<Node, Node> da = (DropAction<Node, Node>) _actionGrid.get(Pair.create(type, dropSite.type));
+			DropAction<MNode, MNode> da = (DropAction<MNode, MNode>) _actionGrid.get(Pair.create(type, dropSite.type));
 			if ( da != null && da.canDrop(node, dropSite.node) ) {
 				return true;
 			} else {
@@ -379,10 +325,10 @@ public class DndController {
 	class DropSite {
 		
 		final DndType type;
-		final Node node;
+		final MNode node;
 		final Widget widget;
 		
-		public DropSite(DndType type, Node node, Widget widget) {
+		public DropSite(DndType type, MNode node, Widget widget) {
 			this.type = type;
 			this.node = node;
 			this.widget = widget;
@@ -390,31 +336,4 @@ public class DndController {
 		
 	}
 	
-	class NodeChildCounter {
-		Integer count = 0;
-		final String kind;
-		final Class<?> clazz;
-		
-		public NodeChildCounter(Class<?> clazz, String kind) {
-			this.clazz = clazz;
-			this.kind = kind;
-		}
-		
-		public void incrementIfOfType(Object obj) {
-			if (this.clazz.getName() ==   obj.getClass().getName()) {
-				count += 1;
-			}
-		}
-		
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			if (count > 0) {
-				sb.append(count.toString() + " " + this.kind);
-				if (count > 1) {
-					sb.append("s");
-				}
-			}
-			return sb.toString();
-		}
-	}	
 }

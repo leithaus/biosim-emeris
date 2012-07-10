@@ -2,14 +2,14 @@ package biosim.client.ui;
 
 import biosim.client.DndController;
 import biosim.client.eventlist.ObservableList;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 import biosim.client.ui.dnd.DndType;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class NodePanel<T extends Node> extends SimplePanel {
+public class NodePanel<T extends MNode> extends SimplePanel {
 
 	final FlowPanel _delegatePanel = new FlowPanel();
 	final WidgetBuilder<T> _widgetBuilder;
@@ -27,7 +27,7 @@ public class NodePanel<T extends Node> extends SimplePanel {
 		setWidget(_delegatePanel);
 	}
 	
-	public static <T extends Node> NodePanel<T> create(ObservableList<T> nodes, final DndController dragController, DndType type) {
+	public static <T extends MNode> NodePanel<T> create(ObservableList<T> nodes, final DndController dragController, DndType type) {
 		return new NodePanel<T>(nodes, dragController, type);
 	}
 	

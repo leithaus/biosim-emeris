@@ -1,13 +1,13 @@
 package biosim.client.ui;
 
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 
 public abstract class DropHandler {
 	
-	public boolean dropAllowed(Node draggee, Node dropTarget) { 
+	public boolean dropAllowed(MNode draggee, MNode dropTarget) { 
 		return true;
 	}
 
-	public abstract void drop(Node draggee, Node dropTarget);
+	public abstract void drop(MNode draggee, MNode dropTarget);
 
 }

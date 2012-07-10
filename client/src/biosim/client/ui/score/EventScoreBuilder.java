@@ -2,8 +2,6 @@ package biosim.client.ui.score;
 
 
 import m3.gwt.lang.Function1;
-import biosim.client.Biosim;
-import biosim.client.DatabaseAccessLayerListener;
 import biosim.client.eventlist.FilteredList;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
@@ -14,8 +12,8 @@ import biosim.client.eventlist.ui.VerticalPanelBuilder;
 import biosim.client.fun.None;
 import biosim.client.fun.Option;
 import biosim.client.fun.Some;
-import biosim.client.model.DataSet;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
+import biosim.client.messages.model.NodeContainer;
 import biosim.client.ui.Filter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,12 +26,12 @@ public class EventScoreBuilder {
 
 	final ObservableList<Filter> _filters = Observables.create();
 	
-	final ObservableList<ObservableList<Option<Node>>> _model = _filters.map(new Function1<Filter, ObservableList<Option<Node>>>() {
+	final ObservableList<ObservableList<Option<MNode>>> _model = _filters.map(new Function1<Filter, ObservableList<Option<MNode>>>() {
 		@Override
-		public ObservableList<Option<Node>> apply(final Filter filter) {
-			return _visibleEvents.map(new Function1<Node, Option<Node>>() {
+		public ObservableList<Option<MNode>> apply(final Filter filter) {
+			return _visibleEvents.map(new Function1<MNode, Option<MNode>>() {
 				@Override
-				public Option<Node> apply(Node node) {
+				public Option<MNode> apply(MNode node) {
 					if ( filter.accept(node) ) return Some.create(node);
 					else return None.apply();
 				}
@@ -45,20 +43,20 @@ public class EventScoreBuilder {
 
 	final VerticalPanel _panel = new VerticalPanel();
 	
-	final FilteredList<Node> _visibleEvents;
+	final FilteredList<MNode> _visibleEvents;
 	
 	final Widget _widget;
 	
-	public EventScoreBuilder(DataSet dataSet) {
+	public EventScoreBuilder() {
 		_clear.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
 				_model.clear();
 			}
 		});
-		_visibleEvents = dataSet.nodes.filter(new Function1<Node, Boolean>() {
+		_visibleEvents = NodeContainer.get().nodes.filter(new Function1<MNode, Boolean>() {
 			@Override
-			public Boolean apply(Node t) {
+			public Boolean apply(MNode t) {
 				boolean result = false;
 				for ( Filter f : _filters ) {
 					if ( f.accept(t) ) {
@@ -70,9 +68,9 @@ public class EventScoreBuilder {
 			}
 		});
 		
-		_widget = ObservableListPanelAdapter.create(_model, new VerticalPanelBuilder(), new Function1<ObservableList<Option<Node>>, Widget>() {
+		_widget = ObservableListPanelAdapter.create(_model, new VerticalPanelBuilder(), new Function1<ObservableList<Option<MNode>>, Widget>() {
 			@Override
-			public Widget apply(ObservableList<Option<Node>> rowModel) {
+			public Widget apply(ObservableList<Option<MNode>> rowModel) {
 				return new EventScoreRow(rowModel).getWidget();
 			}
 		}).getWidget();
@@ -87,10 +85,9 @@ public class EventScoreBuilder {
 			}
 		});
 		
-		Biosim.get().getDatabaseAccessLayer().refreshListeners.add(new DatabaseAccessLayerListener() {
-			@Override
-			public void refreshContentPane() {
-				refilter();
+		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
+			public void event(biosim.client.eventlist.ListEvent<MNode> event) {
+				refilter();				
 			}
 		});
 		
@@ -98,7 +95,7 @@ public class EventScoreBuilder {
 			@Override
 			public void event(ListEvent<Filter> event) {
 				refilter();
-				for ( ObservableList<Option<Node>> events : _model ) {
+				for ( ObservableList<Option<MNode>> events : _model ) {
 					events.reapply();
 				}
 			}

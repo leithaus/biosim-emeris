@@ -6,7 +6,7 @@ import m3.gwt.lang.Function1;
 import m3.gwt.lang.HttpHelper;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
-import biosim.client.model.Uid;
+import biosim.client.messages.model.Uid;
 import biosim.client.utils.DialogHelper;
 
 import com.google.gwt.core.client.GWT;

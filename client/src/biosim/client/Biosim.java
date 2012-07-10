@@ -1,15 +1,20 @@
 package biosim.client;
 
 import static com.google.gwt.query.client.GQuery.$;
+import m3.fj.data.FList;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.LogTool;
+import biosim.client.eventlist.ListEvent;
+import biosim.client.eventlist.ListListener;
+import biosim.client.eventlist.ObservableList;
+import biosim.client.eventlist.Observables;
+import biosim.client.messages.model.MConnection;
+import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
 import biosim.client.messages.model.RemoteServices;
 import biosim.client.messages.model.RemoteServicesImpl;
+import biosim.client.messages.model.Uid;
 import biosim.client.messages.protocol.MessageHandler;
-import biosim.client.model.Connection;
-import biosim.client.model.Node;
-import biosim.client.model.Uid;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.CustomTabPanel;
 import biosim.client.ui.FilterBar;
@@ -51,8 +56,6 @@ public class Biosim implements EntryPoint {
 		return _instance;
 	}
 	
-	DatabaseAccessLayer _databaseAccessLayer = new DatabaseAccessLayer();
-	
 	CustomTabPanel _labelsSection = new CustomTabPanel();
 	CustomTabPanel _contentSection = new CustomTabPanel();
 	CustomTabPanel _connectionsSection = new CustomTabPanel();
@@ -63,7 +66,7 @@ public class Biosim implements EntryPoint {
 	
 	FilterBar _filtersBar = new FilterBar(this);
 
-	Connection _selectedPerson;
+	MConnection _selectedConnection;
 	
 	DndController _dndController;
 	
@@ -122,9 +125,9 @@ public class Biosim implements EntryPoint {
 			
 			initWebSocket();
 			
-			_databaseAccessLayer.refreshListeners.add(new DatabaseAccessLayerListener() {
+			NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
 				@Override
-				public void refreshContentPane() {
+				public void event(ListEvent<MNode> event) {
 					_contentController.refilterContent();
 				}
 			});
@@ -134,7 +137,10 @@ public class Biosim implements EntryPoint {
 	
 			_dndController = new DndController(this, RootPanel.get());
 			
-			_contentController = new ContentController(this, _databaseAccessLayer.getContent(), _dndController);
+			// TDGlen wire in proper query stuff here
+			ObservableList<MNode> fakeContent = Observables.create();
+			_contentController = new ContentController(this, fakeContent, _dndController);
+//			_contentController = new ContentController(this, _databaseAccessLayer.getContent(), _dndController);
 	
 			DockPanel dock = new DockPanel();
 	    
@@ -170,7 +176,7 @@ public class Biosim implements EntryPoint {
 	
 			contentSectionContent.add(_contentController._contentPanel);
 			
-			connectionsSectionContent.add(NodePanel.create(getDatabaseAccessLayer().getConnections(), _dndController, DndType.Connection));
+			connectionsSectionContent.add(NodePanel.create(NodeContainer.get().connections, _dndController, DndType.Connection));
 			
 			_contentController.refilterContent();
 			
@@ -198,7 +204,8 @@ public class Biosim implements EntryPoint {
 		        }
 		    });
 			
-			_eventScore = new EventScoreBuilder(_databaseAccessLayer._dataSet);
+			// TDGlen fix this we no longer have a data set
+			_eventScore = new EventScoreBuilder();
 			RootPanel scoreTab = RootPanel.get("scoreTab");
 			if ( scoreTab != null ) {
 				scoreTab.add(_eventScore.getWidget());
@@ -252,12 +259,9 @@ public class Biosim implements EntryPoint {
 			public Void apply(Void t) {
 				_remoteServices = new RemoteServicesImpl(_socket, NodeContainer.get());
 				
-				_databaseAccessLayer.setSocket(_socket);
-				
 				_labelTreeBuilder = 
 						new LabelTreeBuilder(
 								getAgentUid()
-								, _databaseAccessLayer
 								, _dndController
 								, _remoteServices
 								, _socket
@@ -266,27 +270,33 @@ public class Biosim implements EntryPoint {
 				
 				_labelsSectionContent.add(new ConnectionViewDropSiteBuilder(_dndController).getWidget());
 				
+				_remoteServices.select(MConnection.class, new Function1<FList<MConnection>, Void>() {
+					public Void apply(FList<MConnection> t) {
+						// do nothing since this call alone will trigger an update to the NodeContainer
+						return null;
+					}
+				});
+
 				return null;
 			}
 		});
 
 	}
 
-	void removeContentLinks(Node node) {
+	void removeContentLinks(MNode node) {
 		if ( node != null ) {
 			NodeWidgetBuilder builder = _contentController.builder(node);
 			ContentCriteria ac = builder.getFilterAcceptCriteria();
 			
 			if ( ac.connections.size() > 0 ) {
-				for ( Connection p : ac.connections ) {
-					getDatabaseAccessLayer().removeLink(p, node);
+				for ( MConnection p : ac.connections ) {
+					Biosim.get().getRemoteServices().removeLink(p, node);
 				}
 			} else {
-				for ( Node n : ac.labels ) {
-					getDatabaseAccessLayer().removeLink(n, node);
+				for ( MNode n : ac.labels ) {
+					Biosim.get().getRemoteServices().removeLink(n, node);
 				}
 			}
-			getDatabaseAccessLayer().fireRefreshContentPane();
 		}
 	}
 	
@@ -306,10 +316,6 @@ public class Biosim implements EntryPoint {
 			}
 		}
 		return uiStateCssClass;
-	}
-
-	public DatabaseAccessLayer getDatabaseAccessLayer() {
-		return _databaseAccessLayer;
 	}
 
 	public Uid getAgentUid() {
@@ -337,6 +343,10 @@ public class Biosim implements EntryPoint {
 	
 	public BiosimWebSocket getSocket() {
 		return _socket;
+	}
+
+	public RemoteServices getRemoteServices() {
+		return _remoteServices;
 	}
 	
 }

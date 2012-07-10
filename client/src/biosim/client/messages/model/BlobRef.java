@@ -2,7 +2,6 @@ package biosim.client.messages.model;
 
 import m3.gwt.props.ApplyCodeGeneration;
 
-import biosim.client.model.Uid;
 
 import com.google.gwt.core.client.GWT;
 
@@ -45,25 +44,25 @@ public class BlobRef {
 
 	// BEGIN_GENERATED_CODE
 	
-	public biosim.client.model.Uid getAgentUid() {
+	public biosim.client.messages.model.Uid getAgentUid() {
 	    return _agentUid;
 	}
-	public void setAgentUid(biosim.client.model.Uid agentUid0) {
+	public void setAgentUid(biosim.client.messages.model.Uid agentUid0) {
 	    _setAgentUid(agentUid0);
 	}
-	protected void _setAgentUid(biosim.client.model.Uid agentUid0) {
-	    biosim.client.model.Uid before = _agentUid;
+	protected void _setAgentUid(biosim.client.messages.model.Uid agentUid0) {
+	    biosim.client.messages.model.Uid before = _agentUid;
 	     _agentUid = agentUid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.agentUid, before, agentUid0);
 	}
-	public biosim.client.model.Uid getBlobUid() {
+	public biosim.client.messages.model.Uid getBlobUid() {
 	    return _blobUid;
 	}
-	public void setBlobUid(biosim.client.model.Uid blobUid0) {
+	public void setBlobUid(biosim.client.messages.model.Uid blobUid0) {
 	    _setBlobUid(blobUid0);
 	}
-	protected void _setBlobUid(biosim.client.model.Uid blobUid0) {
-	    biosim.client.model.Uid before = _blobUid;
+	protected void _setBlobUid(biosim.client.messages.model.Uid blobUid0) {
+	    biosim.client.messages.model.Uid before = _blobUid;
 	     _blobUid = blobUid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.blobUid, before, blobUid0);
 	}
@@ -83,13 +82,13 @@ public class BlobRef {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class BlobRefContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext agentUid = new m3.gwt.props.impl.AbstractPropertyContext<BlobRef,biosim.client.model.Uid>(this, "agentUid", biosim.client.model.Uid.class, 0, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(BlobRef bean) { return bean.getAgentUid(); }
-	    	    protected void setImpl(BlobRef bean, biosim.client.model.Uid value ) { bean.setAgentUid(value);}
+	    public m3.gwt.props.PropertyContext agentUid = new m3.gwt.props.impl.AbstractPropertyContext<BlobRef,biosim.client.messages.model.Uid>(this, "agentUid", biosim.client.messages.model.Uid.class, 0, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(BlobRef bean) { return bean.getAgentUid(); }
+	    	    protected void setImpl(BlobRef bean, biosim.client.messages.model.Uid value ) { bean.setAgentUid(value);}
 	    };
-	    public m3.gwt.props.PropertyContext blobUid = new m3.gwt.props.impl.AbstractPropertyContext<BlobRef,biosim.client.model.Uid>(this, "blobUid", biosim.client.model.Uid.class, 1, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(BlobRef bean) { return bean.getBlobUid(); }
-	    	    protected void setImpl(BlobRef bean, biosim.client.model.Uid value ) { bean.setBlobUid(value);}
+	    public m3.gwt.props.PropertyContext blobUid = new m3.gwt.props.impl.AbstractPropertyContext<BlobRef,biosim.client.messages.model.Uid>(this, "blobUid", biosim.client.messages.model.Uid.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(BlobRef bean) { return bean.getBlobUid(); }
+	    	    protected void setImpl(BlobRef bean, biosim.client.messages.model.Uid value ) { bean.setBlobUid(value);}
 	    };
 	    public m3.gwt.props.PropertyContext filename = new m3.gwt.props.impl.AbstractPropertyContext<BlobRef,java.lang.String>(this, "filename", java.lang.String.class, 2, null, false) {
 	    	    protected java.lang.String getImpl(BlobRef bean) { return bean.getFilename(); }

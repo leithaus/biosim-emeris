@@ -4,30 +4,30 @@ import java.util.List;
 
 import m3.gwt.lang.ListX;
 import m3.gwt.props.ApplyCodeGeneration;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 
 @ApplyCodeGeneration
 public class CreateNodesRequest extends RequestBody {
 	
-	private List<Node> _nodes;
+	private List<MNode> _nodes;
 	
-	public CreateNodesRequest	(Node...nodes) {
+	public CreateNodesRequest(MNode...nodes) {
 		_nodes = ListX.create();
-		for ( Node n : nodes ) {
+		for ( MNode n : nodes ) {
 			_nodes.add(n);
 		}
 	}
 
 	// BEGIN_GENERATED_CODE
 	
-	public java.util.List<biosim.client.model.Node> getNodes() {
+	public java.util.List<biosim.client.messages.model.MNode> getNodes() {
 	    return _nodes;
 	}
-	public void setNodes(java.util.List<biosim.client.model.Node> nodes0) {
+	public void setNodes(java.util.List<biosim.client.messages.model.MNode> nodes0) {
 	    _setNodes(nodes0);
 	}
-	protected void _setNodes(java.util.List<biosim.client.model.Node> nodes0) {
-	    java.util.List<biosim.client.model.Node> before = _nodes;
+	protected void _setNodes(java.util.List<biosim.client.messages.model.MNode> nodes0) {
+	    java.util.List<biosim.client.messages.model.MNode> before = _nodes;
 	     _nodes = nodes0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.nodes, before, nodes0);
 	}
@@ -36,9 +36,9 @@ public class CreateNodesRequest extends RequestBody {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class CreateNodesRequestContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext nodes = new m3.gwt.props.impl.AbstractPropertyContext<CreateNodesRequest,java.util.List<biosim.client.model.Node>>(this, "nodes", java.util.List.class, 0, biosim.client.model.Node.class, false) {
-	    	    protected java.util.List<biosim.client.model.Node> getImpl(CreateNodesRequest bean) { return bean.getNodes(); }
-	    	    protected void setImpl(CreateNodesRequest bean, java.util.List<biosim.client.model.Node> value ) { bean.setNodes(value);}
+	    public m3.gwt.props.PropertyContext nodes = new m3.gwt.props.impl.AbstractPropertyContext<CreateNodesRequest,java.util.List<biosim.client.messages.model.MNode>>(this, "nodes", java.util.List.class, 0, biosim.client.messages.model.MNode.class, false) {
+	    	    protected java.util.List<biosim.client.messages.model.MNode> getImpl(CreateNodesRequest bean) { return bean.getNodes(); }
+	    	    protected void setImpl(CreateNodesRequest bean, java.util.List<biosim.client.messages.model.MNode> value ) { bean.setNodes(value);}
 	    };
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();

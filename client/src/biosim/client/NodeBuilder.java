@@ -11,16 +11,14 @@ import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.eventlist.ui.PopupMenu;
-import biosim.client.model.Address;
-import biosim.client.model.Blob;
-import biosim.client.model.Connection;
-import biosim.client.model.DataSet;
-import biosim.client.model.Image;
-import biosim.client.model.Label;
-import biosim.client.model.Link;
-import biosim.client.model.Node;
-import biosim.client.model.Phone;
-import biosim.client.model.TextMessage;
+import biosim.client.messages.model.MBlob;
+import biosim.client.messages.model.MConnection;
+import biosim.client.messages.model.MImage;
+import biosim.client.messages.model.MLabel;
+import biosim.client.messages.model.MLink;
+import biosim.client.messages.model.MNode;
+import biosim.client.messages.model.MText;
+import biosim.client.messages.model.RemoteServices;
 import biosim.client.utils.Base64;
 import biosim.client.utils.DialogHelper;
 
@@ -32,13 +30,6 @@ public class NodeBuilder {
     
     final PopupMenu _popup = new PopupMenu();
     {
-    	_popup.addOption("Add Info...", new Function0<Void>() {
-            @Override
-            public Void apply() {
-                addAddress();
-                return null;
-            }
-        });
     	_popup.addOption("Add Label...", new Function0<Void>() {
             @Override
             public Void apply() {
@@ -46,10 +37,10 @@ public class NodeBuilder {
                 return null;
             }
         });
-    	_popup.addOption("Add Message...", new Function0<Void>() {
+    	_popup.addOption("Add Info/Text...", new Function0<Void>() {
             @Override
             public Void apply() {
-                addTextMessage();
+                addText();
                 return null;
             }
         });
@@ -62,18 +53,12 @@ public class NodeBuilder {
         });
     }
 
-    final Iterable<Label> _labels;
-    final Iterable<Connection> _people;
+    final Iterable<MLabel> _labels;
+    final Iterable<MConnection> _connections;
 
-    final DatabaseAccessLayer _databaseAccessLayer = Biosim.get().getDatabaseAccessLayer();
-
-    public NodeBuilder(Iterable<Label> labels, Iterable<Connection> people) {
+    public NodeBuilder(Iterable<MLabel> labels, Iterable<MConnection> people) {
 	    _labels = labels;
-	    _people = people;
-	}
-
-	DataSet getDataSet() {
-        return _databaseAccessLayer.getDataSet();
+	    _connections = people;
 	}
 	
 	void addLeaf() {
@@ -81,30 +66,33 @@ public class NodeBuilder {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
 				    String labelName = t.trim();
-				    insert(new Label(getDataSet(), labelName));
+				    GWT.log("set a default icon", new Throwable());
+				    MLabel label = new MLabel();
+				    label.setName(labelName);
+				    insert(label);
 				}
 				return null;
 			}
 		});
 	}
 
-	void insert(Node node) {
-        _databaseAccessLayer.addNode(node);
-        for ( Label parent : _labels ) {
-            Link link = parent.link(node);                     
-            _databaseAccessLayer.addNode(link);
+	void insert(MNode node) {
+		RemoteServices rs = Biosim.get().getRemoteServices();
+        rs.insertOrUpdate(node);
+        for ( MLabel parent : _labels ) {
+            MLink link = new MLink(parent, node);                     
+            rs.insertOrUpdate(link);
         }
-        for ( Connection cnxn : _people ) {
-            _databaseAccessLayer.addLink(cnxn, node);
+        for ( MConnection cnxn : _connections ) {
+            rs.insertOrUpdate(new MLink(cnxn, node));
         }
-        _databaseAccessLayer.fireRefreshContentPane();
 	}
 	
-    void addPhone(final Node node) {
+    void addPhone(final MNode node) {
         DialogHelper.showTextPrompt("Enter the Phone #.", "", "200px 20px", new Function1<String,Void>() {
             public Void apply(String t) {
                 if ( t != null && t.trim().length() > 0 ) {
-                    insert(new Phone(getDataSet(), t.trim()));
+                    insert(new MText(t.trim()));
                 }
                 return null;
             }
@@ -128,12 +116,11 @@ public class NodeBuilder {
                                 try {
                                     String buffer = reader.getStringResult();
                                     String base64 = Base64.toBase64(buffer);
-                                    DataSet dataSet = Biosim.get().getDatabaseAccessLayer().getDataSet();
-									Image image = new Image(dataSet);
-                                    Blob blob = new Blob(dataSet, Biosim.get().getAgentUid(), file.getName());
+									MImage image = new MImage();
+                                    MBlob blob = new MBlob(Biosim.get().getAgentUid(), file.getName());
                                     blob.setDataInBase64(base64);
                                     image.setBlob(blob);
-                                    _databaseAccessLayer.addNode(blob);
+                                    Biosim.get().getRemoteServices().insertOrUpdate(blob);
                                     insert(image);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
@@ -148,34 +135,34 @@ public class NodeBuilder {
         });
     }
 	
-	void addNode(final Node parent, String prompt, String size, final Function1<String,Node> instantiator) {
-		DialogHelper.showTextPrompt(prompt, "", size, new Function1<String,Void>() {
-			public Void apply(String s) {
-				if ( s != null && s.trim().length() > 0 ) {
-					Node node = instantiator.apply(s);
-					Biosim.get().getDatabaseAccessLayer().addNode(node, parent);					
-				}
-				return null;
-			}
-		});		
-	}
+//	void addNode(final Node parent, String prompt, String size, final Function1<String,Node> instantiator) {
+//		DialogHelper.showTextPrompt(prompt, "", size, new Function1<String,Void>() {
+//			public Void apply(String s) {
+//				if ( s != null && s.trim().length() > 0 ) {
+//					Node node = instantiator.apply(s);
+//					Biosim.get().getDatabaseAccessLayer().addNode(node, parent);					
+//				}
+//				return null;
+//			}
+//		});		
+//	}
 
-	void addTextMessage() {
-		DialogHelper.showTextPrompt("Enter the message text.", "", "300px 200px", new Function1<String,Void>() {
+//	void addTextMessage() {
+//		DialogHelper.showTextPrompt("Enter the message text.", "", "300px 200px", new Function1<String,Void>() {
+//			public Void apply(String t) {
+//				if ( t != null && t.trim().length() > 0 ) {
+//					insert(new MMessage(getDataSet(), t.trim()));
+//				}
+//				return null;
+//			}
+//		});
+//	}
+
+	void addText() {
+		DialogHelper.showTextPrompt("Enter the text.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					insert(new TextMessage(getDataSet(), t.trim()));
-				}
-				return null;
-			}
-		});
-	}
-
-	void addAddress() {
-		DialogHelper.showTextPrompt("Enter the info.", "", "300px 200px", new Function1<String,Void>() {
-			public Void apply(String t) {
-				if ( t != null && t.trim().length() > 0 ) {
-				    insert(new Address(getDataSet(), t.trim()));
+					insert(new MText(t.trim()));
 				}
 				return null;
 			}
