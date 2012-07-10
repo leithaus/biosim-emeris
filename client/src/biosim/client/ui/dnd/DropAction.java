@@ -1,8 +1,8 @@
 package biosim.client.ui.dnd;
 
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 
-public interface DropAction<T extends Node,U extends Node> {
+public interface DropAction<T extends MNode,U extends MNode> {
 
 	boolean canDrop(T dragee, U dropTarget);
 	

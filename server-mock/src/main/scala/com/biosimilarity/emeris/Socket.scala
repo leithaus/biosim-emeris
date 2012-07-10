@@ -5,7 +5,7 @@ import com.biosimilarity.emeris.newmodel.Model.Uid
 import biosim.client.messages.protocol.ResponseBody
 import biosim.client.messages.protocol.Response
 import biosim.client.messages.protocol.Request
-import biosim.client.model.{ Uid => ClientUid }
+import biosim.client.messages.model.{ Uid => ClientUid }
 
 trait Socket {
 

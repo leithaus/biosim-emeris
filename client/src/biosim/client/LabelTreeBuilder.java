@@ -13,16 +13,14 @@ import org.vectomatic.file.events.LoadEndHandler;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
+import biosim.client.messages.model.MBlob;
+import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
 import biosim.client.messages.model.RemoteServices;
-import biosim.client.model.Blob;
-import biosim.client.model.DataSet;
-import biosim.client.model.Image;
-import biosim.client.model.Node;
-import biosim.client.model.Uid;
+import biosim.client.messages.model.Uid;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.utils.Base64;
@@ -51,20 +49,17 @@ public class LabelTreeBuilder {
 	final Tree _tree = new Tree();
 
 	final Uid _agentUid;
-	final DatabaseAccessLayer _databaseAccessLayer;
 	final DndController _dndController;
 	final RemoteServices _remoteServices;	
 	final BiosimWebSocket _socket;
 	
 	LabelTreeBuilder(
 			Uid agentUid, 
-			DatabaseAccessLayer databaseAccessLayer, 
 			DndController dndController, 
 			RemoteServices remoteServices,
 			BiosimWebSocket socket
 	) {
 		_agentUid = agentUid;
-		_databaseAccessLayer = databaseAccessLayer;
 		_dndController = dndController;
 
 		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
@@ -111,10 +106,7 @@ public class LabelTreeBuilder {
 	
     void updateTreeItem(TreeItem ti) {
 		final MLabel label = getUserObject(ti);
-		final biosim.client.model.Label labelNode = new biosim.client.model.Label();
-		labelNode.setName(label.getName());
-		labelNode.setUid(label.getUid());
-		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(labelNode, _dndController, DndType.Label); 
+		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
 		final FlowPanel w = nwbuilder.getFlowPanel();
 		final PopupMenu popup = new PopupMenu();
 		ti.setWidget(w);
@@ -131,7 +123,7 @@ public class LabelTreeBuilder {
 			popup.addOption("Add Child Label...", new Function0<Void>() {
 	            @Override
 	            public Void apply() {
-				    addLeaf(labelNode);
+				    addLeaf(label);
 	                return null;
 	            }
 	        });
@@ -139,7 +131,7 @@ public class LabelTreeBuilder {
 			popup.addOption("Edit...", new Function0<Void>() {
 	            @Override
 	            public Void apply() {
-				    editLabel(labelNode);
+				    editLabel(label);
 	                return null;
 	            }
 	        });
@@ -147,7 +139,7 @@ public class LabelTreeBuilder {
 			popup.addOption("Add Connection...", new Function0<Void>() {
 	            @Override
 	            public Void apply() {
-				    addLeaf(labelNode);
+				    addLeaf(label);
 	                return null;
 	            }
 	        });
@@ -171,18 +163,18 @@ public class LabelTreeBuilder {
 		
 	}
 	
-	void addLeaf(final Node node) {
+	void addLeaf(final MLabel parent) {
 		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_databaseAccessLayer.addChildLabel(node, t);
+					Biosim.get().getRemoteServices().insertChild(parent, new MLabel(t));
 				}
 				return null;
 			}
 		});
 	}
 	
-	void editLabel(final biosim.client.model.Label label) {
+	void editLabel(final MLabel label) {
 		final VerticalPanel panel = new VerticalPanel();
 		HTML l1 = new HTML("Name:");
 		panel.add(l1);
@@ -200,7 +192,7 @@ public class LabelTreeBuilder {
 					// Set the new name the node, if it is set
 					if (!textBox.getText().isEmpty()) {
 						label.setName(textBox.getText());
-						_databaseAccessLayer.addNode(label);
+						_remoteServices.insertOrUpdate(label);
 					}
 					
 					// Get the files that were selected 
@@ -214,11 +206,10 @@ public class LabelTreeBuilder {
                                 try {
                                     String buffer = reader.getStringResult();
                                     String base64 = Base64.toBase64(buffer);
-                                    Blob blob = new Blob(null, _agentUid, file.getName());
+                                    MBlob blob = new MBlob(_agentUid, file.getName());
                                     blob.setDataInBase64(base64);
-                                    label.setIconRef(blob.getRef());
-                                    _databaseAccessLayer.addNode(blob);
-                                    _databaseAccessLayer.addNode(label);
+                                    label.setIcon(blob.getRef());
+                                    _remoteServices.insertOrUpdate(blob, label);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -232,18 +223,18 @@ public class LabelTreeBuilder {
 		});		
 	}
 
-    void addPhone(final Node node) {
+    void addPhone(final MNode parent) {
         DialogHelper.showSingleLineTextPrompt("Enter the Phone #:", "", "200px 20px", new Function1<String,Void>() {
             public Void apply(String t) {
                 if ( t != null && t.trim().length() > 0 ) {
-                	_databaseAccessLayer.addPhone(node, t);
+                	_remoteServices.insertTextNode(parent, t);
                 }
                 return null;
             }
         });
     }
 
-    void addPhoto(final Node parent) {
+    void addPhoto(final MNode parent) {
         final VerticalPanel photoLoader = new VerticalPanel();
         final FileUploadExt fileUploadExt = new FileUploadExt();
         photoLoader.add(fileUploadExt);
@@ -260,13 +251,13 @@ public class LabelTreeBuilder {
                                 try {
                                     String buffer = reader.getStringResult();
                                     String base64 = Base64.toBase64(buffer);
-                                    DataSet dataSet = null;
-									Image image = new Image(dataSet);
-                                    Blob blob = new Blob(dataSet, _agentUid, file.getName());
+									MImage image = new MImage();
+                                    MBlob blob = new MBlob(_agentUid, file.getName());
                                     blob.setDataInBase64(base64);
                                     image.setBlob(blob);
-                                    _databaseAccessLayer.addNode(blob);
-                                    _databaseAccessLayer.addNode(image, parent);
+                                    MLink link = new MLink(parent, image);
+                                    // order is important here (create links last)
+                                    _remoteServices.insertOrUpdate(blob, image, link);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -280,34 +271,34 @@ public class LabelTreeBuilder {
         });
     }
 	
-	void addNode(final Node parent, String prompt, String size, final Function1<String,Node> instantiator) {
+	void addNode(final MNode parent, String prompt, String size, final Function1<String,MNode> instantiator) {
 		DialogHelper.showTextPrompt(prompt, "", size, new Function1<String,Void>() {
 			public Void apply(String s) {
 				if ( s != null && s.trim().length() > 0 ) {
-					Node node = instantiator.apply(s);
-					_databaseAccessLayer.addNode(node, parent);					
+					MNode child = instantiator.apply(s);
+					_remoteServices.insertChild(parent, child);					
 				}
 				return null;
 			}
 		});		
 	}
 
-	void addTextMessage(final Node node) {
+	void addTextMessage(final MNode parent) {
 		DialogHelper.showTextPrompt("Enter the message text.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_databaseAccessLayer.addTextMessage(node, t);					
+					_remoteServices.insertTextNode(parent, t);					
 				}
 				return null;
 			}
 		});
 	}
 
-	void addAddress(final Node node) {
+	void addAddress(final MNode parent) {
 		DialogHelper.showTextPrompt("Enter the info.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_databaseAccessLayer.addAddress(node, t);					
+					_remoteServices.insertTextNode(parent, t);					
 				}
 				return null;
 			}

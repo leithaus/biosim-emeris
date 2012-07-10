@@ -1,7 +1,7 @@
 package biosim.client.messages.protocol;
 
 import m3.gwt.props.ApplyCodeGeneration;
-import biosim.client.model.Uid;
+import biosim.client.messages.model.Uid;
 
 @ApplyCodeGeneration
 public class Request {
@@ -12,14 +12,14 @@ public class Request {
 	
 	// BEGIN_GENERATED_CODE
 	
-	public biosim.client.model.Uid getUid() {
+	public biosim.client.messages.model.Uid getUid() {
 	    return _uid;
 	}
-	public void setUid(biosim.client.model.Uid uid0) {
+	public void setUid(biosim.client.messages.model.Uid uid0) {
 	    _setUid(uid0);
 	}
-	protected void _setUid(biosim.client.model.Uid uid0) {
-	    biosim.client.model.Uid before = _uid;
+	protected void _setUid(biosim.client.messages.model.Uid uid0) {
+	    biosim.client.messages.model.Uid before = _uid;
 	     _uid = uid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.uid, before, uid0);
 	}
@@ -39,9 +39,9 @@ public class Request {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class RequestContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext uid = new m3.gwt.props.impl.AbstractPropertyContext<Request,biosim.client.model.Uid>(this, "uid", biosim.client.model.Uid.class, 0, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(Request bean) { return bean.getUid(); }
-	    	    protected void setImpl(Request bean, biosim.client.model.Uid value ) { bean.setUid(value);}
+	    public m3.gwt.props.PropertyContext uid = new m3.gwt.props.impl.AbstractPropertyContext<Request,biosim.client.messages.model.Uid>(this, "uid", biosim.client.messages.model.Uid.class, 0, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(Request bean) { return bean.getUid(); }
+	    	    protected void setImpl(Request bean, biosim.client.messages.model.Uid value ) { bean.setUid(value);}
 	    };
 	    public m3.gwt.props.PropertyContext requestBody = new m3.gwt.props.impl.AbstractPropertyContext<Request,biosim.client.messages.protocol.RequestBody>(this, "requestBody", biosim.client.messages.protocol.RequestBody.class, 1, null, false) {
 	    	    protected biosim.client.messages.protocol.RequestBody getImpl(Request bean) { return bean.getRequestBody(); }

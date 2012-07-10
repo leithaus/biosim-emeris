@@ -6,7 +6,7 @@ import java.util.Map;
 import m3.gwt.lang.MapX;
 import biosim.client.Biosim;
 import biosim.client.NodeBuilder;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
@@ -26,7 +26,7 @@ public class FilterBar {
 	
 	final FlowPanel _panel = new FlowPanel();
 	
-	Map<Node,Widget> _filterNodeToWidgetMap = MapX.create();
+	Map<MNode,Widget> _filterNodeToWidgetMap = MapX.create();
 	
 	Filter _filter = new Filter();
 	
@@ -101,7 +101,7 @@ public class FilterBar {
 	}
 
     void addContent(ClickEvent event) {
-        NodeBuilder nodeBuilder = new NodeBuilder(_filter._labels, _filter._people);
+        NodeBuilder nodeBuilder = new NodeBuilder(_filter._labels, _filter._connections);
 	    nodeBuilder.showPopupMenu(event);
 	}
 
@@ -116,14 +116,14 @@ public class FilterBar {
 	}
 
 	private void refresh() {
-		Biosim.get().getDatabaseAccessLayer().fireRefreshContentPane();
+		throw new RuntimeException("implement me");
 	}
 	
-	public void addToFilter(Node node) {
+	public void addToFilter(MNode node) {
 		if ( _filter.canAddFilter(node) ) {
 			_filter = _filter.add(node);
 			
-			for ( Node n : _filter._nodes ) {
+			for ( MNode n : _filter._nodes ) {
 				Widget w = _filterNodeToWidgetMap.get(n);
 				if ( w == null && _filter.isVisible(n) ) {
 					w = createFilterWidget(node.getVisualId());

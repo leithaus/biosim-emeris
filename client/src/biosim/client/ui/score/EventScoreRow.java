@@ -8,8 +8,8 @@ import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.ui.HorizontalPanelBuilder;
 import biosim.client.eventlist.ui.ObservableListPanelAdapter;
 import biosim.client.fun.Option;
-import biosim.client.model.HasBlob;
-import biosim.client.model.Node;
+import biosim.client.messages.model.HasBlob;
+import biosim.client.messages.model.MNode;
 import biosim.client.ui.ToolTipListener;
 
 import com.google.gwt.user.client.ui.HTML;
@@ -29,20 +29,20 @@ public class EventScoreRow {
 		}
 	};
 	
-	final Map<Widget,Node> _widgetToNodeMap = MapX.create();
+	final Map<Widget,MNode> _widgetToNodeMap = MapX.create();
 	
 	final ToolTipListener _toolTipListener = new ToolTipListener(_tooltipGenerator);
 
-	ObservableList<Option<Node>> _model;
+	ObservableList<Option<MNode>> _model;
 	
 	Widget _widget;
 	
-	public EventScoreRow(ObservableList<Option<Node>> model) {
+	public EventScoreRow(ObservableList<Option<MNode>> model) {
 		_model = model;
 		
-		_widget = ObservableListPanelAdapter.create(_model, new HorizontalPanelBuilder(), new Function1<Option<Node>, Widget>() {
+		_widget = ObservableListPanelAdapter.create(_model, new HorizontalPanelBuilder(), new Function1<Option<MNode>, Widget>() {
 			@Override
-			public Widget apply(Option<Node> t) {
+			public Widget apply(Option<MNode> t) {
 				return createCellWidget(t);
 			}
 		}).getWidget();
@@ -57,10 +57,10 @@ public class EventScoreRow {
 //			}
 	}
 	
-	public Widget createCellWidget(Option<Node> o) {
+	public Widget createCellWidget(Option<MNode> o) {
 		Widget cellWidget;
 		if ( o.isDefined() ) {
-			Node node = o.get();
+			MNode node = o.get();
 			if ( node instanceof HasBlob ) {
 				cellWidget = new Image(((HasBlob)node).getBlobRef().getUrl());
 			} else {
@@ -75,7 +75,7 @@ public class EventScoreRow {
 		return cellWidget;
 	}
 
-	public Widget createToolTipWidget(Node node) {
+	public Widget createToolTipWidget(MNode node) {
 		Widget tooltipWidget;
 		if ( node instanceof HasBlob ) {
 			tooltipWidget = new Image(((HasBlob)node).getBlobRef().getUrl());

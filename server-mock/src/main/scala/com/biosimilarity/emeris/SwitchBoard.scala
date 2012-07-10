@@ -9,12 +9,7 @@ import com.biosimilarity.emeris.newmodel.DatabaseFactory
 import biosim.client.messages.protocol.Request
 import biosim.client.messages.protocol.QueryRequest
 import com.biosimilarity.emeris.newmodel.Model.Node
-import biosim.client.model.{ 
-   Connection => ClientConnection, 
-   Blob => ClientBlob, 
-   Label => ClientLabel, 
-   Link => ClientLink, 
-   Node => ClientNode,
+import biosim.client.messages.model.{ 
    Uid => ClientUid
    }
 import biosim.client.messages.model.{ BlobRef => ClientBlobRef }
@@ -32,6 +27,8 @@ import biosim.client.messages.protocol.FetchResponse
 import biosim.client.messages.protocol.SelectRequest
 import biosim.client.messages.protocol.SelectResponse
 import biosim.client.messages.protocol.CreateNodesResponse
+import biosim.client.messages.model.MBlob
+import biosim.client.messages.model.MLink
 
 object SwitchBoard extends Logging {
 
@@ -87,7 +84,7 @@ object SwitchBoard extends Logging {
             cnr.
               getNodes.
               asScala.
-              filterNot(_.isInstanceOf[ClientBlob]).
+              filterNot(_.isInstanceOf[MBlob]).
               asJava
         )
         SocketManager.
@@ -127,17 +124,17 @@ object SwitchBoard extends Logging {
         l
       }
       case conn: Connection => 
-        new MConnection(conn.uid, conn.name, conn.icon)
+        new MConnection(conn.uid, conn.name, conn.icon, conn.remoteAgent)
         
       case _ => sys.error("don't know how to handle type " + sn)
       
     }
   }
   
-  def toServerNode(cn: ClientNode): Node = cn match {
-    case b: ClientBlob => Blob(b.getRef.getAgentUid, b.getRef.getFilename, b.getDataInBase64, b.getUid)
-    case l: ClientLabel => Label(l.getName, l.getIconRef, l.getUid)
-    case l: ClientLink => Link(l.getFrom, l.getTo)
+  def toServerNode(cn: MNode): Node = cn match {
+    case b: MBlob => Blob(b.getRef.getAgentUid, b.getRef.getFilename, b.getDataInBase64, b.getUid)
+    case l: MLabel => Label(l.getName, l.getIcon, l.getUid)
+    case l: MLink => Link(l.getFrom, l.getTo)
     case _ => sys.error("don't know how to handle type " + cn)
   }
   

@@ -1,59 +1,61 @@
 package biosim.client.messages.model;
 
-import biosim.client.model.Uid;
-
 public class MLink extends MNode {
 
 	private Uid _from;
 	private Uid _to;
 	
-	public MLink() {
+	private MLink() {
 	}
 	
-	public MLink(Uid _from, Uid _to) {
-		this._from = _from;
-		this._to = _to;
+	public MLink(Uid from, Uid to) {
+		_from = from;
+		_to = to;
 	}
 	
+	public MLink(MNode from, MNode to) {
+		this(from.getUid(), to.getUid());
+	}
+	
+	@Override
+	public String toString() {
+		return "Link(" + _from + ", " + _to + ")";
+	}
+
 	// BEGIN_GENERATED_CODE
 	
-	public biosim.client.model.Uid getFrom() {
+	public biosim.client.messages.model.Uid getFrom() {
 	    return _from;
 	}
-	public void setFrom(biosim.client.model.Uid from0) {
+	public void setFrom(biosim.client.messages.model.Uid from0) {
 	    _setFrom(from0);
 	}
-	protected void _setFrom(biosim.client.model.Uid from0) {
-	    biosim.client.model.Uid before = _from;
+	protected void _setFrom(biosim.client.messages.model.Uid from0) {
+	    biosim.client.messages.model.Uid before = _from;
 	     _from = from0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.from, before, from0);
 	}
-	public biosim.client.model.Uid getTo() {
+	public biosim.client.messages.model.Uid getTo() {
 	    return _to;
 	}
-	public void setTo(biosim.client.model.Uid to0) {
+	public void setTo(biosim.client.messages.model.Uid to0) {
 	    _setTo(to0);
 	}
-	protected void _setTo(biosim.client.model.Uid to0) {
-	    biosim.client.model.Uid before = _to;
+	protected void _setTo(biosim.client.messages.model.Uid to0) {
+	    biosim.client.messages.model.Uid before = _to;
 	     _to = to0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.to, before, to0);
 	}
-	@Override
-	public String toString() {
-	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
-	}
 	public static class MLinkContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext from = new m3.gwt.props.impl.AbstractPropertyContext<MLink,biosim.client.model.Uid>(this, "from", biosim.client.model.Uid.class, 0, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(MLink bean) { return bean.getFrom(); }
-	    	    protected void setImpl(MLink bean, biosim.client.model.Uid value ) { bean.setFrom(value);}
+	    public m3.gwt.props.PropertyContext from = new m3.gwt.props.impl.AbstractPropertyContext<MLink,biosim.client.messages.model.Uid>(this, "from", biosim.client.messages.model.Uid.class, 0, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(MLink bean) { return bean.getFrom(); }
+	    	    protected void setImpl(MLink bean, biosim.client.messages.model.Uid value ) { bean.setFrom(value);}
 	    };
-	    public m3.gwt.props.PropertyContext to = new m3.gwt.props.impl.AbstractPropertyContext<MLink,biosim.client.model.Uid>(this, "to", biosim.client.model.Uid.class, 1, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(MLink bean) { return bean.getTo(); }
-	    	    protected void setImpl(MLink bean, biosim.client.model.Uid value ) { bean.setTo(value);}
+	    public m3.gwt.props.PropertyContext to = new m3.gwt.props.impl.AbstractPropertyContext<MLink,biosim.client.messages.model.Uid>(this, "to", biosim.client.messages.model.Uid.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(MLink bean) { return bean.getTo(); }
+	    	    protected void setImpl(MLink bean, biosim.client.messages.model.Uid value ) { bean.setTo(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = MNode.Context.uid;
-	    public m3.gwt.props.PropertyContext name = MNode.Context.name;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
 	        set = set.insert("biosim.client.messages.model.MNode");
@@ -64,7 +66,6 @@ public class MLink extends MNode {
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
 	        list = list.cons(this.uid);
-	        list = list.cons(this.name);
 	        list = list.cons(this.from);
 	        list = list.cons(this.to);
 	        return list;

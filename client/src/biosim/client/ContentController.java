@@ -10,8 +10,8 @@ import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
-import biosim.client.model.Address;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
+import biosim.client.messages.model.NodeContainer;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
@@ -24,9 +24,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class ContentController {
 	
-	private Map<Node,NodeWidgetBuilder> _nodeToWidgetBuilderMap = MapX.create();
+	private Map<MNode,NodeWidgetBuilder> _nodeToWidgetBuilderMap = MapX.create();
 	FlowPanel _contentPanel = new FlowPanel();
-	ObservableList<Node> _contentList;
+	ObservableList<MNode> _contentList;
 	Biosim _biosim;
 	
 	Function _nullCompletionCallback = new Function() {
@@ -35,15 +35,15 @@ public class ContentController {
 		}
 	};
 
-	ListListener<Node> _listener = new FineGrainedListListener<Node>() {
+	ListListener<MNode> _listener = new FineGrainedListListener<MNode>() {
 		@Override
-		public void added(ListEvent<Node> event) {
+		public void added(ListEvent<MNode> event) {
 			NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
 			if ( !nwb.isVisible() ) {
 				show(nwb, null);
 			}
 		}
-		public void removed(ListEvent<Node> event) {
+		public void removed(ListEvent<MNode> event) {
 			NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
 			if ( nwb.isVisible() ) {
 				hide(nwb, null);
@@ -51,22 +51,22 @@ public class ContentController {
 		}
 	};
 
-	ContentController(Biosim biosim, ObservableList<Node> allNodes, final DndController dndController) {
+	ContentController(Biosim biosim, ObservableList<MNode> allNodes, final DndController dndController) {
 		_biosim = biosim;
-		allNodes.addListener(new FineGrainedListListener<Node>() {
+		allNodes.addListener(new FineGrainedListListener<MNode>() {
 			@Override
-			public void added(ListEvent<Node> event) {
+			public void added(ListEvent<MNode> event) {
 				NodeWidgetBuilder nwb = new NodeWidgetBuilder(event.getElement(), dndController, DndType.Content);
 				_contentPanel.add(nwb.getPanel());
 				nwb.getPanel().setVisible(false);
 				_nodeToWidgetBuilderMap.put(event.getElement(), nwb);
 			}
-			public void changed(biosim.client.eventlist.ListEvent<Node> event) {
+			public void changed(biosim.client.eventlist.ListEvent<MNode> event) {
 				NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
 				nwb.rebuild();
 			}
 			@Override
-			public void removed(ListEvent<Node> event) {
+			public void removed(ListEvent<MNode> event) {
 				final NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
 				hide(nwb, new Function() {
 					public void f() {
@@ -78,18 +78,18 @@ public class ContentController {
 		_contentList = allNodes;
 	}
 	
-	public void setContentList(ObservableList<Node> newList) {
-		ObservableList<Node> oldList = _contentList;
+	public void setContentList(ObservableList<MNode> newList) {
+		ObservableList<MNode> oldList = _contentList;
 		
 		oldList.removeListener(_listener);
 		
-		Observables.diff(oldList, newList, new Observables.DiffHandler<Node>() {
+		Observables.diff(oldList, newList, new Observables.DiffHandler<MNode>() {
 			@Override
-			public void added(Node t) {
+			public void added(MNode t) {
 				show(_nodeToWidgetBuilderMap.get(t), null);
 			}
 			@Override
-			public void removed(Node t) {
+			public void removed(MNode t) {
 				hide(_nodeToWidgetBuilderMap.get(t), null);
 			}
 		});
@@ -126,16 +126,13 @@ public class ContentController {
 		$(widget).slideUp(500, completionCallback);
 	}
 
-	public NodeWidgetBuilder builder(Node node) {
+	public NodeWidgetBuilder builder(MNode node) {
 		return _nodeToWidgetBuilderMap.get(node);
 	}
 
 	public void refilterContent() {
-		final ObservableList<Node> content = Observables.create();
-		for ( Node node : _biosim.getDatabaseAccessLayer().getContent() ) {
-			if ( node instanceof Address ) {
-				toString();
-			}
+		final ObservableList<MNode> content = Observables.create();
+		for ( MNode node : NodeContainer.get().nodes ) {
 			ContentCriteria accept = _biosim._filtersBar.getFilter().acceptVerbose(node);
 			NodeWidgetBuilder builder = builder(node);
 			if ( accept != null && builder != null ) {

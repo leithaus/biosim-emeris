@@ -4,7 +4,7 @@ import java.util.Map;
 
 import m3.gwt.lang.MapX;
 import biosim.client.Biosim;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
@@ -23,7 +23,7 @@ public class NodeDropWidgetBuilder {
 
 	final FlowPanel _panel = new FlowPanel();
 	
-	Map<Node,Widget> _nodes = MapX.create();
+	Map<MNode,Widget> _nodes = MapX.create();
 	Biosim _biosim;
 	Button _clear;
 	
@@ -55,7 +55,7 @@ public class NodeDropWidgetBuilder {
 		
 	}
 	
-	public void add(Node node) {
+	public void add(MNode node) {
 		if ( !_nodes.containsKey(node) ) {
 			Widget w = createFilterWidget(node.getVisualId());
 			_panel.add(w);

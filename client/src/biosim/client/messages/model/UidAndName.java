@@ -1,7 +1,6 @@
 package biosim.client.messages.model;
 
 import m3.gwt.props.ApplyCodeGeneration;
-import biosim.client.model.Uid;
 
 @ApplyCodeGeneration
 public class UidAndName {
@@ -19,14 +18,14 @@ public class UidAndName {
 	
 	// BEGIN_GENERATED_CODE
 	
-	public biosim.client.model.Uid getUid() {
+	public biosim.client.messages.model.Uid getUid() {
 	    return _uid;
 	}
-	public void setUid(biosim.client.model.Uid uid0) {
+	public void setUid(biosim.client.messages.model.Uid uid0) {
 	    _setUid(uid0);
 	}
-	protected void _setUid(biosim.client.model.Uid uid0) {
-	    biosim.client.model.Uid before = _uid;
+	protected void _setUid(biosim.client.messages.model.Uid uid0) {
+	    biosim.client.messages.model.Uid before = _uid;
 	     _uid = uid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.uid, before, uid0);
 	}
@@ -46,9 +45,9 @@ public class UidAndName {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class UidAndNameContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext uid = new m3.gwt.props.impl.AbstractPropertyContext<UidAndName,biosim.client.model.Uid>(this, "uid", biosim.client.model.Uid.class, 0, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(UidAndName bean) { return bean.getUid(); }
-	    	    protected void setImpl(UidAndName bean, biosim.client.model.Uid value ) { bean.setUid(value);}
+	    public m3.gwt.props.PropertyContext uid = new m3.gwt.props.impl.AbstractPropertyContext<UidAndName,biosim.client.messages.model.Uid>(this, "uid", biosim.client.messages.model.Uid.class, 0, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(UidAndName bean) { return bean.getUid(); }
+	    	    protected void setImpl(UidAndName bean, biosim.client.messages.model.Uid value ) { bean.setUid(value);}
 	    };
 	    public m3.gwt.props.PropertyContext name = new m3.gwt.props.impl.AbstractPropertyContext<UidAndName,java.lang.String>(this, "name", java.lang.String.class, 1, null, false) {
 	    	    protected java.lang.String getImpl(UidAndName bean) { return bean.getName(); }

@@ -5,7 +5,8 @@ import java.util.List;
 import m3.gwt.lang.ListX;
 import biosim.client.Biosim;
 import biosim.client.DndController;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MImage;
+import biosim.client.messages.model.MNode;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.utils.GqueryUtils;
 
@@ -31,7 +32,7 @@ public class NodeWidgetBuilder {
 	CustomFlowPanel _widget = new CustomFlowPanel();
 	SimplePanel _wrapper = new SimplePanel();
 	
-	final Node _node;
+	final MNode _node;
 	final DndType _dndType;
 	final DndController _dndController;
 	
@@ -41,7 +42,7 @@ public class NodeWidgetBuilder {
 	List<Widget> _sourceLabelWidgets = ListX.create();
 	ContentCriteria _filterAcceptCriteria;
 
-	public NodeWidgetBuilder(Node node, DndController dndController, DndType dndType) {
+	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType) {
 		_node = node;
 		_dndType = dndType;
 		_dndController = dndController;
@@ -75,14 +76,14 @@ public class NodeWidgetBuilder {
 			_dndController.makeDraggable(_dndType, _node, _widget, _icon);
 		}
 		
-		if ( _node instanceof biosim.client.model.Image ) {
+		if ( _node instanceof MImage ) {
 			
 			// Create a FlexTable into which the image will be displayed
 			HorizontalPanel p = new HorizontalPanel();
 			p.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 			
 			// Create the image element
-			final String imageURL = ((biosim.client.model.Image)_node).getBlobRef().getUrl();
+			final String imageURL = ((MImage)_node).getBlobRef().getUrl();
 			Image i = new Image(imageURL);
 			if (i.getHeight() > i.getWidth()) {
 				i.setHeight("150px");
@@ -155,7 +156,7 @@ public class NodeWidgetBuilder {
 		return _filterAcceptCriteria;
 	}
 	
-	public Node getNode() {
+	public MNode getNode() {
 		return _node;
 	}
 	

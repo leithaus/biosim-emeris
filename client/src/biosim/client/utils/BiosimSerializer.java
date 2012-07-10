@@ -5,7 +5,7 @@ import m3.gwt.props.json.JsonSerializer;
 import m3.gwt.props.json.JsonWriter;
 import m3.gwt.props.json.SingleTypeHandler;
 import biosim.client.BiosimUberContext;
-import biosim.client.model.Uid;
+import biosim.client.messages.model.Uid;
 
 public class BiosimSerializer extends JsonSerializer {
 

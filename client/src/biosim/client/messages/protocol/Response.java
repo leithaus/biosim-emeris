@@ -5,7 +5,7 @@ import java.util.List;
 import m3.gwt.lang.ListX;
 import m3.gwt.props.ApplyCodeGeneration;
 import m3.gwt.websocket.WebSocket.IncomingMessage;
-import biosim.client.model.Uid;
+import biosim.client.messages.model.Uid;
 
 @ApplyCodeGeneration
 public class Response {
@@ -42,25 +42,25 @@ public class Response {
 	
 	// BEGIN_GENERATED_CODE
 	
-	public biosim.client.model.Uid getUid() {
+	public biosim.client.messages.model.Uid getUid() {
 	    return _uid;
 	}
-	public void setUid(biosim.client.model.Uid uid0) {
+	public void setUid(biosim.client.messages.model.Uid uid0) {
 	    _setUid(uid0);
 	}
-	protected void _setUid(biosim.client.model.Uid uid0) {
-	    biosim.client.model.Uid before = _uid;
+	protected void _setUid(biosim.client.messages.model.Uid uid0) {
+	    biosim.client.messages.model.Uid before = _uid;
 	     _uid = uid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.uid, before, uid0);
 	}
-	public biosim.client.model.Uid getRequestUid() {
+	public biosim.client.messages.model.Uid getRequestUid() {
 	    return _requestUid;
 	}
-	public void setRequestUid(biosim.client.model.Uid requestUid0) {
+	public void setRequestUid(biosim.client.messages.model.Uid requestUid0) {
 	    _setRequestUid(requestUid0);
 	}
-	protected void _setRequestUid(biosim.client.model.Uid requestUid0) {
-	    biosim.client.model.Uid before = _requestUid;
+	protected void _setRequestUid(biosim.client.messages.model.Uid requestUid0) {
+	    biosim.client.messages.model.Uid before = _requestUid;
 	     _requestUid = requestUid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.requestUid, before, requestUid0);
 	}
@@ -80,13 +80,13 @@ public class Response {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class ResponseContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext uid = new m3.gwt.props.impl.AbstractPropertyContext<Response,biosim.client.model.Uid>(this, "uid", biosim.client.model.Uid.class, 0, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(Response bean) { return bean.getUid(); }
-	    	    protected void setImpl(Response bean, biosim.client.model.Uid value ) { bean.setUid(value);}
+	    public m3.gwt.props.PropertyContext uid = new m3.gwt.props.impl.AbstractPropertyContext<Response,biosim.client.messages.model.Uid>(this, "uid", biosim.client.messages.model.Uid.class, 0, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(Response bean) { return bean.getUid(); }
+	    	    protected void setImpl(Response bean, biosim.client.messages.model.Uid value ) { bean.setUid(value);}
 	    };
-	    public m3.gwt.props.PropertyContext requestUid = new m3.gwt.props.impl.AbstractPropertyContext<Response,biosim.client.model.Uid>(this, "requestUid", biosim.client.model.Uid.class, 1, null, false) {
-	    	    protected biosim.client.model.Uid getImpl(Response bean) { return bean.getRequestUid(); }
-	    	    protected void setImpl(Response bean, biosim.client.model.Uid value ) { bean.setRequestUid(value);}
+	    public m3.gwt.props.PropertyContext requestUid = new m3.gwt.props.impl.AbstractPropertyContext<Response,biosim.client.messages.model.Uid>(this, "requestUid", biosim.client.messages.model.Uid.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(Response bean) { return bean.getRequestUid(); }
+	    	    protected void setImpl(Response bean, biosim.client.messages.model.Uid value ) { bean.setRequestUid(value);}
 	    };
 	    public m3.gwt.props.PropertyContext responseBody = new m3.gwt.props.impl.AbstractPropertyContext<Response,biosim.client.messages.protocol.ResponseBody>(this, "responseBody", biosim.client.messages.protocol.ResponseBody.class, 2, null, false) {
 	    	    protected biosim.client.messages.protocol.ResponseBody getImpl(Response bean) { return bean.getResponseBody(); }

@@ -136,7 +136,7 @@ object Model {
 
   }
 
-  case class Connection(name: String, icon: BlobRef, uid: Uid = Uid()) extends Node
+  case class Connection(name: String, icon: BlobRef, remoteAgent: Uid, uid: Uid = Uid()) extends Node
   
   case class Address(value: String, uid: Uid = Uid()) extends Node 
   case class Phone(value: String, uid: Uid = Uid()) extends Node 

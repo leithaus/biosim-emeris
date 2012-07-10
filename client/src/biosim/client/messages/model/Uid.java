@@ -1,4 +1,4 @@
-package biosim.client.model;
+package biosim.client.messages.model;
 
 import m3.gwt.props.ApplyCodeGeneration;
 
@@ -107,7 +107,7 @@ public class Uid {
 	    };
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
-	        set = set.insert("biosim.client.model.Uid");
+	        set = set.insert("biosim.client.messages.model.Uid");
 	        set = set.insert("java.lang.Object");
 	        return set;
 	    }
@@ -120,7 +120,7 @@ public class Uid {
 	        return new Uid();
 	    }
 	    UidContainerContext(Class<?> actualClass) {
-	        super(biosim.client.model.Uid.class);
+	        super(biosim.client.messages.model.Uid.class);
 	    }
 	}
 	public static final UidContainerContext Context = new UidContainerContext(Uid.class);

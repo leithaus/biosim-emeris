@@ -5,7 +5,7 @@ import m3.gwt.lang.Function1;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.ui.FlowPanelBuilder;
 import biosim.client.eventlist.ui.ObservableListPanelAdapter;
-import biosim.client.model.Node;
+import biosim.client.messages.model.MNode;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.utils.GqueryUtils;
@@ -25,12 +25,12 @@ public class ContentControllerNew {
 		}
 	};
 
-	ContentControllerNew(Biosim biosim, ObservableList<Node> contentList, final DndController dndController) {
+	ContentControllerNew(Biosim biosim, ObservableList<MNode> contentList, final DndController dndController) {
 		_biosim = biosim;
 		
-		ObservableList<NodeWidgetBuilder> nwbList = contentList.map(new Function1<Node, NodeWidgetBuilder>() {
+		ObservableList<NodeWidgetBuilder> nwbList = contentList.map(new Function1<MNode, NodeWidgetBuilder>() {
 			@Override
-			public NodeWidgetBuilder apply(Node node) {
+			public NodeWidgetBuilder apply(MNode node) {
 				return new NodeWidgetBuilder(node, dndController, DndType.Content);
 			}
 		});
