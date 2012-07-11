@@ -16,6 +16,16 @@ public class MLabel extends MNode {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (!super.equals(obj)) {
+			return false;
+		}
+		
+		MLabel other = (MLabel)obj;
+		return (getChildren().length() != other.getChildren().length());
+	}
+	
+	@Override
 	public String toHtmlString() {
 		return _name;
 	}

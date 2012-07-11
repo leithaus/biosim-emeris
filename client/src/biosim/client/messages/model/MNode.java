@@ -43,16 +43,39 @@ public class MNode {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+		
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		
+		if (!(obj instanceof MNode)) {
 			return false;
+		}
+		
 		MNode other = (MNode) obj;
 		if (getUid() == null) {
-			if (other.getUid() != null)
+			if (other.getUid() != null) {
 				return false;
-		} else if (!getUid().equals(other.getUid()))
+			}
+		} else if (!getUid().equals(other.getUid())) {
 			return false;
+		}
+		
+		if (getName() == null) {
+			if (other.getName() != null) {
+				return false;
+			}
+		} else if (!getName().equals(other.getName())) {
+			return false;
+		}
+		
+		if (getIconUrl() == null) {
+			if (other.getIconUrl() != null) {
+				return false;
+			}
+		} else if (!getIconUrl().equals(other.getIconUrl())) {
+			return false;
+		}
+		
 		return true;
 	}
 

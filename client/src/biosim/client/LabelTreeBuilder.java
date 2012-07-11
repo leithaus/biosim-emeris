@@ -86,7 +86,10 @@ public class LabelTreeBuilder {
 	void updateTreeItemOnChange(TreeItem ti, MLabel label) {
 		MLabel ml = getUserObject(ti);
 		if (ml.getUid() == label.getUid()) {
-			ti.setText(label.getName());
+			if (!ml.equals(label)) {
+				ti.setUserObject(label);
+				updateTreeItem(ti);
+			}
 		} else {
 			for (int j = 0; j < ti.getChildCount(); j += 1) {
 				TreeItem t2 = ti.getChild(j);
@@ -311,10 +314,12 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
-		_localAgent.getAgentServices().fetch(agentUid, new Function1<MLabel,Void>() {
+		_localAgent.getAgentServices().rootLabels(agentUid, new Function1<Iterable<MLabel>,Void>() {
 			@Override
-			public Void apply(MLabel label) {
-				addChildren(label, null);
+			public Void apply(Iterable<MLabel> labels) {
+				for ( MLabel label : labels ) {
+					addChildren(label, null);
+				}
 				return null;
 			}
 		});
