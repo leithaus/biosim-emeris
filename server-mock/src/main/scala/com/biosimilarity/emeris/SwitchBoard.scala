@@ -29,6 +29,9 @@ import biosim.client.messages.protocol.SelectResponse
 import biosim.client.messages.protocol.CreateNodesResponse
 import biosim.client.messages.model.MBlob
 import biosim.client.messages.model.MLink
+import biosim.client.messages.protocol.RootLabelsRequest
+import biosim.client.messages.protocol.ResponseBody
+import biosim.client.messages.protocol.RootLabelsResponse
 
 object SwitchBoard extends Logging {
 
@@ -55,12 +58,23 @@ object SwitchBoard extends Logging {
   def onRequest(socket: Socket, request: Request) = {
     val db = DatabaseFactory.database(socket.agentUid)
     val dao = db.dao
-    val responseBody = request.getRequestBody match {
+    val responseBody: Option[ResponseBody] = request.getRequestBody match {
       case req: FetchRequest => {
-        val body = new FetchResponse
-        val serverNode = db.fetch[Node](req.getUid).get
-        body.setNode(toClientNode(serverNode, dao))
-        Some(body)
+        val nodes = req.
+          getUids.
+          asScala.
+          flatMap(u=>db.fetch[Node](u)).
+          map(n=>toClientNode(n, dao))
+        Some(new FetchResponse(nodes))
+      }
+      case rlr: RootLabelsRequest => {
+        val agent = db.fetch[Agent](socket.agentUid).get
+        val resp = new RootLabelsResponse
+        val labels = db.
+          children(agent).
+          collect { case l: Label => l.uid }.
+          foreach(uid=>resp.addUid(uid))
+        Some(resp)
       }
       case qr: QueryRequest => None
       case sr: SelectRequest => {
@@ -103,17 +117,6 @@ object SwitchBoard extends Logging {
   
   def toClientNode(sn: Node, dao: AgentDAO): MNode = {
     sn match {
-      case sa: Agent => { // hack to make agent look like a set of labels since that is the idiom we use to get the root labels 
-        val l = new MLabel
-        val children = dao.
-          childLabels(sn).
-          map(cl => toClientUid(cl.uid)).
-          toList
-        l.setName(sa.name)
-        l.setUid(sa.uid)
-        l.setChildren(children)
-        l
-      }
       case label: Label => {
         val l = new MLabel
         l.setName(label.name)

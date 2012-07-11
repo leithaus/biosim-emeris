@@ -1,7 +1,6 @@
 package biosim.client;
 
 import static com.google.gwt.query.client.GQuery.$;
-import m3.fj.data.FList;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.LogTool;
 import biosim.client.eventlist.ListEvent;
@@ -270,8 +269,8 @@ public class Biosim implements EntryPoint {
 				
 				_labelsSectionContent.add(new ConnectionViewDropSiteBuilder(_dndController).getWidget());
 				
-				_remoteServices.select(MConnection.class, new Function1<FList<MConnection>, Void>() {
-					public Void apply(FList<MConnection> t) {
+				_remoteServices.select(MConnection.class, new Function1<Iterable<MConnection>, Void>() {
+					public Void apply(Iterable<MConnection> t) {
 						// do nothing since this call alone will trigger an update to the NodeContainer
 						return null;
 					}

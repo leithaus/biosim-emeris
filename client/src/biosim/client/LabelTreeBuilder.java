@@ -313,10 +313,12 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
-		_remoteServices.fetch(agentUid, new Function1<MLabel,Void>() {
+		_remoteServices.rootLabels(agentUid, new Function1<Iterable<MLabel>,Void>() {
 			@Override
-			public Void apply(MLabel label) {
-				addChildren(label, null);
+			public Void apply(Iterable<MLabel> labels) {
+				for ( MLabel label : labels ) {
+					addChildren(label, null);
+				}
 				return null;
 			}
 		});
