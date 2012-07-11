@@ -1,7 +1,5 @@
 package biosim.client.messages.model;
 
-import java.util.List;
-
 import m3.fj.data.FList;
 import m3.gwt.lang.ClassX;
 import m3.gwt.lang.Function1;
@@ -10,6 +8,8 @@ import biosim.client.messages.protocol.FetchRequest;
 import biosim.client.messages.protocol.FetchResponse;
 import biosim.client.messages.protocol.QueryRequest;
 import biosim.client.messages.protocol.QueryResponse;
+import biosim.client.messages.protocol.RootLabelsRequest;
+import biosim.client.messages.protocol.RootLabelsResponse;
 import biosim.client.messages.protocol.SelectRequest;
 import biosim.client.messages.protocol.SelectResponse;
 import biosim.client.utils.BiosimWebSocket;
@@ -28,39 +28,72 @@ public class RemoteServicesImpl implements RemoteServices {
 
 	@Override
 	public <T extends MNode> void fetch(Uid uid, final Function1<T, Void> asyncCallback) {
-		fetch(uid, false, asyncCallback);
+		fetch(FList.create(uid), false, new Function1<Iterable<T>, Void>() {
+			@Override
+			public Void apply(Iterable<T> list) {
+				asyncCallback.apply(list.iterator().next());
+				return null;
+			}
+		});
 	}
 	
-	<T extends MNode> void fetchImpl(Uid uid, final Function1<T, Void> asyncCallback) {
-		_socket.send(new FetchRequest(uid), new Function1<FetchResponse, Void>() {
+	<T extends MNode> void fetchImpl(Iterable<Uid> uids, final Function1<FList<T>, Void> asyncCallback) {
+		_socket.send(new FetchRequest(uids), new Function1<FetchResponse, Void>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void apply(FetchResponse response) {
-				asyncCallback.apply((T)response.getNode());
-				_nodeContainer.nodes.add(response.getNode());
+				asyncCallback.apply((FList<T>)response.getNodes());
+				for ( MNode t : response.getNodes() ) {
+					_nodeContainer.insertOrUpdate(t);
+				}
 				return null;
 			}
 		});
 	}
 	
 	@Override
-	public <T extends MNode> void fetch(Uid uid, boolean bypassCache, Function1<T, Void> asyncCallback) {
+	public <T extends MNode> void fetch(Iterable<Uid> uids, boolean bypassCache, final Function1<Iterable<T>, Void> asyncCallback) {
 		
-		T t = null;
+		FList<T> results = FList.nil();
+		Iterable<Uid> uidsToSendToServer;
+		
 		if ( !bypassCache ) {
-			t = _nodeContainer.fetch(uid);
+			FList<Uid> temp = FList.nil();
+			for ( Uid uid : uids ) {
+				T t = _nodeContainer.fetch(uid);
+				if ( t != null ) {
+					results = results.cons(t);
+				} else {
+					temp = temp.cons(uid);
+				}
+			}
+			uidsToSendToServer = temp;
+		} else {
+			uidsToSendToServer = uids;
 		}
 		
-		if ( t == null ) {
-			fetchImpl(uid, asyncCallback);			
+		if ( uidsToSendToServer.iterator().hasNext() ) {
+			final FList<T> results_f = results;
+			fetchImpl(uidsToSendToServer, new Function1<FList<T>, Void>() {
+				@Override
+				public Void apply(FList<T> list) {
+					if ( !results_f.isEmpty() ) {
+						for ( T t : results_f ) {
+							list = list.cons(t);
+						}
+					}
+					asyncCallback.apply(list);
+					return null;
+				}
+			});			
 		} else {
-			asyncCallback.apply(t);
+			asyncCallback.apply(results);
 		}
 		
 	}
 	
 	@Override
-	public <T extends MNode> void select(Class<T> clazz, final Function1<FList<T>, Void> asyncCallback) {
+	public <T extends MNode> void select(Class<T> clazz, final Function1<Iterable<T>, Void> asyncCallback) {
 		SelectRequest req = new SelectRequest();
 		req.setShortClassname(ClassX.getShortName(clazz));
 		_socket.send(req, new Function1<SelectResponse,Void>() {
@@ -81,7 +114,7 @@ public class RemoteServicesImpl implements RemoteServices {
 	}
 	
 	@Override
-	public void query(List<MNode> labels, Uid uid, final Function1<List<FilterAcceptCriteria>, Void> asyncCallback) {
+	public void query(Iterable<MNode> labels, Uid uid, final Function1<Iterable<FilterAcceptCriteria>, Void> asyncCallback) {
 		_socket.send(new QueryRequest(), new Function1<QueryResponse, Void>() {
 			@Override
 			public Void apply(QueryResponse response) {
@@ -106,6 +139,17 @@ public class RemoteServicesImpl implements RemoteServices {
 	public void removeLink(MNode p, MNode node) {
 		// TDGlen implement me
 		throw new RuntimeException("implement me");
+	}
+	
+	@Override
+	public void rootLabels(Uid uid, final Function1<Iterable<MLabel>, Void> asyncCallback) {
+		_socket.send(new RootLabelsRequest(), new Function1<RootLabelsResponse, Void>() {
+			@Override
+			public Void apply(RootLabelsResponse response) {
+				fetch(response.getUids(), false, asyncCallback);
+				return null;
+			}
+		});
 	}
 
 }
