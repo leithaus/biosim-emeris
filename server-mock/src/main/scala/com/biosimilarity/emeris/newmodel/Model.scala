@@ -159,10 +159,14 @@ object Model {
     def connections: Iterable[Connection]
   }
 
-  class LocalAgentDAO(database0: AgentDatabase) extends AgentDAO {
+  class AgentDAOViaDatabase(database0: AgentDatabase) extends AgentDAO {
 
     implicit def database: AgentDatabase = database0
 
+    lazy val nodes = 
+      database.
+        nodes
+    
     override def fetch(uid: Uid) =
       database.
         nodes.
@@ -190,7 +194,7 @@ object Model {
 
     val uid: Uid
     
-    lazy val dao = new LocalAgentDAO(this)
+    lazy val dao = new AgentDAOViaDatabase(this)
     
     def insert[T <: Node](n: T): T
     def fetch[T <: Node](uid: Uid)(implicit mf: Manifest[T]): Option[T]
@@ -219,6 +223,24 @@ object Model {
     def asJsonStr = pretty(render(asJValue))
 
     def asAgentData = AgentData(uid, nodes.toList)
+    
+  }
+  
+  class FilteredDatabase(delegate: AgentDatabase, connection: Connection) extends AgentDatabase  {
+    
+    val uid = delegate.uid
+    
+    lazy val nodes = delegate.nodes.filter(_.canBeSeenBy(connection)(delegate))
+
+    private def notSupported = sys.error("not supported on filtered databases")
+    override def dropDatabase() = notSupported
+    override def insert[T <: Node](n: T): T = notSupported
+    override def delete(uid: Uid) = notSupported
+    
+    override def fetch[T <: Node](uid: Uid)(implicit mf: Manifest[T]): Option[T] = 
+      nodes.
+        find(_.uid == uid).
+        asInstanceOf[Option[T]]
     
   }
   

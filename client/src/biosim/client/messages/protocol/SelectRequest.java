@@ -3,7 +3,7 @@ package biosim.client.messages.protocol;
 import m3.gwt.props.ApplyCodeGeneration;
 
 @ApplyCodeGeneration
-public class SelectRequest extends RequestBody {
+public class SelectRequest extends ConnectionScopedRequestBody {
 
 	private String _shortClassname;
 	
@@ -32,16 +32,19 @@ public class SelectRequest extends RequestBody {
 	    	    protected java.lang.String getImpl(SelectRequest bean) { return bean.getShortClassname(); }
 	    	    protected void setImpl(SelectRequest bean, java.lang.String value ) { bean.setShortClassname(value);}
 	    };
+	    public m3.gwt.props.PropertyContext connectionUid = ConnectionScopedRequestBody.Context.connectionUid;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
 	        set = set.insert("biosim.client.messages.protocol.SelectRequest");
 	        set = set.insert("biosim.client.messages.protocol.RequestBody");
 	        set = set.insert("java.lang.Object");
+	        set = set.insert("biosim.client.messages.protocol.ConnectionScopedRequestBody");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
 	        list = list.cons(this.shortClassname);
+	        list = list.cons(this.connectionUid);
 	        return list;
 	    }
 	    public SelectRequest newInstance() {

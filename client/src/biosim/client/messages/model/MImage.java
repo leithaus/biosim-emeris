@@ -52,8 +52,8 @@ public class MImage extends MNode {
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
-	        list = list.cons(this.uid);
 	        list = list.cons(this.blobRef);
+	        list = list.cons(this.uid);
 	        return list;
 	    }
 	    public MImage newInstance() {

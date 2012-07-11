@@ -29,6 +29,7 @@ import biosim.client.messages.protocol.SelectResponse
 import biosim.client.messages.protocol.CreateNodesResponse
 import biosim.client.messages.model.MBlob
 import biosim.client.messages.model.MLink
+import biosim.client.messages.protocol.ConnectionScopedRequestBody
 
 object SwitchBoard extends Logging {
 
@@ -53,28 +54,41 @@ object SwitchBoard extends Logging {
   }
 
   def onRequest(socket: Socket, request: Request) = {
-    val db = DatabaseFactory.database(socket.agentUid)
-    val dao = db.dao
+  	val localAgentDb = DatabaseFactory.database(socket.agentUid)
     val responseBody = request.getRequestBody match {
-      case req: FetchRequest => {
-        val body = new FetchResponse
-        val serverNode = db.fetch[Node](req.getUid).get
-        body.setNode(toClientNode(serverNode, dao))
-        Some(body)
-      }
-      case qr: QueryRequest => None
-      case sr: SelectRequest => {
-        sr.getShortClassname match {
-          case "MConnection" => {
-            val connections = db.
-              nodes.
-              collect{case c: Connection => c}.
-              map(c=>toClientNode(c, dao))
-            val resp = new SelectResponse
-            resp.setNodes(connections.toList)
-            Some(resp)
+      case csrb: ConnectionScopedRequestBody => {
+        val db = csrb.getConnectionUid match {
+          case null => localAgentDb
+          case uid => {
+            val localConn = localAgentDb.fetch[Connection](uid).get
+            val remoteAgentDb = DatabaseFactory.database(localConn.remoteAgent)
+            val remoteConn = remoteAgentDb.fetch[Connection](uid).get
+            new FilteredDatabase(remoteAgentDb, remoteConn)
           }
-          case _ => sys.error("don't know how to handle " + sr.getShortClassname)
+        }
+        val dao = db.dao
+        csrb match {
+          case req: FetchRequest => {
+            val body = new FetchResponse
+            val serverNode = db.fetch[Node](req.getUid).get
+            body.setNode(toClientNode(serverNode, dao))
+            Some(body)
+          }
+          case qr: QueryRequest => None
+          case sr: SelectRequest => {
+            sr.getShortClassname match {
+              case "MConnection" => {
+                val connections = db.
+                  nodes.
+                  collect { case c: Connection => c }.
+                  map(c => toClientNode(c, dao))
+                val resp = new SelectResponse
+                resp.setNodes(connections.toList)
+                Some(resp)
+              }
+              case _ => sys.error("don't know how to handle " + sr.getShortClassname)
+            }
+          }
         }
       }
       case cnr: CreateNodesRequest => {
@@ -83,7 +97,7 @@ object SwitchBoard extends Logging {
           asScala.
           map(toServerNode)
         nodes.
-          foreach(n => db.insert(n))
+          foreach(n => localAgentDb.insert(n))
         
         val response = new CreateNodesResponse
         response.setNodes(

@@ -8,11 +8,10 @@ import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
-import biosim.client.messages.model.RemoteServices;
-import biosim.client.messages.model.RemoteServicesImpl;
 import biosim.client.messages.model.Uid;
 import biosim.client.messages.protocol.MessageHandler;
 import biosim.client.ui.ContentCriteria;
@@ -77,7 +76,7 @@ public class Biosim implements EntryPoint {
 	Uid _senderUid = Uid.random();
 	
 	BiosimWebSocket _socket;
-	RemoteServices _remoteServices;
+	LocalAgent _localAgent;
 	
 	AgentManagerPanel _agentManagerPanel;
 	
@@ -257,20 +256,20 @@ public class Biosim implements EntryPoint {
 			
 			@Override
 			public Void apply(Void t) {
-				_remoteServices = new RemoteServicesImpl(_socket, NodeContainer.get());
+				_localAgent = new LocalAgent(_socket);
 				
 				_labelTreeBuilder = 
 						new LabelTreeBuilder(
 								getAgentUid()
 								, _dndController
-								, _remoteServices
+								, _localAgent
 								, _socket
 						);
 				_labelsSectionContent.add(_labelTreeBuilder.getTree());
 				
 				_labelsSectionContent.add(new ConnectionViewDropSiteBuilder(_dndController).getWidget());
 				
-				_remoteServices.select(MConnection.class, new Function1<FList<MConnection>, Void>() {
+				getLocalAgent().getAgentServices().select(MConnection.class, new Function1<FList<MConnection>, Void>() {
 					public Void apply(FList<MConnection> t) {
 						// do nothing since this call alone will trigger an update to the NodeContainer
 						return null;
@@ -290,11 +289,11 @@ public class Biosim implements EntryPoint {
 			
 			if ( ac.connections.size() > 0 ) {
 				for ( MConnection p : ac.connections ) {
-					Biosim.get().getRemoteServices().removeLink(p, node);
+					getLocalAgent().removeLink(p, node);
 				}
 			} else {
 				for ( MNode n : ac.labels ) {
-					Biosim.get().getRemoteServices().removeLink(n, node);
+					getLocalAgent().removeLink(n, node);
 				}
 			}
 		}
@@ -345,8 +344,8 @@ public class Biosim implements EntryPoint {
 		return _socket;
 	}
 
-	public RemoteServices getRemoteServices() {
-		return _remoteServices;
+	public LocalAgent getLocalAgent() {
+		return _localAgent;
 	}
 	
 }

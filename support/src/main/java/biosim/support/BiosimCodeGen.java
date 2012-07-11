@@ -215,13 +215,19 @@ public class BiosimCodeGen {
     		return type;
     	}
     }
+
+//    public List<Property> getProperties(JavaClass jc) {
+//    	return getProperties(jc, false);
+//    }
     
-    public List<Property> getProperties(JavaClass jc) {
+    public List<Property> getProperties(JavaClass jc, boolean descend) {
+    	if ( jc.getName().contains("TestC")) {
+    		toString();
+    	}
     	List<Property> l = ListX.create();
     	if ( jc != null && !jc.isInterface() && isCodeGenerationNeeded(jc) && !jc.isEnum() ) {
         	for ( JavaField field : jc.getFields() ) {
-        		boolean skipField = 
-        			field.isStatic() || hasAnnotation(field, OmitProperty.class);
+        		boolean skipField = field.isStatic() || hasAnnotation(field, OmitProperty.class);
         		if ( skipField ) {
         			continue;
         		}
@@ -229,6 +235,9 @@ public class BiosimCodeGen {
                 prop.field = field;
                 prop.name = parseFieldName(field.getName());
         		l.add(prop);
+        	}
+        	if ( descend && jc.getSuperJavaClass() != null ) {
+        		l.addAll(getProperties(jc.getSuperJavaClass(), true));
         	}
     	}
     	return l;    	
@@ -268,7 +277,7 @@ public class BiosimCodeGen {
    		lines.add("public static class " + contextClassname + " extends m3.gwt.props.impl.AbstractContainerContext {");
     	
     	int index = 0;
-    	for ( Property prop : getProperties(sourceHolder.getJavaClass()) ) {
+    	for ( Property prop : getProperties(sourceHolder.getJavaClass(), false) ) {
     	    JavaField field = prop.field;
     		Type type = field.getType();
     		String typeName = getTypeAsString(toReferenceType(type));
@@ -285,7 +294,7 @@ public class BiosimCodeGen {
     	}
 
     	if ( superClassHasContext ) {
-    		for ( Property prop : getProperties(superJavaClass) ) {
+    		for ( Property prop : getProperties(superJavaClass, true) ) {
         	    lines.add("    public m3.gwt.props.PropertyContext " + prop.name + " = " + superJavaClass.getName() + ".Context." + prop.name + ";");
     		}
     	}
@@ -302,10 +311,7 @@ public class BiosimCodeGen {
         lines.add("        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();");
         
         List<Property> props = ListX.create();
-        if ( superClassHasContext ) {        	
-        	props.addAll(getProperties(superJavaClass));
-        }
-        props.addAll(getProperties(sourceHolder.getJavaClass()));
+        props.addAll(getProperties(sourceHolder.getJavaClass(), true));
         for ( Property prop : props ) {
             lines.add("        list = list.cons(this." + prop.name + ");");
         }
@@ -372,7 +378,7 @@ public class BiosimCodeGen {
         JavaClass javaClass = sourceHolder.getJavaClass();
     	_codeGeneratedClasses.add(sourceHolder);
     	List<String> lines = ListX.create();
-    	for ( Property prop : getProperties(sourceHolder.getJavaClass()) ) {
+    	for ( Property prop : getProperties(sourceHolder.getJavaClass(), false) ) {
     		JavaField field = prop.field;
     		if ( !field.isPrivate() ) {
     			System.err.println(field + " is not private");

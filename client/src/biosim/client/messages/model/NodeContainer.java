@@ -4,6 +4,7 @@ import java.util.Map;
 
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.MapX;
+import biosim.client.Biosim;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
@@ -11,11 +12,14 @@ import biosim.client.eventlist.Observables;
 
 public class NodeContainer {
 
-	static NodeContainer _instance = new NodeContainer();
+	static NodeContainer _instance = new NodeContainer(Biosim.get().getAgentUid());
 	
 	public static NodeContainer get() {
 		return _instance;
 	}
+	
+	MConnection _connection;
+	Uid _agentUid;
 		
 	public final ObservableList<MNode> nodes = Observables.create();
 	
@@ -52,9 +56,16 @@ public class NodeContainer {
 	
 	public final Map<Uid,MNode> nodesByUid = MapX.create();
 
-	private NodeContainer() {
+	private NodeContainer(Uid agentUid) {
+		_agentUid = agentUid;
+		_connection = null;
 	}
 
+	public NodeContainer(MConnection conn) {
+		_agentUid = conn.getRemoteAgent();
+		_connection = conn;
+	}
+	
 	public void insertOrUpdate(MNode node) {
 		MNode localNode = nodesByUid.get(node.getUid());
 		if ( localNode == null ) {
@@ -68,6 +79,10 @@ public class NodeContainer {
 	@SuppressWarnings("unchecked")
 	public <T extends MNode> T fetch(Uid uid) {
 		return (T) nodesByUid.get(uid);
+	}
+	
+	public Uid getAgentUid() {
+		return _agentUid;
 	}
 	
 }

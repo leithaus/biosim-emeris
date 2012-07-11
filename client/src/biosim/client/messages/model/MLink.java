@@ -65,9 +65,9 @@ public class MLink extends MNode {
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
-	        list = list.cons(this.uid);
 	        list = list.cons(this.from);
 	        list = list.cons(this.to);
+	        list = list.cons(this.uid);
 	        return list;
 	    }
 	    public MLink newInstance() {

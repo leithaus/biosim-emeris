@@ -84,7 +84,7 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MNode dragee, MLabel dropTarget) {
-				Biosim.get().getRemoteServices().insertOrUpdate(new MLink(dropTarget, dragee));
+				Biosim.get().getLocalAgent().insertOrUpdate(new MLink(dropTarget, dragee));
 			}
 		}; 
 		registerDropAction(DndType.Content, DndType.Label, labelAction);
@@ -97,7 +97,7 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MNode dragee, MConnection dropTarget) {
-				Biosim.get().getRemoteServices().insertOrUpdate(new MLink(dropTarget, dragee));
+				Biosim.get().getLocalAgent().insertOrUpdate(new MLink(dropTarget, dragee));
 			}
 		}; 
 		registerDropAction(DndType.Label, DndType.Connection, authorizeAction);
@@ -110,7 +110,7 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MConnection dragee, MNode dropTarget) {
-				Biosim.get().getRemoteServices().insertOrUpdate(new MLink(dragee, dropTarget));
+				Biosim.get().getLocalAgent().insertOrUpdate(new MLink(dragee, dropTarget));
 			}
 		}; 
 		registerDropAction(DndType.Connection, DndType.Label, authorizeReverseDndAction);

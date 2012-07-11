@@ -11,6 +11,7 @@ import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.eventlist.ui.PopupMenu;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MBlob;
 import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MImage;
@@ -18,7 +19,6 @@ import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.MText;
-import biosim.client.messages.model.RemoteServices;
 import biosim.client.utils.Base64;
 import biosim.client.utils.DialogHelper;
 
@@ -77,14 +77,14 @@ public class NodeBuilder {
 	}
 
 	void insert(MNode node) {
-		RemoteServices rs = Biosim.get().getRemoteServices();
-        rs.insertOrUpdate(node);
+		LocalAgent la = Biosim.get().getLocalAgent();
+        la.insertOrUpdate(node);
         for ( MLabel parent : _labels ) {
             MLink link = new MLink(parent, node);                     
-            rs.insertOrUpdate(link);
+            la.insertOrUpdate(link);
         }
         for ( MConnection cnxn : _connections ) {
-            rs.insertOrUpdate(new MLink(cnxn, node));
+            la.insertOrUpdate(new MLink(cnxn, node));
         }
 	}
 	
@@ -120,7 +120,7 @@ public class NodeBuilder {
                                     MBlob blob = new MBlob(Biosim.get().getAgentUid(), file.getName());
                                     blob.setDataInBase64(base64);
                                     image.setBlob(blob);
-                                    Biosim.get().getRemoteServices().insertOrUpdate(blob);
+                                    Biosim.get().getLocalAgent().insertOrUpdate(blob);
                                     insert(image);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);

@@ -13,13 +13,13 @@ import org.vectomatic.file.events.LoadEndHandler;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MBlob;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
-import biosim.client.messages.model.RemoteServices;
 import biosim.client.messages.model.Uid;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
@@ -50,17 +50,20 @@ public class LabelTreeBuilder {
 
 	final Uid _agentUid;
 	final DndController _dndController;
-	final RemoteServices _remoteServices;	
+	final LocalAgent _localAgent;
+//	final AgentServices _remoteServices;
 	final BiosimWebSocket _socket;
 	
 	LabelTreeBuilder(
 			Uid agentUid, 
 			DndController dndController, 
-			RemoteServices remoteServices,
+			LocalAgent localAgent,
 			BiosimWebSocket socket
 	) {
 		_agentUid = agentUid;
 		_dndController = dndController;
+		_localAgent = localAgent;
+		_socket = socket;
 
 		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
 			@Override
@@ -76,9 +79,7 @@ public class LabelTreeBuilder {
 				}
 			}
 		});
-	
-		_remoteServices = remoteServices;
-		_socket = socket;
+		
 		addRootLabelsForAgent(_agentUid);
 	}
 	
@@ -167,7 +168,7 @@ public class LabelTreeBuilder {
 		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_remoteServices.insertChild(parent, new MLabel(t));
+					_localAgent.insertChild(parent, new MLabel(t));
 				}
 				return null;
 			}
@@ -192,7 +193,7 @@ public class LabelTreeBuilder {
 					// Set the new name the node, if it is set
 					if (!textBox.getText().isEmpty()) {
 						label.setName(textBox.getText());
-						_remoteServices.insertOrUpdate(label);
+						_localAgent.insertOrUpdate(label);
 					}
 					
 					// Get the files that were selected 
@@ -209,7 +210,7 @@ public class LabelTreeBuilder {
                                     MBlob blob = new MBlob(_agentUid, file.getName());
                                     blob.setDataInBase64(base64);
                                     label.setIcon(blob.getRef());
-                                    _remoteServices.insertOrUpdate(blob, label);
+                                    _localAgent.insertOrUpdate(blob, label);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -227,7 +228,7 @@ public class LabelTreeBuilder {
         DialogHelper.showSingleLineTextPrompt("Enter the Phone #:", "", "200px 20px", new Function1<String,Void>() {
             public Void apply(String t) {
                 if ( t != null && t.trim().length() > 0 ) {
-                	_remoteServices.insertTextNode(parent, t);
+                	_localAgent.insertTextNode(parent, t);
                 }
                 return null;
             }
@@ -257,7 +258,7 @@ public class LabelTreeBuilder {
                                     image.setBlob(blob);
                                     MLink link = new MLink(parent, image);
                                     // order is important here (create links last)
-                                    _remoteServices.insertOrUpdate(blob, image, link);
+                                    _localAgent.insertOrUpdate(blob, image, link);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -276,7 +277,7 @@ public class LabelTreeBuilder {
 			public Void apply(String s) {
 				if ( s != null && s.trim().length() > 0 ) {
 					MNode child = instantiator.apply(s);
-					_remoteServices.insertChild(parent, child);					
+					_localAgent.insertChild(parent, child);					
 				}
 				return null;
 			}
@@ -287,7 +288,7 @@ public class LabelTreeBuilder {
 		DialogHelper.showTextPrompt("Enter the message text.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_remoteServices.insertTextNode(parent, t);					
+					_localAgent.insertTextNode(parent, t);					
 				}
 				return null;
 			}
@@ -298,7 +299,7 @@ public class LabelTreeBuilder {
 		DialogHelper.showTextPrompt("Enter the info.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_remoteServices.insertTextNode(parent, t);					
+					_localAgent.insertTextNode(parent, t);					
 				}
 				return null;
 			}
@@ -310,7 +311,7 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
-		_remoteServices.fetch(agentUid, new Function1<MLabel,Void>() {
+		_localAgent.getAgentServices().fetch(agentUid, new Function1<MLabel,Void>() {
 			@Override
 			public Void apply(MLabel label) {
 				addChildren(label, null);
@@ -324,14 +325,13 @@ public class LabelTreeBuilder {
 	}
 	
 	boolean isEditable(MLabel n) {
-		GWT.log("implement me", new Throwable());
-		return true;
+		return _localAgent.isEditable(n);
 	}
 	
 	void addChildren(final biosim.client.messages.model.MLabel parent, final TreeItem parentTi) {
 		for ( Uid ch0 : parent.getChildren() ) {
 			final Uid ch = ch0;
-			_remoteServices.fetch(ch, new Function1<MLabel,Void>() {
+			_localAgent.getAgentServices().fetch(ch, new Function1<MLabel,Void>() {
 				@Override
 				public Void apply(MLabel label) {
 					TreeItem ti = createTreeItem(parentTi, label);
@@ -344,23 +344,5 @@ public class LabelTreeBuilder {
 			});
 		}	
 	}
-
-//	public void addLink(Link l) {
-//		for ( TreeItem p_ti : _treeItemsByNode.get(l.getFromNode()) ) {
-//			createTreeItem(p_ti, (Label) l.getToNode(), l);
-//		}
-//	}
-//	
-//	public void removeLink(Link l) {
-//		Set<TreeItem> nodeList = _treeItemsByNode.get(l.getToNode());
-//		for ( TreeItem ti : _treeItemsByLink.get(l) ) {
-//			ti.getParentItem().removeItem(ti);
-//			nodeList.remove(ti);
-//		}
-//		if ( nodeList.isEmpty() ) {
-//			_treeItemsByNode.remove(l.getToNode());
-//		}
-//		_treeItemsByLink.remove(l);
-//	}
 	
 }
