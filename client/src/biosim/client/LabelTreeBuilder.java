@@ -85,7 +85,10 @@ public class LabelTreeBuilder {
 	void updateTreeItemOnChange(TreeItem ti, MLabel label) {
 		MLabel ml = getUserObject(ti);
 		if (ml.getUid() == label.getUid()) {
-			ti.setText(label.getName());
+			if (!ml.equals(label)) {
+				ti.setUserObject(label);
+				updateTreeItem(ti);
+			}
 		} else {
 			for (int j = 0; j < ti.getChildCount(); j += 1) {
 				TreeItem t2 = ti.getChild(j);
