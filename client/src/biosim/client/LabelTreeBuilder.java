@@ -11,6 +11,7 @@ import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.eventlist.ListEvent;
+import biosim.client.eventlist.ListEventType;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.LocalAgent;
@@ -68,14 +69,19 @@ public class LabelTreeBuilder {
 		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
 			@Override
 			public void event(ListEvent<MNode> event) {
+				TreeItem ti = getTreeItemFromUid(event.getElement().getUid());
+				
 				if (event.getElement() instanceof MLabel) {
 					MLabel label = (MLabel)event.getElement();
-					for (int i = 0; i < _tree.getItemCount(); i += 1) {
-						TreeItem ti = _tree.getItem(i);
-						updateTreeItemOnChange(ti, label);
+					if (event.getType() == ListEventType.Added) {
+						onAddedLabel(ti, label);
+					} else if (event.getType() == ListEventType.Changed) {
+						onChangedLabel(ti, label);
+					} else if (event.getType() == ListEventType.Removed) {
+						onRemovedLabel(ti, label);
 					}
 				} else if (event.getElement() instanceof MLink) {
-					
+					//MLink link = (MLink)event.getElement();
 				}
 			}
 		});
@@ -83,18 +89,55 @@ public class LabelTreeBuilder {
 		addRootLabelsForAgent(_agentUid);
 	}
 	
-	void updateTreeItemOnChange(TreeItem ti, MLabel label) {
+	TreeItem itemFromUid(TreeItem ti, Uid uid) {
 		MLabel ml = getUserObject(ti);
-		if (ml.getUid() == label.getUid()) {
-			if (!ml.equals(label)) {
-				ti.setUserObject(label);
-				updateTreeItem(ti);
-			}
+		if (ml.getUid().equals(uid)) {
+			return ti;
 		} else {
-			for (int j = 0; j < ti.getChildCount(); j += 1) {
-				TreeItem t2 = ti.getChild(j);
-				this.updateTreeItemOnChange(t2, label);
+			TreeItem t2 = null;
+			for (int j = 0; j < ti.getChildCount() && t2 == null; j++) {
+				t2 = this.itemFromUid(ti.getChild(j), uid);
 			}
+			return t2;
+		}
+	}
+	
+	TreeItem getTreeItemFromUid(Uid uid) {
+		TreeItem ret = null;
+		for (int i = 0; i < _tree.getItemCount() && ret == null; i += 1) {
+			ret = itemFromUid(_tree.getItem(i), uid);
+		}
+		
+		return ret;
+	}
+	
+	void onAddedLabel(TreeItem ti, MLabel label) {
+		if (ti != null) {
+			
+		}
+	}
+	
+	void onChangedLabel(TreeItem ti, MLabel label) {
+		if (ti != null){
+			ti.setUserObject(label);
+			updateTreeItem(ti);
+		}
+	}
+
+	void onRemovedLabel(TreeItem ti, MLabel label) {
+		if (ti != null) {
+			TreeItem pi = ti.getParentItem();
+			MLabel l = this.getUserObject(pi);
+			
+			MLabel newLabel = (MLabel)NodeContainer.get().nodesByUid.get(l.getUid());
+			pi.setUserObject(newLabel);
+			updateTreeItem(pi);
+			
+			_tree.removeItem(ti);
+		} else {
+			// We have to check to see if the MLabel is the child of an existing
+			// node in the tree, then get the MLabel for that parent and update the 
+			// tree with it there.
 		}
 	}
 	
