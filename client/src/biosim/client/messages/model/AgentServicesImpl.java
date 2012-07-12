@@ -79,9 +79,6 @@ public class AgentServicesImpl implements AgentServices {
 			fetchImpl(uidsToSendToServer, new Function1<FList<T>, Void>() {
 				@Override
 				public Void apply(FList<T> list) {
-					for ( T t : list ) {
-						_nodeContainer.insertOrUpdate(t);
-					}
 					if ( !results_f.isEmpty() ) {
 						for ( T t : results_f ) {
 							list = list.cons(t);
