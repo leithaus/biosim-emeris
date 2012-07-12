@@ -102,10 +102,9 @@ object SwitchBoard extends Logging {
         
         val response = new CreateNodesResponse
         response.setNodes(
-            cnr.
-              getNodes.
-              asScala.
-              filterNot(_.isInstanceOf[MBlob]).
+            nodes.
+              filterNot(_.isInstanceOf[Blob]).
+              map(sn=>toClientNode(sn, localAgentDb.dao)(localAgentDb)).
               asJava
         )
         SocketManager.broadcast(socket.agentUid, response)

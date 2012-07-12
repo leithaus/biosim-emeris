@@ -37,21 +37,28 @@ public class AgentServicesImpl implements AgentServices {
 		});
 	}
 	
-	<T extends MNode> void fetchImpl(Iterable<Uid> uids, final Function1<FList<T>, Void> asyncCallback) {
+	<T extends MNode> void directFetch(Iterable<Uid> uids, final Function1<FList<T>, Void> asyncCallback) {
 		send(new FetchRequest(uids), new Function1<FetchResponse, Void>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void apply(FetchResponse response) {
-				for ( MNode t : response.getNodes() ) {
-					t.setAgentServices(AgentServicesImpl.this);
-				}
+				insertOrUpdate(response.getNodes());
 				asyncCallback.apply((FList<T>)response.getNodes());
-				for ( MNode t : response.getNodes() ) {
-					_nodeContainer.insertOrUpdate(t);
-				}
 				return null;
 			}
+
 		});
+	}
+
+	private void insertOrUpdate(Iterable<MNode> nodes) {
+		for ( MNode n : nodes ) {
+			insertOrUpdate(n);
+		}
+	}
+
+	private void insertOrUpdate(MNode t) {
+		t.setAgentServices(this);
+		_nodeContainer.insertOrUpdate(t);
 	}
 	
 	@Override
@@ -77,7 +84,7 @@ public class AgentServicesImpl implements AgentServices {
 		
 		if ( uidsToSendToServer.iterator().hasNext() ) {
 			final FList<T> results_f = results;
-			fetchImpl(uidsToSendToServer, new Function1<FList<T>, Void>() {
+			directFetch(uidsToSendToServer, new Function1<FList<T>, Void>() {
 				@Override
 				public Void apply(FList<T> list) {
 					if ( !results_f.isEmpty() ) {
@@ -103,10 +110,7 @@ public class AgentServicesImpl implements AgentServices {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void apply(SelectResponse response) {
-				for ( MNode n : response.getNodes() ) {
-					n.setAgentServices(AgentServicesImpl.this);
-					_nodeContainer.insertOrUpdate(n);
-				}
+				insertOrUpdate(response.getNodes());
 				return asyncCallback.apply((FList<T>)response.getNodes());
 			}
 		});
