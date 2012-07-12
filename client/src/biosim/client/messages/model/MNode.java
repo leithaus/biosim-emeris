@@ -43,20 +43,13 @@ public class MNode {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		
 		if (obj == null)
 			return false;
-		
-		if (!(obj instanceof MNode)) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 
 		MNode other = (MNode) obj;
-		if (getUid() == null) {
-			if (other.getUid() != null) {
-				return false;
-			}
-		} else if (!getUid().equals(other.getUid())) {
+		if (!getUid().equals(other.getUid())) {
 			return false;
 		}
 		
@@ -64,9 +57,6 @@ public class MNode {
 	}
 
 	public biosim.client.messages.model.Uid getUid() {
-		if ( _uid == null ) {
-			_uid = Uid.random();
-		}
 	    return _uid;
 	}
 
