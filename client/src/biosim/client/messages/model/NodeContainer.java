@@ -12,14 +12,13 @@ import biosim.client.eventlist.Observables;
 
 public class NodeContainer {
 
-	static NodeContainer _instance = new NodeContainer(Biosim.get().getAgentUid());
+	static NodeContainer _instance = new NodeContainer();
 	
 	public static NodeContainer get() {
 		return _instance;
 	}
 	
 	MConnection _connection;
-	Uid _agentUid;
 		
 	public final ObservableList<MNode> nodes = Observables.create();
 	
@@ -56,13 +55,11 @@ public class NodeContainer {
 	
 	public final Map<Uid,MNode> nodesByUid = MapX.create();
 
-	private NodeContainer(Uid agentUid) {
-		_agentUid = agentUid;
+	private NodeContainer() {
 		_connection = null;
 	}
 
 	public NodeContainer(MConnection conn) {
-		_agentUid = conn.getRemoteAgent();
 		_connection = conn;
 	}
 	
@@ -82,7 +79,11 @@ public class NodeContainer {
 	}
 	
 	public Uid getAgentUid() {
-		return _agentUid;
+		if ( _connection == null ) {
+			return Biosim.get().getAgentUid();
+		} else {
+			return _connection.getRemoteAgent();
+		}
 	}
 	
 }

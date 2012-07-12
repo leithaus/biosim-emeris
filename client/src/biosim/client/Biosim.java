@@ -174,7 +174,7 @@ public class Biosim implements EntryPoint {
 	
 			contentSectionContent.add(_contentController._contentPanel);
 			
-			connectionsSectionContent.add(NodePanel.create(NodeContainer.get().connections, _dndController, DndType.Connection));
+			connectionsSectionContent.add(NodePanel.create(getNodeContainer().connections, _dndController, DndType.Connection));
 			
 			_contentController.refilterContent();
 			
@@ -217,6 +217,10 @@ public class Biosim implements EntryPoint {
 	    }
 		
 //		fitContentSectionInJava();
+	}
+
+	private NodeContainer getNodeContainer() {
+		return NodeContainer.get();
 	}
 
 	void addToRootPanel(String tag, Widget widget) {

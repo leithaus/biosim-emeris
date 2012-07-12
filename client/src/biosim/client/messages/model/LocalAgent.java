@@ -50,11 +50,12 @@ public class LocalAgent {
 	}
 
 	public Uid getOwner(MNode node) {
-		if ( _agentServices.getNodeContainer().nodesByUid.containsKey(node) ) {
+		Uid key = node.getUid();
+		if ( _agentServices.getNodeContainer().nodesByUid.containsKey(key) ) {
 			return _agentServices.getNodeContainer().getAgentUid();
 		}
 		for (AgentServices as : _remoteAgentServices.values() ) {
-			if ( as.getNodeContainer().nodesByUid.containsKey(node) ) {
+			if ( as.getNodeContainer().nodesByUid.containsKey(key) ) {
 				return as.getNodeContainer().getAgentUid();
 			}						
 		}

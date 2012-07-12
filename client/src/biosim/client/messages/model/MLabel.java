@@ -14,16 +14,6 @@ public class MLabel extends MNode {
 	public MLabel(String _name) {
 		this._name = _name;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!super.equals(obj)) {
-			return false;
-		}
-		
-		MLabel other = (MLabel)obj;
-		return (getChildren().length() != other.getChildren().length());
-	}
 	
 	@Override
 	public String toHtmlString() {

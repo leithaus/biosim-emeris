@@ -2,7 +2,7 @@ package biosim.client.messages.protocol;
 
 
 
-public class RootLabelsRequest extends RequestBody {
+public class RootLabelsRequest extends ConnectionScopedRequestBody {
 
 	public RootLabelsRequest() {
 	}
@@ -14,15 +14,18 @@ public class RootLabelsRequest extends RequestBody {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class RootLabelsRequestContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
+	    public m3.gwt.props.PropertyContext connectionUid = ConnectionScopedRequestBody.Context.connectionUid;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
 	        set = set.insert("biosim.client.messages.protocol.RequestBody");
 	        set = set.insert("java.lang.Object");
+	        set = set.insert("biosim.client.messages.protocol.ConnectionScopedRequestBody");
 	        set = set.insert("biosim.client.messages.protocol.RootLabelsRequest");
 	        return set;
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
+	        list = list.cons(this.connectionUid);
 	        return list;
 	    }
 	    public RootLabelsRequest newInstance() {

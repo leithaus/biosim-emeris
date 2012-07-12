@@ -125,7 +125,7 @@ object SwitchBoard extends Logging {
         SocketManager.broadcast(socket.agentUid, response)
         None
       }
-      case _ => sys.error("don't know how to handle type " + request.getClass)
+      case rb => sys.error("don't know how to handle type " + rb)
     }
     responseBody.foreach(rb=>socket.send(rb, request))
   }
