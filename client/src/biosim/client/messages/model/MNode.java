@@ -30,6 +30,30 @@ public class MNode {
 		return null;
 	}
 	
+	private AsyncCallback<Iterable<MNode>> labelsAdapter(final Function1<Iterable<MLabel>, Void> ac) {
+		return new AsyncCallback<Iterable<MNode>>() {
+			@Override
+			public Void apply(Iterable<MNode> nodes) {
+				List<MLabel> labels = ListX.create();
+				for ( MNode n : nodes ) {
+					if ( n instanceof MLabel ) {
+						labels.add((MLabel)n);
+					}
+				}
+				ac.apply(labels);
+				return null;
+			}
+		};
+	}
+	
+	public void getChildLabels(Function1<Iterable<MLabel>, Void> asyncCallback) {
+		getChildren(labelsAdapter(asyncCallback));
+	}
+	
+	public void getParentLabels(Function1<Iterable<MLabel>, Void> asyncCallback) {
+		getParents(labelsAdapter(asyncCallback));
+	}
+	
 	public void getChildren(Function1<Iterable<MNode>, Void> asyncCallback) {
 		getLinks(true, asyncCallback);		
 	}
