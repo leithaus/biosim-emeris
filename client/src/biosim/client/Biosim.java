@@ -91,6 +91,8 @@ public class Biosim implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		
+		initAgentUid();
+		
 		BiosimUberContext.get();
 		
 	    GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
@@ -319,16 +321,20 @@ public class Biosim implements EntryPoint {
 		}
 		return uiStateCssClass;
 	}
-
+	
 	public Uid getAgentUid() {
-		String agentUid = Window.Location.getParameter("agentUid");
+		Uid agentUid = Globals.get().getAgentUid();
 		if ( agentUid == null ) {
 			String msg = "agentUid url parm is required";
 			DialogHelper.alert(msg);
 			throw new RuntimeException(msg);
-		} else {
-			return new Uid(agentUid);
 		}
+		return agentUid;
+	}
+
+	private void initAgentUid() {
+		String agentUid = Window.Location.getParameter("agentUid");
+		Globals.get().setAgentUid(new Uid(agentUid));
 	}
 	
 	public LabelTreeBuilder getLabelTreeBuilder() {

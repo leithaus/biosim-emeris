@@ -10,8 +10,6 @@ public interface AgentServices {
 	<T extends MNode> void select(Class<T> clazz, Function1<Iterable<T>,Void> asyncCallback);
 	
 	void query(Iterable<MNode> labels,  Uid uid, Function1<Iterable<FilterAcceptCriteria>,Void> asyncCallback);
-	
-	void rootLabels(Uid uid, Function1<Iterable<MLabel>, Void> asyncCallback);
 
 	NodeContainer getNodeContainer();
 	

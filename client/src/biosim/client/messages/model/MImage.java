@@ -43,6 +43,8 @@ public class MImage extends MNode {
 	    	    protected void setImpl(MImage bean, biosim.client.messages.model.BlobRef value ) { bean.setBlobRef(value);}
 	    };
 	    public m3.gwt.props.PropertyContext uid = MNode.Context.uid;
+	    public m3.gwt.props.PropertyContext linkHints = MNode.Context.linkHints;
+	    public m3.gwt.props.PropertyContext agentServices = MNode.Context.agentServices;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
 	        set = set.insert("biosim.client.messages.model.MImage");
@@ -54,6 +56,8 @@ public class MImage extends MNode {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
 	        list = list.cons(this.blobRef);
 	        list = list.cons(this.uid);
+	        list = list.cons(this.linkHints);
+	        list = list.cons(this.agentServices);
 	        return list;
 	    }
 	    public MImage newInstance() {

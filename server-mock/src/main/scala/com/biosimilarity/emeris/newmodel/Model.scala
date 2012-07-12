@@ -48,6 +48,8 @@ object Model {
         ch.visitDescendants(visitor)
       }
     }
+    
+    def linkUids(implicit ad: AgentDatabase) = incomingLinks.map(_.uid) ++ outgoingLinks.map(_.uid)
 
     def visitDescendants(visitor: PartialFunction[Node, Unit])(implicit ad: AgentDatabase): Unit = {
       visitDescendants { node: Node =>

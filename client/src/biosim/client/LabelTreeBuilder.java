@@ -15,6 +15,7 @@ import biosim.client.eventlist.ListEventType;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.LocalAgent;
+import biosim.client.messages.model.MAgent;
 import biosim.client.messages.model.MBlob;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
@@ -145,6 +146,8 @@ public class LabelTreeBuilder {
 		TreeItem ti = new TreeItem();
 		if ( parent != null ) {
 			parent.addItem(ti);
+		} else {
+			_tree.addItem(ti);
 		}
 		ti.setUserObject(label);
 		updateTreeItem(ti);
@@ -158,7 +161,7 @@ public class LabelTreeBuilder {
 		final PopupMenu popup = new PopupMenu();
 		ti.setWidget(w);
 				
-		if ( isEditable(label) ) {	
+		if ( label.isEditable() ) {	
 			final Button pop = new Button("&raquo;");			
 			w.add(pop);
 			pop.addClickHandler(new ClickHandler() {
@@ -357,12 +360,10 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
-		_localAgent.getAgentServices().rootLabels(agentUid, new Function1<Iterable<MLabel>,Void>() {
+		_localAgent.getAgentServices().fetch(agentUid, new Function1<MAgent, Void>() {
 			@Override
-			public Void apply(Iterable<MLabel> labels) {
-				for ( MLabel label : labels ) {
-					addChildren(label, null);
-				}
+			public Void apply(MAgent agent) {
+				addChildren(agent, null);
 				return null;
 			}
 		});
@@ -372,25 +373,23 @@ public class LabelTreeBuilder {
 		return (MLabel) ti.getUserObject();		
 	}
 	
-	boolean isEditable(MLabel n) {
-		return _localAgent.isEditable(n);
+	void addChildren(final biosim.client.messages.model.MNode parent, final TreeItem parentTi) {
+		parent.getChildren(new AsyncCallback<Iterable<MNode>>() {
+			@Override
+			public Void apply(Iterable<MNode> nodes) {
+				for ( MNode node : nodes ) {
+					if ( node instanceof MLabel) {
+						addChild((MLabel)node, parentTi);
+					}
+				}
+				return null;
+			}
+		});
 	}
 	
-	void addChildren(final biosim.client.messages.model.MLabel parent, final TreeItem parentTi) {
-		for ( Uid ch0 : parent.getChildren() ) {
-			final Uid ch = ch0;
-			_localAgent.getAgentServices().fetch(ch, new Function1<MLabel,Void>() {
-				@Override
-				public Void apply(MLabel label) {
-					TreeItem ti = createTreeItem(parentTi, label);
-					if ( parentTi == null ) {
-						_tree.addItem(ti);
-					}
-					addChildren(label, ti);
-					return null;
-				}
-			});
-		}	
+	void addChild(MLabel label, TreeItem parentTi) {
+		TreeItem ti = createTreeItem(parentTi, label);
+		addChildren(label, ti);
 	}
 	
 }

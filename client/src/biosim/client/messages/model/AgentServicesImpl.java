@@ -9,8 +9,6 @@ import biosim.client.messages.protocol.FetchResponse;
 import biosim.client.messages.protocol.QueryRequest;
 import biosim.client.messages.protocol.QueryResponse;
 import biosim.client.messages.protocol.RequestBody;
-import biosim.client.messages.protocol.RootLabelsRequest;
-import biosim.client.messages.protocol.RootLabelsResponse;
 import biosim.client.messages.protocol.SelectRequest;
 import biosim.client.messages.protocol.SelectResponse;
 import biosim.client.utils.BiosimWebSocket;
@@ -44,6 +42,9 @@ public class AgentServicesImpl implements AgentServices {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void apply(FetchResponse response) {
+				for ( MNode t : response.getNodes() ) {
+					t.setAgentServices(AgentServicesImpl.this);
+				}
 				asyncCallback.apply((FList<T>)response.getNodes());
 				for ( MNode t : response.getNodes() ) {
 					_nodeContainer.insertOrUpdate(t);
@@ -103,6 +104,7 @@ public class AgentServicesImpl implements AgentServices {
 			@Override
 			public Void apply(SelectResponse response) {
 				for ( MNode n : response.getNodes() ) {
+					n.setAgentServices(AgentServicesImpl.this);
 					_nodeContainer.insertOrUpdate(n);
 				}
 				return asyncCallback.apply((FList<T>)response.getNodes());
@@ -130,16 +132,5 @@ public class AgentServicesImpl implements AgentServices {
 	
 	public NodeContainer getNodeContainer() {
 		return _nodeContainer;
-	}
-	
-	@Override
-	public void rootLabels(Uid uid, final Function1<Iterable<MLabel>, Void> asyncCallback) {
-		send(new RootLabelsRequest(), new Function1<RootLabelsResponse, Void>() {
-			@Override
-			public Void apply(RootLabelsResponse response) {
-				fetch(response.getUids(), false, asyncCallback);
-				return null;
-			}
-		});
 	}
 }

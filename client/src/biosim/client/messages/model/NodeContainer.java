@@ -1,11 +1,8 @@
 package biosim.client.messages.model;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import m3.gwt.lang.Function1;
-import m3.gwt.lang.ListX;
 import m3.gwt.lang.MapX;
 import biosim.client.Biosim;
 import biosim.client.eventlist.FineGrainedListListener;
@@ -58,27 +55,6 @@ public class NodeContainer {
 	
 	public final Map<Uid,MNode> nodesByUid = MapX.create();
 	
-	public List<MNode> parentsForNode(MNode node) {
-		List<MNode> ret = ListX.create();
-		
-		Iterator<MNode> iterator = nodes.iterator();
-		while (iterator.hasNext()) {
-			MNode n = iterator.next();
-			if (n instanceof MLabel) {
-				MLabel m = (MLabel)n;
-				
-				Iterator<Uid> it = m.getChildren().iterator();
-				while (it.hasNext()) {
-					Uid uid = it.next();
-					if (uid.equals(node.getUid())) {
-						ret.add(n);
-					}
-				}
-			}
-		}
-		
-		return ret;
-	}
 
 	private NodeContainer() {
 		_connection = null;

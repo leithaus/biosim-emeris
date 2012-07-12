@@ -1,38 +1,31 @@
 package com.biosimilarity.emeris
 
-
-import java.util.UUID
-import m3.predef._
-import net.liftweb.json._
-import net.liftweb.json.JsonDSL._
-import com.biosimilarity.emeris.newmodel.DatabaseFactory
-import biosim.client.messages.protocol.Request
-import biosim.client.messages.protocol.QueryRequest
-import com.biosimilarity.emeris.newmodel.Model.Node
-import biosim.client.messages.model.{ 
-   Uid => ClientUid
-   }
-import biosim.client.messages.model.{ BlobRef => ClientBlobRef }
-import com.biosimilarity.emeris.newmodel.Model.Uid
 import scala.collection.JavaConverters._
-import biosim.client.messages.protocol.CreateNodesRequest
-import biosim.client.messages.protocol.Response
-import predef._
 import com.biosimilarity.emeris.newmodel.Model._
+import com.biosimilarity.emeris.newmodel.Model.Node
+import com.biosimilarity.emeris.newmodel.Model.Uid
+import com.biosimilarity.emeris.newmodel.DatabaseFactory
+import biosim.client.messages.model.{BlobRef => ClientBlobRef}
+import biosim.client.messages.model.MBlob
 import biosim.client.messages.model.MConnection
 import biosim.client.messages.model.MLabel
+import biosim.client.messages.model.MLink
 import biosim.client.messages.model.MNode
+import biosim.client.messages.model.{Uid => ClientUid}
+import biosim.client.messages.protocol.ConnectionScopedRequestBody
+import biosim.client.messages.protocol.CreateNodesRequest
+import biosim.client.messages.protocol.CreateNodesResponse
 import biosim.client.messages.protocol.FetchRequest
 import biosim.client.messages.protocol.FetchResponse
+import biosim.client.messages.protocol.QueryRequest
+import biosim.client.messages.protocol.Request
+import biosim.client.messages.protocol.ResponseBody
 import biosim.client.messages.protocol.SelectRequest
 import biosim.client.messages.protocol.SelectResponse
-import biosim.client.messages.protocol.CreateNodesResponse
-import biosim.client.messages.model.MBlob
-import biosim.client.messages.model.MLink
-import biosim.client.messages.protocol.ConnectionScopedRequestBody
-import biosim.client.messages.protocol.RootLabelsRequest
-import biosim.client.messages.protocol.ResponseBody
-import biosim.client.messages.protocol.RootLabelsResponse
+import m3.predef._
+import net.liftweb.json.JsonDSL._
+import predef._
+import biosim.client.messages.model.MAgent
 
 object SwitchBoard extends Logging {
 
@@ -60,7 +53,7 @@ object SwitchBoard extends Logging {
   	val localAgentDb = DatabaseFactory.database(socket.agentUid)
     val responseBody = request.getRequestBody match {
       case csrb: ConnectionScopedRequestBody => {
-        val db = csrb.getConnectionUid match {
+        implicit val db = csrb.getConnectionUid match {
           case null => localAgentDb
           case uid => {
             val localConn = localAgentDb.fetch[Connection](uid).get
@@ -77,17 +70,9 @@ object SwitchBoard extends Logging {
               getUids.
               asScala.
               flatMap(uid=>db.fetch[Node](uid)).
+              distinct.
               map(n=>toClientNode(n, dao))
             Some(new FetchResponse(nodes))
-          }
-          case rlr: RootLabelsRequest => {
-            val agent = db.fetch[Agent](socket.agentUid).get
-            val resp = new RootLabelsResponse
-            val labels = db.
-              children(agent).
-              collect { case l: Label => l.uid }.
-              foreach(uid=>resp.addUid(uid))
-            Some(resp)
           }
           case qr: QueryRequest => None
           case sr: SelectRequest => {
@@ -97,6 +82,7 @@ object SwitchBoard extends Logging {
                   nodes.
                   collect { case c: Connection => c }.
                   map(c => toClientNode(c, dao))
+                  
                 val resp = new SelectResponse
                 resp.setNodes(connections.toList)
                 Some(resp)
@@ -130,26 +116,27 @@ object SwitchBoard extends Logging {
     responseBody.foreach(rb=>socket.send(rb, request))
   }
   
-  def toClientNode(sn: Node, dao: AgentDAO): MNode = {
-    sn match {
-      case label: Label => {
-        val l = new MLabel
-        l.setName(label.name)
-        l.setUid(label.uid)
-        l.setIcon(label.icon)
-        val children = dao.
-          childLabels(sn).
-          map(cl => toClientUid(cl.uid)).
-          toList
-        l.setChildren(children)
-        l
-      }
+  def toClientNode(sn: Node, dao: AgentDAO)(implicit db: AgentDatabase): MNode = {
+    val cn = sn match {
+      
+      case agent: Agent => 
+        new MAgent
+      
+      case link: Link => 
+        new MLink(link.from, link.to)
+      
+      case label: Label => 
+        new MLabel(label.name, label.icon)
+      
       case conn: Connection => 
         new MConnection(conn.uid, conn.name, conn.icon, conn.remoteAgent)
         
       case _ => sys.error("don't know how to handle type " + sn)
       
     }
+    cn.setUid(sn.uid)
+    cn.setLinkHints(sn.linkUids.map(toClientUid).toList)
+    cn
   }
   
   def toServerNode(cn: MNode): Node = cn match {
