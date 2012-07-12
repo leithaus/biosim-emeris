@@ -1,9 +1,11 @@
 package biosim.client.messages.model;
 
 import java.util.Map;
+import java.util.Set;
 
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.MapX;
+import m3.gwt.lang.SetX;
 import biosim.client.Biosim;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
@@ -54,6 +56,8 @@ public class NodeContainer {
 			});
 	
 	public final Map<Uid,MNode> nodesByUid = MapX.create();
+	public final Map<Uid,Set<MLink>> linksByFrom = MapX.create();
+	public final Map<Uid,Set<MLink>> linksByTo = MapX.create();
 	
 
 	private NodeContainer() {
@@ -72,6 +76,20 @@ public class NodeContainer {
 			int i = nodes.indexOf(localNode);
 			nodes.set(i, node);
 		}
+		if ( node instanceof MLink ) {
+			MLink link = (MLink) node;
+			updateLinks(linksByFrom, link.getFrom(), link);
+			updateLinks(linksByTo, link.getTo(), link);
+		}
+	}
+	
+	private void updateLinks(Map<Uid,Set<MLink>> map, Uid key, MLink link) {
+		Set<MLink> set = map.get(key);
+		if ( set == null ) {
+			set = SetX.create();
+			map.put(key, set);
+		}
+		set.add(link);
 	}
 	
 	@SuppressWarnings("unchecked")

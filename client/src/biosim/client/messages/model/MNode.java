@@ -68,8 +68,14 @@ public class MNode {
 		}
 		_agentServices.fetch(_linkHints, false, new AsyncCallback<Iterable<MLink>>() {
 			@Override
-			public Void apply(Iterable<MLink> links) {
-				List<Uid> nodesToFetch = ListX.create(); 
+			public Void apply(Iterable<MLink> ignoredBecauseLinkHintsIsJustAHint) {
+				List<Uid> nodesToFetch = ListX.create();
+				Iterable<MLink> links;
+				if ( children ) {
+					links = _agentServices.getNodeContainer().linksByFrom.get(getUid());
+				} else {
+					links = _agentServices.getNodeContainer().linksByTo.get(getUid());					
+				}
 				for ( MLink l : links ) {
 					Uid sourceUid;
 					Uid targetUid;
