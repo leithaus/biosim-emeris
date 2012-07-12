@@ -1,5 +1,8 @@
 package biosim.client;
 
+import java.util.Iterator;
+import java.util.List;
+
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 
@@ -112,8 +115,9 @@ public class LabelTreeBuilder {
 	}
 	
 	void onAddedLabel(TreeItem ti, MLabel label) {
-		if (ti != null) {
-			
+		// If the label does not exist, update its parents
+		if (ti == null) {
+			updateParentNodes(label);
 		}
 	}
 	
@@ -124,6 +128,17 @@ public class LabelTreeBuilder {
 		}
 	}
 
+	void updateParentNodes(MLabel label) {
+		List<MNode> parents = NodeContainer.get().parentsForNode(label);
+		Iterator<MNode> it = parents.iterator();
+		while(it.hasNext()) {
+			MLabel l = (MLabel)it.next();
+			TreeItem treeItem = getTreeItemFromUid(l.getUid());
+			treeItem.setUserObject(l);
+			updateTreeItem(treeItem);
+		}		
+	}
+	
 	void onRemovedLabel(TreeItem ti, MLabel label) {
 		if (ti != null) {
 			TreeItem pi = ti.getParentItem();
@@ -138,6 +153,7 @@ public class LabelTreeBuilder {
 			// We have to check to see if the MLabel is the child of an existing
 			// node in the tree, then get the MLabel for that parent and update the 
 			// tree with it there.
+			updateParentNodes(label);
 		}
 	}
 	
@@ -373,7 +389,8 @@ public class LabelTreeBuilder {
 	}
 	
 	boolean isEditable(MLabel n) {
-		return _localAgent.isEditable(n);
+		return true;
+//		return _localAgent.isEditable(n);
 	}
 	
 	void addChildren(final biosim.client.messages.model.MLabel parent, final TreeItem parentTi) {
