@@ -2,6 +2,8 @@ package biosim.client.messages.model;
 
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
+
 import m3.fj.data.FList;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
@@ -68,7 +70,7 @@ public class MNode {
 		}
 		_agentServices.fetch(_linkHints, false, new AsyncCallback<Iterable<MLink>>() {
 			@Override
-			public Void apply(Iterable<MLink> ignoredBecauseLinkHintsIsJustAHint) {
+			public Void apply(Iterable<MLink> hintsFromLink) {
 				List<Uid> nodesToFetch = ListX.create();
 				Iterable<MLink> links;
 				if ( children ) {
@@ -77,7 +79,11 @@ public class MNode {
 					links = _agentServices.getNodeContainer().linksByTo.get(getUid());					
 				}
 				
-				if (links != null) {
+				if (links == null && hintsFromLink.iterator().hasNext() ) {
+					GWT.log("links null but hints has values this should not be. " + getUid() + " children = " + children);
+				}
+				
+				if ( links != null ) {
 					for ( MLink l : links ) {
 						Uid sourceUid;
 						Uid targetUid;
@@ -93,6 +99,7 @@ public class MNode {
 						}
 					}
 				}
+				
 				_agentServices.fetch(nodesToFetch, false, asyncCallback);
 				return null;
 			}

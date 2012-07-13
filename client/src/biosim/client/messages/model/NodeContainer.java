@@ -80,6 +80,9 @@ public class NodeContainer {
 			MLink link = (MLink) node;
 			updateLinks(linksByFrom, link.getFrom(), link);
 			updateLinks(linksByTo, link.getTo(), link);
+		} else {
+			updateLinks(linksByFrom, node.getUid(), null);
+			updateLinks(linksByTo, node.getUid(), null);
 		}
 	}
 	
@@ -89,7 +92,9 @@ public class NodeContainer {
 			set = SetX.create();
 			map.put(key, set);
 		}
-		set.add(link);
+		if ( link != null ) {
+			set.add(link);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
