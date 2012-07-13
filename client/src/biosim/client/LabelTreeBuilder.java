@@ -107,7 +107,7 @@ public class LabelTreeBuilder {
 						@Override
 						public Void apply(Iterable<MLabel> labels) {
 							for (MLabel l : labels) {
-								addChild2(l, ti);
+								addChild(l, ti);
 							}
 							
 							// Remove the temporary item when we finish loading
@@ -430,7 +430,9 @@ public class LabelTreeBuilder {
 			@Override
 			public Void apply(Iterable<MNode> nodes) {
 				if (parentTi != null) {
-					parentTi.addItem(DUMMY_TREE_NODE);
+					if (nodes.iterator().hasNext()) {
+						parentTi.addItem(DUMMY_TREE_NODE);
+					}
 				} else {
 					for (MNode node : nodes) {
 						if (node instanceof MLabel) {
@@ -446,10 +448,5 @@ public class LabelTreeBuilder {
 	void addChild(MLabel label, TreeItem parentTi) {
 		TreeItem ti = createTreeItem(parentTi, label);
 		addChildren(label, ti);
-	}
-	
-	void addChild2(MLabel label, TreeItem parentTi) {
-		TreeItem ti = createTreeItem(parentTi, label);
-		ti.addItem(DUMMY_TREE_NODE);
 	}
 }
