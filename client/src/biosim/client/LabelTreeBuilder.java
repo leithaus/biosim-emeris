@@ -38,6 +38,8 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -46,8 +48,11 @@ import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+
 public class LabelTreeBuilder {
-    
+
+	final String DUMMY_TREE_NODE = "DUMMY";
+
 	final Tree _tree = new Tree();
 
 	final Uid _agentUid;
@@ -87,12 +92,43 @@ public class LabelTreeBuilder {
 			}
 		});
 		
+		_tree.addOpenHandler(new OpenHandler<TreeItem>() {
+			@Override
+			public void onOpen(OpenEvent<TreeItem> event) {
+				final TreeItem ti = event.getTarget();
+				if (ti.getChildCount() == 1 && ti.getChild(0).getText().equals(DUMMY_TREE_NODE)) {
+					
+					// Close the item immediately
+					ti.setState(false, false);
+
+					// Add the children of the node
+					MLabel label = getUserObject(ti);
+					label.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
+						@Override
+						public Void apply(Iterable<MLabel> labels) {
+							for (MLabel l : labels) {
+								addChild2(l, ti);
+							}
+							
+							// Remove the temporary item when we finish loading
+							ti.getChild(0).remove();
+
+							// Reopen the item
+							ti.setState(true, false);
+
+							return null;
+						}
+					});
+				}
+			}
+		});
+		
 		addRootLabelsForAgent(_agentUid);
 	}
 	
 	TreeItem itemFromUid(TreeItem ti, Uid uid) {
 		MLabel ml = getUserObject(ti);
-		if (ml.getUid().equals(uid)) {
+		if (ml != null && ml.getUid().equals(uid)) {
 			return ti;
 		} else {
 			TreeItem t2 = null;
@@ -393,9 +429,13 @@ public class LabelTreeBuilder {
 		parent.getChildren(new AsyncCallback<Iterable<MNode>>() {
 			@Override
 			public Void apply(Iterable<MNode> nodes) {
-				for ( MNode node : nodes ) {
-					if ( node instanceof MLabel) {
-						addChild((MLabel)node, parentTi);
+				if (parentTi != null) {
+					parentTi.addItem(DUMMY_TREE_NODE);
+				} else {
+					for (MNode node : nodes) {
+						if (node instanceof MLabel) {
+							addChild((MLabel)node, parentTi);
+						}
 					}
 				}
 				return null;
@@ -408,4 +448,8 @@ public class LabelTreeBuilder {
 		addChildren(label, ti);
 	}
 	
+	void addChild2(MLabel label, TreeItem parentTi) {
+		TreeItem ti = createTreeItem(parentTi, label);
+		ti.addItem(DUMMY_TREE_NODE);
+	}
 }

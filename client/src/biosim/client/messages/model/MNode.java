@@ -76,18 +76,21 @@ public class MNode {
 				} else {
 					links = _agentServices.getNodeContainer().linksByTo.get(getUid());					
 				}
-				for ( MLink l : links ) {
-					Uid sourceUid;
-					Uid targetUid;
-					if ( children ) {
-						sourceUid = l.getFrom();
-						targetUid = l.getTo();
-					} else {
-						sourceUid = l.getTo();
-						targetUid = l.getFrom();
-					}
-					if ( getUid().equals(sourceUid) ) {
-						nodesToFetch.add(targetUid);
+				
+				if (links != null) {
+					for ( MLink l : links ) {
+						Uid sourceUid;
+						Uid targetUid;
+						if ( children ) {
+							sourceUid = l.getFrom();
+							targetUid = l.getTo();
+						} else {
+							sourceUid = l.getTo();
+							targetUid = l.getFrom();
+						}
+						if ( getUid().equals(sourceUid) ) {
+							nodesToFetch.add(targetUid);
+						}
 					}
 				}
 				_agentServices.fetch(nodesToFetch, false, asyncCallback);
