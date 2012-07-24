@@ -261,7 +261,7 @@ public class Biosim implements EntryPoint {
 			
 			@Override
 			public Void apply(Void t) {
-				_localAgent = new LocalAgent(_socket);
+				_localAgent = new LocalAgent(getAgentUid(), _socket);
 				
 				_labelTreeBuilder = 
 						new LabelTreeBuilder(

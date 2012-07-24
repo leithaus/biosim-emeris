@@ -16,12 +16,21 @@ import biosim.client.utils.BiosimWebSocket;
 
 public class AgentServicesImpl implements AgentServices {
 
-	final Uid _connectionUid;
+	final Uid _agentUid;
+	final MConnection _connection;
 	final BiosimWebSocket _socket;
 	final NodeContainer _nodeContainer;
 	
-	public AgentServicesImpl(Uid connectionUid, BiosimWebSocket socket, NodeContainer nodeContainer) {
-		_connectionUid = connectionUid;
+	public AgentServicesImpl(Uid agentUid, BiosimWebSocket socket, NodeContainer nodeContainer) {
+		_agentUid = agentUid;
+		_connection = null;
+		_socket = socket;
+		_nodeContainer = nodeContainer;
+	}
+
+	public AgentServicesImpl( MConnection connection, BiosimWebSocket socket, NodeContainer nodeContainer) {
+		_agentUid = connection.getRemoteAgent();
+		_connection = connection;
 		_socket = socket;
 		_nodeContainer = nodeContainer;
 	}
@@ -126,10 +135,23 @@ public class AgentServicesImpl implements AgentServices {
 			}
 		});
 	}
+	
+	public Uid getAgentUid() {
+		return _agentUid;
+	}
 
+	@Override
+	public Uid getConnectionUid() {
+		if ( _connection == null ) {
+			return null;
+		} else {
+			return _connection.getUid();
+		}
+	}
+	
 	public void send(final RequestBody body, Function1<?,?> responseHandler) {
-    	if ( body instanceof ConnectionScopedRequestBody ) {
-    		((ConnectionScopedRequestBody) body).setConnectionUid(_connectionUid);
+    	if ( body instanceof ConnectionScopedRequestBody && _connection != null ) {
+    		((ConnectionScopedRequestBody) body).setConnectionUid(_connection.getUid());
     	}
     	_socket.send(body, responseHandler);
     }

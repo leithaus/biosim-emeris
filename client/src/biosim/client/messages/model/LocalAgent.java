@@ -13,9 +13,9 @@ public class LocalAgent {
 	AgentServices _agentServices;
 	Map<Uid,AgentServices> _remoteAgentServices = MapX.create();
 	
-	public LocalAgent(BiosimWebSocket _socket) {
+	public LocalAgent(Uid agentUid, BiosimWebSocket _socket) {
 		this._socket = _socket;
-		this._agentServices = new AgentServicesImpl(null, _socket, NodeContainer.get());
+		this._agentServices = new AgentServicesImpl(agentUid, _socket, NodeContainer.get());
 	}
 
 	public void insertOrUpdate(MNode...nodes) {
@@ -40,7 +40,16 @@ public class LocalAgent {
 		return _agentServices;
 	}
 	
-	public AgentServices getRemoteAgentServices(MConnection conn) {
+	public AgentServices getAgentServices(Uid connectionUid) {
+		for ( AgentServices as : _remoteAgentServices.values() ) {
+			if ( as.getConnectionUid().equals(connectionUid) ) {
+				return as;
+			}
+		}
+		return null;
+	}
+	
+	public AgentServices getAgentServices(MConnection conn) {
 		AgentServices ras = _remoteAgentServices.get(conn.getUid());
 		if ( ras == null ) {
 			ras = new AgentServicesImpl(conn.getUid(), _socket, new NodeContainer(conn));

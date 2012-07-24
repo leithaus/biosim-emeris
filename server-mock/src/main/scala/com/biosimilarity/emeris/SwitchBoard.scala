@@ -100,7 +100,9 @@ object SwitchBoard extends Logging {
         nodes.
           foreach(n => localAgentDb.insert(n))
         
-        val response = new CreateNodesResponse
+        val response = new CreateNodesResponse()
+        response.setAgentUid(localAgentDb.uid)
+        response.setConnectionUid(null)
         response.setNodes(
             nodes.
               filterNot(_.isInstanceOf[Blob]).
