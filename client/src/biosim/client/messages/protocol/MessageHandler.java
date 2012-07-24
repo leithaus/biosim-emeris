@@ -13,7 +13,7 @@ public class MessageHandler {
 
 	NodeContainer _nodeContainer = NodeContainer.get();
 	LocalAgent _localAgent;
-	
+
 	public void process(Response response) {
 		ResponseBody body = response.getResponseBody();
 		if ( body instanceof CreateNodesResponse ) {
@@ -23,6 +23,9 @@ public class MessageHandler {
 				agentServices = _localAgent.getAgentServices(cnr.getConnectionUid());
 			} else {
 				agentServices = _localAgent.getAgentServices(cnr.getConnectionUid());
+			}
+			if ( agentServices == null ) {
+				throw new NullPointerException();
 			}
 			for ( MNode newNode : ((CreateNodesResponse) body).getNodes() ) {
 				newNode.setAgentServices(agentServices);

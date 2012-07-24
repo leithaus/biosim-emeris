@@ -41,6 +41,9 @@ public class LocalAgent {
 	}
 	
 	public AgentServices getAgentServices(Uid connectionUid) {
+		if ( connectionUid == null ) {
+			return getAgentServices();
+		}
 		for ( AgentServices as : _remoteAgentServices.values() ) {
 			if ( as.getConnectionUid().equals(connectionUid) ) {
 				return as;

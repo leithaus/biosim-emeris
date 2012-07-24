@@ -57,11 +57,11 @@ object InsertMinimalDataSet extends App {
     val rootLabel = add(Label("me", Some(icon.blobRef)))
     addLink(agent, rootLabel)
 
-    val aa = add(Label("aa", Some(icon.blobRef)))
-    addLink(rootLabel, aa)
-    
-    val bb = add(Label("bb", Some(icon.blobRef)))
-    addLink(aa, bb)
+//    val aa = add(Label("aa", Some(icon.blobRef)))
+//    addLink(rootLabel, aa)
+//    
+//    val bb = add(Label("bb", Some(icon.blobRef)))
+//    addLink(aa, bb)
     
   }
 

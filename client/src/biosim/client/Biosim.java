@@ -257,11 +257,13 @@ public class Biosim implements EntryPoint {
 
 //		DialogHelper.alert("using wsUrl = " + wsUrl);
 		
-		_socket = new BiosimWebSocket(wsUrl, new MessageHandler(), new Function1<Void, Void>() {
+		final MessageHandler messageHandler = new MessageHandler();
+		_socket = new BiosimWebSocket(wsUrl, messageHandler, new Function1<Void, Void>() {
 			
 			@Override
 			public Void apply(Void t) {
 				_localAgent = new LocalAgent(getAgentUid(), _socket);
+				messageHandler.setLocalAgent(_localAgent);
 				
 				_labelTreeBuilder = 
 						new LabelTreeBuilder(
