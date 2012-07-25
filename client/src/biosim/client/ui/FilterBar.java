@@ -8,6 +8,7 @@ import biosim.client.Biosim;
 import biosim.client.NodeBuilder;
 import biosim.client.messages.model.MNode;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.FontWeight;
@@ -101,7 +102,7 @@ public class FilterBar {
 	}
 
     void addContent(ClickEvent event) {
-        NodeBuilder nodeBuilder = new NodeBuilder(_filter._labels, _filter._connections);
+        NodeBuilder nodeBuilder = new NodeBuilder(_filter.getLabels(), _filter.getConnections());
 	    nodeBuilder.showPopupMenu(event);
 	}
 
@@ -116,7 +117,7 @@ public class FilterBar {
 	}
 
 	private void refresh() {
-		throw new RuntimeException("implement me");
+		GWT.log("implement me", new RuntimeException("implement me"));
 	}
 	
 	public void addToFilter(MNode node) {

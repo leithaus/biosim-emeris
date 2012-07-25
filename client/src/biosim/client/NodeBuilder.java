@@ -60,6 +60,7 @@ public class NodeBuilder {
 	    _labels = labels;
 	    _connections = people;
 	}
+    
 	
 	void addLeaf() {
 		DialogHelper.showTextPrompt("Enter the Name of child label to add.", "", "200px 20px", new Function1<String,Void>() {

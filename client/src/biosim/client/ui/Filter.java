@@ -3,63 +3,44 @@ package biosim.client.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import m3.gwt.lang.ListX;
-import m3.gwt.lang.MapX;
 import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MNode;
-import biosim.client.utils.SetX;
 
 public class Filter {
 
-	final List<MNode> _nodes = ListX.create();
-	final List<MConnection> _connections = ListX.create();
-	final Set<MLabel> _labels = SetX.create();
-	final Map<MLabel, List<String>> _labelsAndChildren = MapX.create();
+	final List<MNode> _nodes;
 	
 	public Filter() {
 		this(new ArrayList<MNode>());
 	}
 	
 	public Filter(List<MNode> nodes) {
-		
-//		for ( MNode node : nodes ) {
-//			if ( !_nodes.contains(node) && canAddFilter(node) ) {
-//				if ( node instanceof MLabel ) {
-//					for ( MNode f : nodes ) {
-//						if ( f.isDescendantOf(node) ) {
-//							_labels.remove(node);
-//						}
-//					}
-//				}
-//				
-//				if ( node instanceof MConnection ) {
-//					_connections.add((MConnection)node);
-//				}
-//				if ( node instanceof MLabel ) {
-//					MLabel label = (MLabel) node;
-//					_labels.add(label);
-//				}
-//			}
-//			_nodes.add(node);
-//		}
-//
-//		_labelsAndChildren.clear();
-//		for ( MLabel l : _labels ) {
-//			List<String> paths = _labelsAndChildren.get(l);
-//			if ( paths == null ) {
-//				paths = ListX.create();
-//				_labelsAndChildren.put(l, paths);
-//			}
-//			paths.add(l.getName());
-//			l.addChildLabels(_labelsAndChildren);
-//		}
-
+		_nodes = nodes;
 	}
 	
+    public List<MLabel> getLabels() {
+    	List<MLabel> l = ListX.create();
+    	for ( MNode n : _nodes ) {
+    		if ( l instanceof MLabel ) {
+    			l.add((MLabel)n);
+    		}
+    	}
+    	return l;
+    }
+
+    public List<MConnection> getConnections() {
+    	List<MConnection> l = ListX.create();
+    	for ( MNode n : _nodes ) {
+    		if ( l instanceof MConnection ) {
+    			l.add((MConnection)n);
+    		}
+    	}
+    	return l;
+    }
+
 	public boolean canAddFilter(MNode node) {
 //		if ( _nodes.contains(node) ) {
 //			return false;
@@ -155,8 +136,9 @@ public class Filter {
 //	}
 
 	public boolean isVisible(MNode n) {
-		if ( n instanceof MLabel ) return _labels.contains(n);
-		else return _nodes.contains(n);
+		return true;
+//		if ( n instanceof MLabel ) return _labels.contains(n);
+//		else return _nodes.contains(n);
 	}
 	
 }
