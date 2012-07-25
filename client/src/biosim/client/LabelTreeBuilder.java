@@ -1,7 +1,10 @@
 package biosim.client;
 
+import java.util.List;
+
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
+import m3.gwt.lang.ListX;
 
 import org.vectomatic.file.File;
 import org.vectomatic.file.FileList;
@@ -140,25 +143,21 @@ public class LabelTreeBuilder {
 		addRootLabelsForAgent(_agentUid);
 	}
 	
-	private TreeItem _itemFromUid(TreeItem ti, Uid uid) {
+	private void _treeItemsFromUid(TreeItem ti, Uid uid, List<TreeItem> l) {
 		MLabel ml = getUserObject(ti);
 		if (ml != null && ml.getUid().equals(uid)) {
-			return ti;
+			l.add(ti);
 		} else {
-			TreeItem t2 = null;
-			for (int j = 0; j < ti.getChildCount() && t2 == null; j++) {
-				t2 = this._itemFromUid(ti.getChild(j), uid);
+			for (int j = 0; j < ti.getChildCount(); j++) {
+				_treeItemsFromUid(ti.getChild(j), uid, l);
 			}
-			return t2;
 		}
 	}
-	
-	TreeItem getTreeItemFromUid(Uid uid) {
-		TreeItem ret = null;
-		for (int i = 0; i < _tree.getItemCount() && ret == null; i += 1) {
-			ret = _itemFromUid(_tree.getItem(i), uid);
+	List<TreeItem> treeItemsFromUid(Uid uid) {
+		List<TreeItem> ret = ListX.create();
+		for (int i = 0; i < _tree.getItemCount(); i += 1) {
+			_treeItemsFromUid(_tree.getItem(i), uid, ret);
 		}
-		
 		return ret;
 	}
 
@@ -167,10 +166,12 @@ public class LabelTreeBuilder {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
 				for (MLabel l : labels) {
-					TreeItem treeItem = getTreeItemFromUid(l.getUid());
-					treeItem.setUserObject(l);
-					updateTreeItem(treeItem);
-					addChildIfNecessary(treeItem, label);
+					List<TreeItem> treeItems = treeItemsFromUid(l.getUid());
+					for (TreeItem treeItem : treeItems) {
+						treeItem.setUserObject(l);
+						updateTreeItem(treeItem);
+						addChildIfNecessary(treeItem, label);
+					}
 				}
 				return null;
 			}
@@ -179,9 +180,8 @@ public class LabelTreeBuilder {
 	}
 	
 	void onChangedLabel(MLabel label) {
-		TreeItem ti = getTreeItemFromUid(label.getUid());
-
-		if (ti != null){
+		List<TreeItem> treeItems = treeItemsFromUid(label.getUid());
+		for (TreeItem ti : treeItems) {
 			ti.setUserObject(label);
 			updateTreeItem(ti);
 		}
@@ -192,9 +192,9 @@ public class LabelTreeBuilder {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
 				for (MLabel l : labels) {
-					TreeItem treeItem = getTreeItemFromUid(l.getUid());
-					if (treeItem != null) {
-						removeChildWithUid(treeItem, label.getUid());
+					List<TreeItem> treeItems = treeItemsFromUid(l.getUid());
+					for (TreeItem ti : treeItems) {
+						removeChildWithUid(ti, label.getUid());
 					}
 				}
 				return null;
@@ -208,8 +208,8 @@ public class LabelTreeBuilder {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
 				for (MLabel l : labels) {
-					TreeItem treeItem = getTreeItemFromUid(l.getUid());
-					if (treeItem != null) {
+					List<TreeItem> treeItems = treeItemsFromUid(l.getUid());
+					for (TreeItem treeItem : treeItems) {
 						treeItem.setUserObject(l);
 						updateTreeItem(treeItem);
 						addChildren(l, treeItem);
@@ -243,8 +243,8 @@ public class LabelTreeBuilder {
 	
 	void onAddedLink(MLink link) {
 		// Get a tree item associated with the from node
-		TreeItem ti = getTreeItemFromUid(link.getFrom());
-		if (ti != null) {
+		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
+		for (TreeItem ti : treeItems) {
 			MLabel label = (MLabel)NodeContainer.get().nodesByUid.get(link.getTo());
 			if (label == null) {
 				GWT.log("Label is null for uid: " + link.getTo().toString(), new Throwable("bad label"));
@@ -256,9 +256,8 @@ public class LabelTreeBuilder {
 
 	void onRemovedLink(MLink link) {
 		// Get a tree item associated with the from node
-		TreeItem ti = getTreeItemFromUid(link.getFrom());
-		
-		if (ti != null) {
+		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
+		for (TreeItem ti : treeItems) {
 			removeChildWithUid(ti, link.getTo());
 		}
 	}
