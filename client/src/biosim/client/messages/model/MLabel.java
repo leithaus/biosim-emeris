@@ -4,6 +4,8 @@ package biosim.client.messages.model;
 
 public class MLabel extends MNode {
 
+	public final String defaultIconUrl = "/images/tag.png";
+	
 	private BlobRef _icon;
 	private String _name;
 	
@@ -32,7 +34,7 @@ public class MLabel extends MNode {
 	@Override
 	public String getIconUrl() {
 		if ( _icon == null ) {
-			return "/images/tag.png";
+			return defaultIconUrl;
 		} else {
 			return _icon.getUrl();
 		}

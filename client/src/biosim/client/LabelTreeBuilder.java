@@ -11,7 +11,6 @@ import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.eventlist.ListEvent;
-import biosim.client.eventlist.ListEventType;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.LocalAgent;
@@ -31,6 +30,7 @@ import biosim.client.utils.DialogHelper;
 import biosim.client.utils.GqueryUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -51,7 +51,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class LabelTreeBuilder {
 
-	final String DUMMY_TREE_NODE = "DUMMY";
+	final String DUMMY_TREE_NODE = "DUMMY_TREE_NODE";
 
 	final Tree _tree = new Tree();
 
@@ -75,19 +75,34 @@ public class LabelTreeBuilder {
 		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
 			@Override
 			public void event(ListEvent<MNode> event) {
-				TreeItem ti = getTreeItemFromUid(event.getElement().getUid());
 				
 				if (event.getElement() instanceof MLabel) {
+					GWT.log("Label " + event.getType().toString());
 					MLabel label = (MLabel)event.getElement();
-					if (event.getType() == ListEventType.Added) {
-						onAddedLabel(ti, label);
-					} else if (event.getType() == ListEventType.Changed) {
-						onChangedLabel(ti, label);
-					} else if (event.getType() == ListEventType.Removed) {
-						onRemovedLabel(ti, label);
+
+					switch(event.getType()) {
+					case Added:
+						onAddedLabel(label);
+						break;
+					case Changed:
+						onChangedLabel(label);
+						break;
+					case Removed:
+						onRemovedLabel(label);
+						break;
 					}
 				} else if (event.getElement() instanceof MLink) {
-					//MLink link = (MLink)event.getElement();
+					GWT.log("Link " + event.getType().toString());
+					MLink link = (MLink)event.getElement();
+
+					switch(event.getType()) {
+					case Added:
+						onAddedLink(link);
+						break;
+					case Removed:
+						onRemovedLink(link);
+						break;
+					}
 				}
 			}
 		});
@@ -96,8 +111,7 @@ public class LabelTreeBuilder {
 			@Override
 			public void onOpen(OpenEvent<TreeItem> event) {
 				final TreeItem ti = event.getTarget();
-				if (ti.getChildCount() == 1 && ti.getChild(0).getText().equals(DUMMY_TREE_NODE)) {
-					
+				if (hasDummyNode(ti)) {					
 					// Close the item immediately
 					ti.setState(false, false);
 
@@ -126,14 +140,14 @@ public class LabelTreeBuilder {
 		addRootLabelsForAgent(_agentUid);
 	}
 	
-	TreeItem itemFromUid(TreeItem ti, Uid uid) {
+	private TreeItem _itemFromUid(TreeItem ti, Uid uid) {
 		MLabel ml = getUserObject(ti);
 		if (ml != null && ml.getUid().equals(uid)) {
 			return ti;
 		} else {
 			TreeItem t2 = null;
 			for (int j = 0; j < ti.getChildCount() && t2 == null; j++) {
-				t2 = this.itemFromUid(ti.getChild(j), uid);
+				t2 = this._itemFromUid(ti.getChild(j), uid);
 			}
 			return t2;
 		}
@@ -142,58 +156,113 @@ public class LabelTreeBuilder {
 	TreeItem getTreeItemFromUid(Uid uid) {
 		TreeItem ret = null;
 		for (int i = 0; i < _tree.getItemCount() && ret == null; i += 1) {
-			ret = itemFromUid(_tree.getItem(i), uid);
+			ret = _itemFromUid(_tree.getItem(i), uid);
 		}
 		
 		return ret;
 	}
-	
-	void onAddedLabel(TreeItem ti, MLabel label) {
-		// If the label does not exist, update its parents
-		if (ti == null) {
-			updateParentNodes(label);
-		}
+
+	void onAddedLabel(final MLabel label) {
+		label.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
+			@Override
+			public Void apply(Iterable<MLabel> labels) {
+				for (MLabel l : labels) {
+					TreeItem treeItem = getTreeItemFromUid(l.getUid());
+					treeItem.setUserObject(l);
+					updateTreeItem(treeItem);
+					addChildIfNecessary(treeItem, label);
+				}
+				return null;
+			}
+		});
+		updateParentNodes(label);
 	}
 	
-	void onChangedLabel(TreeItem ti, MLabel label) {
+	void onChangedLabel(MLabel label) {
+		TreeItem ti = getTreeItemFromUid(label.getUid());
+
 		if (ti != null){
 			ti.setUserObject(label);
 			updateTreeItem(ti);
 		}
 	}
 
+	void onRemovedLabel(final MLabel label) {
+		label.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
+			@Override
+			public Void apply(Iterable<MLabel> labels) {
+				for (MLabel l : labels) {
+					TreeItem treeItem = getTreeItemFromUid(l.getUid());
+					if (treeItem != null) {
+						removeChildWithUid(treeItem, label.getUid());
+					}
+				}
+				return null;
+			}
+		});
+		updateParentNodes(label);
+	}
+	
 	void updateParentNodes(MLabel label) {
 		label.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
-				for ( MLabel l : labels ) {
+				for (MLabel l : labels) {
 					TreeItem treeItem = getTreeItemFromUid(l.getUid());
-					treeItem.setUserObject(l);
-					updateTreeItem(treeItem);
+					if (treeItem != null) {
+						treeItem.setUserObject(l);
+						updateTreeItem(treeItem);
+						addChildren(l, treeItem);
+					}
 				}
 				return null;
 			}
 		});
 	}
 	
-	void onRemovedLabel(TreeItem ti, MLabel label) {
-		if (ti != null) {
-			TreeItem pi = ti.getParentItem();
-			MLabel l = this.getUserObject(pi);
-			
-			MLabel newLabel = (MLabel)NodeContainer.get().nodesByUid.get(l.getUid());
-			pi.setUserObject(newLabel);
-			updateTreeItem(pi);
-			
-			_tree.removeItem(ti);
-		} else {
-			// We have to check to see if the MLabel is the child of an existing
-			// node in the tree, then get the MLabel for that parent and update the 
-			// tree with it there.
-			updateParentNodes(label);
+	void removeChildWithUid(TreeItem ti, Uid uid) {
+		for (int i = 0; i < ti.getChildCount(); i += 1) {
+			MLabel label = getUserObject(ti.getChild(i));
+			if (label !=  null && label.getUid().equals(uid)) {
+				ti.removeItem(ti.getChild(i));
+				break;
+			}
 		}
 	}
 	
+	boolean hasChildWithUid(TreeItem ti, Uid uid) {
+		for (int i = 0; i < ti.getChildCount(); i += 1) {
+			MLabel label = getUserObject(ti.getChild(i));
+			if (label !=  null && label.getUid().equals(uid)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	void onAddedLink(MLink link) {
+		// Get a tree item associated with the from node
+		TreeItem ti = getTreeItemFromUid(link.getFrom());
+		if (ti != null) {
+			MLabel label = (MLabel)NodeContainer.get().nodesByUid.get(link.getTo());
+			if (label == null) {
+				GWT.log("Label is null for uid: " + link.getTo().toString(), new Throwable("bad label"));
+			} else {
+				addChildIfNecessary(ti, label);
+			}
+		}
+	}
+
+	void onRemovedLink(MLink link) {
+		// Get a tree item associated with the from node
+		TreeItem ti = getTreeItemFromUid(link.getFrom());
+		
+		if (ti != null) {
+			removeChildWithUid(ti, link.getTo());
+		}
+	}
+
 	TreeItem createTreeItem(TreeItem parent, MLabel label) {
 		TreeItem ti = new TreeItem();
 		if ( parent != null ) {
@@ -206,7 +275,11 @@ public class LabelTreeBuilder {
 		return ti;
 	}
 	
-    void updateTreeItem(TreeItem ti) {
+	boolean hasDummyNode(TreeItem ti) {
+		return (ti.getChildCount() == 1 && ti.getChild(0).getText().equals(DUMMY_TREE_NODE));
+	}
+	
+    void updateTreeItem(final TreeItem ti) {
 		final MLabel label = getUserObject(ti);
 		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
 		final FlowPanel w = nwbuilder.getFlowPanel();
@@ -238,14 +311,6 @@ public class LabelTreeBuilder {
 	            }
 	        });
 			
-			popup.addOption("Add Connection...", new Function0<Void>() {
-	            @Override
-	            public Void apply() {
-				    addLeaf(label);
-	                return null;
-	            }
-	        });
-			
 			w.addDomHandler(new MouseOutHandler() {
 				@Override
 				public void onMouseOut(MouseOutEvent event) {
@@ -261,15 +326,37 @@ public class LabelTreeBuilder {
 			},  MouseOverEvent.getType());
 			
 			GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
+			
+			// Make sure that the open/close button is set properly
+			label.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
+				@Override
+				public Void apply(Iterable<MLabel> labels) {
+					// If the tree item is not expanded
+					if (!ti.getState()) {
+						// If there are now no children in the model and the first 
+						// child is the dummy node, remove it.
+						if (!labels.iterator().hasNext()) {
+							if (hasDummyNode(ti)) {
+								ti.getChild(0).remove();
+							}
+						}
+					}
+					return null;
+				}				
+			});
 		}
-		
 	}
 	
 	void addLeaf(final MLabel parent) {
 		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
-			public Void apply(String t) {
+			public Void apply(final String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_localAgent.insertChild(parent, new MLabel(t));
+					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {						
+						@Override
+						public void execute() {
+							_localAgent.insertChild(parent, new MLabel(t));
+						}
+					});
 				}
 				return null;
 			}
@@ -429,14 +516,20 @@ public class LabelTreeBuilder {
 		parent.getChildren(new AsyncCallback<Iterable<MNode>>() {
 			@Override
 			public Void apply(Iterable<MNode> nodes) {
-				if (parentTi != null) {
-					if (nodes.iterator().hasNext()) {
-						parentTi.addItem(DUMMY_TREE_NODE);
-					}
-				} else {
+				if (parentTi == null) {
 					for (MNode node : nodes) {
 						if (node instanceof MLabel) {
 							addChild((MLabel)node, parentTi);
+						}
+					}
+				} else {
+					if (nodes.iterator().hasNext()) {
+						if (parentTi.getChildCount() == 0) {
+							parentTi.addItem(DUMMY_TREE_NODE);
+						}
+					} else {
+						if (parentTi.getChildCount() > 0) {
+							parentTi.removeItems();
 						}
 					}
 				}
@@ -448,5 +541,14 @@ public class LabelTreeBuilder {
 	void addChild(MLabel label, TreeItem parentTi) {
 		TreeItem ti = createTreeItem(parentTi, label);
 		addChildren(label, ti);
+	}
+	
+	void addChildIfNecessary(TreeItem treeItem, MLabel label) {
+		if (!hasDummyNode(treeItem)) {
+			if (!hasChildWithUid(treeItem, label.getUid())) {
+				addChild(label, treeItem);
+			}
+		}
+
 	}
 }

@@ -15,6 +15,7 @@ import biosim.client.messages.model.Uid;
 import biosim.client.messages.protocol.MessageHandler;
 import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.CustomTabPanel;
+import biosim.client.ui.Filter;
 import biosim.client.ui.FilterBar;
 import biosim.client.ui.NodePanel;
 import biosim.client.ui.NodeWidgetBuilder;
@@ -62,7 +63,13 @@ public class Biosim implements EntryPoint {
 	
 	ContentController _contentController;
 	
-	FilterBar _filtersBar = new FilterBar(this);
+	FilterBar _filtersBar = new FilterBar(new Function1<Filter,Void>() {
+		@Override
+		public Void apply(Filter filter) {
+			getEventScore().addStream(filter);
+			return null;
+		}
+	});
 
 	MConnection _selectedConnection;
 	

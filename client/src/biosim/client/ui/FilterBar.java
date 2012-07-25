@@ -3,8 +3,8 @@ package biosim.client.ui;
 
 import java.util.Map;
 
+import m3.gwt.lang.Function1;
 import m3.gwt.lang.MapX;
-import biosim.client.Biosim;
 import biosim.client.NodeBuilder;
 import biosim.client.messages.model.MNode;
 
@@ -31,16 +31,15 @@ public class FilterBar {
 	
 	Filter _filter = new Filter();
 	
-	Biosim _biosim;
     Button _addContent = new Button("Add Content");
 	Button _clear = new Button("Clear");
 	Button _addToScore = new Button("Add to Event Score");
 	
 	HorizontalPanel _buttons = new HorizontalPanel();
+	Function1<Filter,Void> _eventScoreCallback;
 	
-	
-	public FilterBar(Biosim biosim) {
-		_biosim = biosim;
+	public FilterBar(Function1<Filter,Void> eventScoreCallback) {
+		_eventScoreCallback = eventScoreCallback;
 		_panel.setStylePrimaryName("tabFilterBar");
 		_panel.addStyleName("ui-widget-content biosimbox ui-corner-all titledBorderDiv fixedHeight");
 		_panel.add(new TitledBorderDiv("Filters"));
@@ -64,7 +63,7 @@ public class FilterBar {
 		initializeButton(_addToScore, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent e) {
-				_biosim.getEventScore().addStream(_filter);
+				_eventScoreCallback.apply(_filter);
 			}
 		});
 		
