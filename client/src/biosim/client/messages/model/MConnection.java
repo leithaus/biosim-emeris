@@ -11,6 +11,8 @@ public class MConnection extends MNode {
 	}
 	
 	public MConnection(Uid _uid, String _name, BlobRef _icon, Uid _remoteAgent) {
+		super(_uid);
+		this._name = _name;
 		this._icon = _icon;
 		this._remoteAgent = _remoteAgent;
 	}

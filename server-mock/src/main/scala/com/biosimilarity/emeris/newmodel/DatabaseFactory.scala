@@ -14,6 +14,20 @@ trait DatabaseFactory {
   
   def databases: Iterable[AgentDatabase]
   
+  def removeConnections(uid: Uid) = {
+    databases.foreach { implicit db =>
+      db.
+        nodes.
+        collect { case c: Connection => c }.
+        filter(_.remoteAgent == uid).
+        foreach { conn =>
+          conn.incomingLinks.foreach(l=>db.delete(l.uid))
+          conn.outgoingLinks.foreach(l=>db.delete(l.uid))
+          db.delete(conn.uid)
+        }
+    }
+  }
+  
 }
 
 trait LoggingDatabaseFactory extends DatabaseFactory with Logging {
@@ -47,7 +61,18 @@ trait FileSystemDatabaseFactory extends DatabaseFactory with Logging {
     logger.debug("createDatabase({})", uid)
     (databasesRootDirectory \\ uid.value)
       .makeDirectories()
-    database(uid)
+    val dbs = databases
+    val newDb = database(uid)
+    dbs.foreach { db0 =>
+      val conns = db0.nodes.collect{ case c: Connection => c }
+      dbs.filter(_.uid != db0.uid).foreach { db1 =>
+        if ( !conns.exists(_.remoteAgent == db1.uid ) ) {
+          val conn = Connection(db1.uid.value, None, db1.uid)
+          db0.insert(conn)
+        }
+      }
+    }
+    newDb
   }
   
   def databaseGen(uid: Uid) = {

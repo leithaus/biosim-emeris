@@ -277,10 +277,9 @@ object Model {
 
     override def delete(uid: Uid) = uidFile(uid).delete
     
-    override def dropDatabase() = {
+    override def dropDatabase() =
       directory.deleteTree
-    }
-
+      DatabaseFactory
   }
     
 }
