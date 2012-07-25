@@ -29,7 +29,7 @@ public class MNode {
 	}
 
 	public String getVisualId() {
-		return null;
+		return getName();
 	}
 	
 	private AsyncCallback<Iterable<MNode>> labelsAdapter(final Function1<Iterable<MLabel>, Void> ac) {
