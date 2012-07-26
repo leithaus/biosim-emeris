@@ -24,17 +24,6 @@ public class QueryResponse extends ResponseBody {
 
 	// BEGIN_GENERATED_CODE
 	
-	public java.util.List<biosim.client.messages.model.FilterAcceptCriteria> getResults() {
-	    return _results;
-	}
-	public void setResults(java.util.List<biosim.client.messages.model.FilterAcceptCriteria> results0) {
-	    _setResults(results0);
-	}
-	protected void _setResults(java.util.List<biosim.client.messages.model.FilterAcceptCriteria> results0) {
-	    java.util.List<biosim.client.messages.model.FilterAcceptCriteria> before = _results;
-	     _results = results0;
-	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.results, before, results0);
-	}
 	public biosim.client.messages.model.Uid getQueryUid() {
 	    return _queryUid;
 	}
@@ -46,18 +35,29 @@ public class QueryResponse extends ResponseBody {
 	     _queryUid = queryUid0;
 	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.queryUid, before, queryUid0);
 	}
+	public java.util.List<biosim.client.messages.model.FilterAcceptCriteria> getResults() {
+	    return _results;
+	}
+	public void setResults(java.util.List<biosim.client.messages.model.FilterAcceptCriteria> results0) {
+	    _setResults(results0);
+	}
+	protected void _setResults(java.util.List<biosim.client.messages.model.FilterAcceptCriteria> results0) {
+	    java.util.List<biosim.client.messages.model.FilterAcceptCriteria> before = _results;
+	     _results = results0;
+	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.results, before, results0);
+	}
 	@Override
 	public String toString() {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class QueryResponseContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext results = new m3.gwt.props.impl.AbstractPropertyContext<QueryResponse,java.util.List<biosim.client.messages.model.FilterAcceptCriteria>>(this, "results", java.util.List.class, 0, biosim.client.messages.model.FilterAcceptCriteria.class, false) {
-	    	    protected java.util.List<biosim.client.messages.model.FilterAcceptCriteria> getImpl(QueryResponse bean) { return bean.getResults(); }
-	    	    protected void setImpl(QueryResponse bean, java.util.List<biosim.client.messages.model.FilterAcceptCriteria> value ) { bean.setResults(value);}
-	    };
-	    public m3.gwt.props.PropertyContext queryUid = new m3.gwt.props.impl.AbstractPropertyContext<QueryResponse,biosim.client.messages.model.Uid>(this, "queryUid", biosim.client.messages.model.Uid.class, 1, null, false) {
+	    public m3.gwt.props.PropertyContext queryUid = new m3.gwt.props.impl.AbstractPropertyContext<QueryResponse,biosim.client.messages.model.Uid>(this, "queryUid", biosim.client.messages.model.Uid.class, 0, null, false) {
 	    	    protected biosim.client.messages.model.Uid getImpl(QueryResponse bean) { return bean.getQueryUid(); }
 	    	    protected void setImpl(QueryResponse bean, biosim.client.messages.model.Uid value ) { bean.setQueryUid(value);}
+	    };
+	    public m3.gwt.props.PropertyContext results = new m3.gwt.props.impl.AbstractPropertyContext<QueryResponse,java.util.List<biosim.client.messages.model.FilterAcceptCriteria>>(this, "results", java.util.List.class, 1, biosim.client.messages.model.FilterAcceptCriteria.class, false) {
+	    	    protected java.util.List<biosim.client.messages.model.FilterAcceptCriteria> getImpl(QueryResponse bean) { return bean.getResults(); }
+	    	    protected void setImpl(QueryResponse bean, java.util.List<biosim.client.messages.model.FilterAcceptCriteria> value ) { bean.setResults(value);}
 	    };
 	    protected m3.fj.data.FSet<String> createImplementsList() {
 	        m3.fj.data.FSet<String> set = m3.fj.data.FSet.empty();
@@ -68,8 +68,8 @@ public class QueryResponse extends ResponseBody {
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
-	        list = list.cons(this.results);
 	        list = list.cons(this.queryUid);
+	        list = list.cons(this.results);
 	        return list;
 	    }
 	    public QueryResponse newInstance() {

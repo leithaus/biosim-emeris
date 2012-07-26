@@ -20,6 +20,7 @@ import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MAgent;
 import biosim.client.messages.model.MBlob;
 import biosim.client.messages.model.MConnection;
+import biosim.client.messages.model.MIconNode;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
@@ -82,17 +83,17 @@ public class LabelTreeBuilder {
 				
 				if (event.getElement() instanceof MLabel) {
 					GWT.log("Label " + event.getType().toString());
-					MLabel label = (MLabel)event.getElement();
+					MIconNode node = (MIconNode)event.getElement();
 
 					switch(event.getType()) {
 					case Added:
-						onAddedLabel(label);
+						onAddedLabel(node);
 						break;
 					case Changed:
-						onChangedLabel(label);
+						onChangedLabel(node);
 						break;
 					case Removed:
-						onRemovedLabel(label);
+						onRemovedLabel(node);
 						break;
 					}
 				} else if (event.getElement() instanceof MLink) {
@@ -120,8 +121,8 @@ public class LabelTreeBuilder {
 					ti.setState(false, false);
 
 					// Add the children of the node
-					MLabel label = getUserObject(ti);
-					label.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
+					MIconNode node = getUserObject(ti);
+					node.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
 						@Override
 						public Void apply(Iterable<MLabel> labels) {
 							for (MLabel l : labels) {
@@ -145,8 +146,8 @@ public class LabelTreeBuilder {
 	}
 	
 	private void _treeItemsFromUid(TreeItem ti, Uid uid, List<TreeItem> l) {
-		MLabel ml = getUserObject(ti);
-		if (ml != null && ml.getUid().equals(uid)) {
+		MIconNode node = getUserObject(ti);
+		if (node != null && node.getUid().equals(uid)) {
 			l.add(ti);
 		} else {
 			for (int j = 0; j < ti.getChildCount(); j++) {
@@ -162,8 +163,8 @@ public class LabelTreeBuilder {
 		return ret;
 	}
 
-	void onAddedLabel(final MLabel label) {
-		label.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
+	void onAddedLabel(final MIconNode node) {
+		node.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
 				for (MLabel l : labels) {
@@ -171,41 +172,41 @@ public class LabelTreeBuilder {
 					for (TreeItem treeItem : treeItems) {
 						treeItem.setUserObject(l);
 						updateTreeItem(treeItem);
-						addChildIfNecessary(treeItem, label);
+						addChildIfNecessary(treeItem, node);
 					}
 				}
 				return null;
 			}
 		});
-		updateParentNodes(label);
+		updateParentNodes(node);
 	}
 	
-	void onChangedLabel(MLabel label) {
-		List<TreeItem> treeItems = treeItemsFromUid(label.getUid());
+	void onChangedLabel(MIconNode node) {
+		List<TreeItem> treeItems = treeItemsFromUid(node.getUid());
 		for (TreeItem ti : treeItems) {
-			ti.setUserObject(label);
+			ti.setUserObject(node);
 			updateTreeItem(ti);
 		}
 	}
 
-	void onRemovedLabel(final MLabel label) {
-		label.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
+	void onRemovedLabel(final MIconNode node) {
+		node.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
 				for (MLabel l : labels) {
 					List<TreeItem> treeItems = treeItemsFromUid(l.getUid());
 					for (TreeItem ti : treeItems) {
-						removeChildWithUid(ti, label.getUid());
+						removeChildWithUid(ti, node.getUid());
 					}
 				}
 				return null;
 			}
 		});
-		updateParentNodes(label);
+		updateParentNodes(node);
 	}
 	
-	void updateParentNodes(MLabel label) {
-		label.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
+	void updateParentNodes(MIconNode node) {
+		node.getParentLabels(new AsyncCallback<Iterable<MLabel>>() {
 			@Override
 			public Void apply(Iterable<MLabel> labels) {
 				for (MLabel l : labels) {
@@ -223,8 +224,8 @@ public class LabelTreeBuilder {
 	
 	void removeChildWithUid(TreeItem ti, Uid uid) {
 		for (int i = 0; i < ti.getChildCount(); i += 1) {
-			MLabel label = getUserObject(ti.getChild(i));
-			if (label !=  null && label.getUid().equals(uid)) {
+			MIconNode node = getUserObject(ti.getChild(i));
+			if (node !=  null && node.getUid().equals(uid)) {
 				ti.removeItem(ti.getChild(i));
 				break;
 			}
@@ -233,8 +234,8 @@ public class LabelTreeBuilder {
 	
 	boolean hasChildWithUid(TreeItem ti, Uid uid) {
 		for (int i = 0; i < ti.getChildCount(); i += 1) {
-			MLabel label = getUserObject(ti.getChild(i));
-			if (label !=  null && label.getUid().equals(uid)) {
+			MIconNode node = getUserObject(ti.getChild(i));
+			if (node !=  null && node.getUid().equals(uid)) {
 				return true;
 			}
 		}
@@ -243,18 +244,40 @@ public class LabelTreeBuilder {
 	}
 	
 	void onAddedLink(MLink link) {
+		
+		final MNode[] fromNode = new MNode[1];
+		link.linkFrom(new Function1<MNode, Void>() {
+			@Override
+			public Void apply(MNode node) {
+				fromNode[0] = node;
+				return null;
+			}
+		});
+		
+		final MNode[] toNode = new MNode[1];
+		link.linkTo(new Function1<MNode, Void>() {
+			@Override
+			public Void apply(MNode node) {
+				toNode[0] = node;
+				return null;
+			}
+		});
+		
+		MIconNode startNode, endNode = null;
+		if (fromNode[0] instanceof MLabel){
+			startNode = (MIconNode)fromNode[0];
+			endNode = (MIconNode)toNode[0];
+		} else if (fromNode[0] instanceof MConnection){
+			startNode = (MIconNode)toNode[0];
+			endNode = (MIconNode)fromNode[0];
+		} else {
+			return;
+		}
+
 		// Get a tree item associated with the from node
-		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
+		List<TreeItem> treeItems = treeItemsFromUid(startNode.getUid());
 		for (TreeItem ti : treeItems) {
-			final TreeItem ti_f = ti;
-			link.linkTo(new Function1<MNode, Void>() {
-				@Override
-				public Void apply(MNode node) {
-					MLabel label = (MLabel) node;
-					addChildIfNecessary(ti_f, label);
-					return null;
-				}
-			});
+			addChildIfNecessary(ti, endNode);
 		}
 	}
 
@@ -266,14 +289,14 @@ public class LabelTreeBuilder {
 		}
 	}
 
-	TreeItem createTreeItem(TreeItem parent, MLabel label) {
+	TreeItem createTreeItem(TreeItem parent, MIconNode node) {
 		TreeItem ti = new TreeItem();
 		if ( parent != null ) {
 			parent.addItem(ti);
 		} else {
 			_tree.addItem(ti);
 		}
-		ti.setUserObject(label);
+		ti.setUserObject(node);
 		updateTreeItem(ti);
 		return ti;
 	}
@@ -283,13 +306,13 @@ public class LabelTreeBuilder {
 	}
 	
     void updateTreeItem(final TreeItem ti) {
-		final MLabel label = getUserObject(ti);
-		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(label, _dndController, DndType.Label); 
+		final MIconNode node = getUserObject(ti);
+		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label); 
 		final FlowPanel w = nwbuilder.getFlowPanel();
 		final PopupMenu popup = new PopupMenu();
 		ti.setWidget(w);
 				
-		if ( label.isEditable() ) {	
+		if ( node.isEditable() ) {	
 			final Button pop = new Button("&raquo;");			
 			w.add(pop);
 			pop.addClickHandler(new ClickHandler() {
@@ -301,7 +324,7 @@ public class LabelTreeBuilder {
 			popup.addOption("Add Child Label...", new Function0<Void>() {
 	            @Override
 	            public Void apply() {
-				    addLeaf(label);
+				    addLeaf(node);
 	                return null;
 	            }
 	        });
@@ -309,7 +332,7 @@ public class LabelTreeBuilder {
 			popup.addOption("Edit...", new Function0<Void>() {
 	            @Override
 	            public Void apply() {
-				    editLabel(label);
+				    editLabel(node);
 	                return null;
 	            }
 	        });
@@ -331,7 +354,7 @@ public class LabelTreeBuilder {
 			GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
 			
 			// Make sure that the open/close button is set properly
-			label.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
+			node.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
 				@Override
 				public Void apply(Iterable<MLabel> labels) {
 					// If the tree item is not expanded
@@ -350,7 +373,7 @@ public class LabelTreeBuilder {
 		}
 	}
 	
-	void addLeaf(final MLabel parent) {
+	void addLeaf(final MIconNode parent) {
 		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
 			public Void apply(final String t) {
 				if ( t != null && t.trim().length() > 0 ) {
@@ -366,12 +389,12 @@ public class LabelTreeBuilder {
 		});
 	}
 	
-	void editLabel(final MLabel label) {
+	void editLabel(final MIconNode node) {
 		final VerticalPanel panel = new VerticalPanel();
 		HTML l1 = new HTML("Name:");
 		panel.add(l1);
 		final TextBox textBox = new TextBox();
-		textBox.setText(label.getName());
+		textBox.setText(node.getName());
 		panel.add(textBox);
 		
 		HTML l2 = new HTML("Icon:");
@@ -383,8 +406,8 @@ public class LabelTreeBuilder {
 				if (p != null) {
 					// Set the new name the node, if it is set
 					if (!textBox.getText().isEmpty()) {
-						label.setName(textBox.getText());
-						_localAgent.insertOrUpdate(label);
+						node.setName(textBox.getText());
+						_localAgent.insertOrUpdate(node);
 					}
 					
 					// Get the files that were selected 
@@ -400,8 +423,8 @@ public class LabelTreeBuilder {
                                     String base64 = Base64.toBase64(buffer);
                                     MBlob blob = new MBlob(_agentUid, file.getName());
                                     blob.setDataInBase64(base64);
-                                    label.setIcon(blob.getRef());
-                                    _localAgent.insertOrUpdate(blob, label);
+                                    node.setIcon(blob.getRef());
+                                    _localAgent.insertOrUpdate(blob, node);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -511,8 +534,8 @@ public class LabelTreeBuilder {
 		});
 	}
 
-	MLabel getUserObject(TreeItem ti) {
-		return (MLabel) ti.getUserObject();		
+	MIconNode getUserObject(TreeItem ti) {
+		return (MIconNode) ti.getUserObject();		
 	}
 	
 	void addChildren(final biosim.client.messages.model.MNode parent, final TreeItem parentTi) {
@@ -521,7 +544,7 @@ public class LabelTreeBuilder {
 			public Void apply(Iterable<MNode> nodes) {
 				if (parentTi == null) {
 					for (MNode node : nodes) {
-						if (node instanceof MLabel) {
+						if (node instanceof MIconNode) {
 							addChild((MLabel)node, parentTi);
 						}
 					}
@@ -541,15 +564,15 @@ public class LabelTreeBuilder {
 		});
 	}
 	
-	void addChild(MLabel label, TreeItem parentTi) {
-		TreeItem ti = createTreeItem(parentTi, label);
-		addChildren(label, ti);
+	void addChild(MIconNode node, TreeItem parentTi) {
+		TreeItem ti = createTreeItem(parentTi, node);
+		addChildren(node, ti);
 	}
 	
-	void addChildIfNecessary(TreeItem treeItem, MLabel label) {
+	void addChildIfNecessary(TreeItem treeItem, MIconNode node) {
 		if (!hasDummyNode(treeItem)) {
-			if (!hasChildWithUid(treeItem, label.getUid())) {
-				addChild(label, treeItem);
+			if (!hasChildWithUid(treeItem, node.getUid())) {
+				addChild(node, treeItem);
 			}
 		}
 
