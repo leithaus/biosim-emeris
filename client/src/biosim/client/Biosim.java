@@ -3,17 +3,17 @@ package biosim.client;
 import static com.google.gwt.query.client.GQuery.$;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.LogTool;
+import m3.gwt.lang.Pair;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ObservableList;
-import biosim.client.eventlist.Observables;
+import biosim.client.messages.model.FilterAcceptCriteria;
 import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
 import biosim.client.messages.model.Uid;
 import biosim.client.messages.protocol.MessageHandler;
-import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.CustomTabPanel;
 import biosim.client.ui.Filter;
 import biosim.client.ui.FilterBar;
@@ -44,11 +44,6 @@ import com.google.gwt.user.client.ui.Widget;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Biosim implements EntryPoint {
-
-	public static final String _connectionDropHover = "ui-state-active";
-	public static final String _connectionIconDragging = "ui-state-highlight";
-	public static final String _connectionSelected = "ui-state-focus";
-	public static final String _boxStyle = "biosimbox ui-widget-content ui-corner-all";
 	
 	static Biosim _instance;
 	public static Biosim get() {
@@ -63,11 +58,15 @@ public class Biosim implements EntryPoint {
 	
 	ContentController _contentController;
 	
-	FilterBar _filtersBar = new FilterBar(new Function1<Filter,Void>() {
+	FilterBar _filtersBar = new FilterBar(new FilterBar.Callback() {
 		@Override
-		public Void apply(Filter filter) {
+		public ObservableList<Pair<FilterAcceptCriteria,MNode>> getContentList() {
+			return _contentController.getContent();
+		}
+
+		@Override
+		public void addToEventScore(Filter filter) {
 			getEventScore().addStream(filter);
-			return null;
 		}
 	});
 
@@ -135,19 +134,32 @@ public class Biosim implements EntryPoint {
 			NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
 				@Override
 				public void event(ListEvent<MNode> event) {
-					_contentController.refilterContent();
+					_filtersBar.refresh();
 				}
 			});
 	
 			_instance = this;
-	//		_composeMessageBuilder = new ComposeMessageBuilder(this);
-	
-			_dndController = new DndController(this, RootPanel.get());
 			
-			// TDGlen wire in proper query stuff here
-			ObservableList<MNode> fakeContent = Observables.create();
-			_contentController = new ContentController(this, fakeContent, _dndController);
-//			_contentController = new ContentController(this, _databaseAccessLayer.getContent(), _dndController);
+			_dndController = new DndController(RootPanel.get(), new DndController.Callback() {
+				@Override
+				public void removeContentLinks(MNode node) {
+					removeContentLinks(node);
+				}
+				@Override
+				public FilterBar getFilterBar() {
+					return _filtersBar;
+				}
+				@Override
+				public ContentController getContentController() {
+					return _contentController;
+				}
+				@Override
+				public LocalAgent getLocalAgent() {
+					return _localAgent;
+				}
+			});
+			
+			_contentController = new ContentController(_dndController);
 	
 			DockPanel dock = new DockPanel();
 	    
@@ -184,8 +196,6 @@ public class Biosim implements EntryPoint {
 			contentSectionContent.add(_contentController._contentPanel);
 			
 			connectionsSectionContent.add(NodePanel.create(getNodeContainer().connections, _dndController, DndType.Connection));
-			
-			_contentController.refilterContent();
 			
 			_scissors.addStyleName("fright");
 			_contentSection.getTabBar().add(_scissors);
@@ -290,6 +300,8 @@ public class Biosim implements EntryPoint {
 					}
 				});
 
+				_filtersBar.setLocalAgent(_localAgent);
+				
 				return null;
 			}
 		});
@@ -299,15 +311,15 @@ public class Biosim implements EntryPoint {
 	void removeContentLinks(MNode node) {
 		if ( node != null ) {
 			NodeWidgetBuilder builder = _contentController.builder(node);
-			ContentCriteria ac = builder.getFilterAcceptCriteria();
+			FilterAcceptCriteria ac = builder.getFilterAcceptCriteria();
 			
-			if ( ac.connections.size() > 0 ) {
-				for ( MConnection p : ac.connections ) {
-					getLocalAgent().removeLink(p, node);
+			if ( ac.getConnections().size() > 0 ) {
+				for ( Uid connUid : ac.getConnections() ) {
+					getLocalAgent().removeLink(connUid, node);
 				}
 			} else {
-				for ( MNode n : ac.labels ) {
-					getLocalAgent().removeLink(n, node);
+				for ( Uid labelUid : ac.getLabels() ) {
+					getLocalAgent().removeLink(labelUid, node);
 				}
 			}
 		}
@@ -315,20 +327,6 @@ public class Biosim implements EntryPoint {
 	
 	public ContentController getContentController() {
 		return _contentController;
-	}
-	
-	public static String getCurrentUiStateCssClass(String styleNames) {
-		String uiStateCssClass = null;
-		if(styleNames != null && styleNames.length() > 0) {
-			styleNames = styleNames.trim();
-			String[] classes = styleNames.split(" ");
-			for(String cssClass : classes) {
-				if(cssClass.startsWith("ui-state")) {
-					uiStateCssClass = cssClass;
-				}
-			}
-		}
-		return uiStateCssClass;
 	}
 	
 	public Uid getAgentUid() {

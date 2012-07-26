@@ -245,12 +245,15 @@ public class LabelTreeBuilder {
 		// Get a tree item associated with the from node
 		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
 		for (TreeItem ti : treeItems) {
-			MLabel label = (MLabel)NodeContainer.get().nodesByUid.get(link.getTo());
-			if (label == null) {
-				GWT.log("Label is null for uid: " + link.getTo().toString(), new Throwable("bad label"));
-			} else {
-				addChildIfNecessary(ti, label);
-			}
+			final TreeItem ti_f = ti;
+			link.linkTo(new Function1<MNode, Void>() {
+				@Override
+				public Void apply(MNode node) {
+					MLabel label = (MLabel) node;
+					addChildIfNecessary(ti_f, label);
+					return null;
+				}
+			});
 		}
 	}
 

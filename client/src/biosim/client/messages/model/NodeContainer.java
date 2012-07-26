@@ -67,6 +67,19 @@ public class NodeContainer {
 	public NodeContainer(MConnection conn) {
 		_connection = conn;
 	}
+
+	public void insertOrUpdate(Iterable<MNode> nodes) {
+		for ( MNode n : nodes ) {
+			if ( !(n instanceof MLink) ) {
+				insertOrUpdate(n);
+			}
+		}
+		for ( MNode n : nodes ) {
+			if ( n instanceof MLink ) {
+				insertOrUpdate(n);
+			}
+		}
+	}
 	
 	public void insertOrUpdate(MNode node) {
 		MNode localNode = nodesByUid.get(node.getUid());

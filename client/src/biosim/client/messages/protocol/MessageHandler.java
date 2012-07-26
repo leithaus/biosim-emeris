@@ -29,8 +29,8 @@ public class MessageHandler {
 			}
 			for ( MNode newNode : ((CreateNodesResponse) body).getNodes() ) {
 				newNode.setAgentServices(agentServices);
-				_nodeContainer.insertOrUpdate(newNode);
 			}
+			_nodeContainer.insertOrUpdate(((CreateNodesResponse) body).getNodes());
 		} else {
 			throw new RuntimeException("don't know how to handle type " + response.getClass());
 		}

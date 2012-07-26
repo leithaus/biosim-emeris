@@ -26,6 +26,8 @@ import m3.predef._
 import net.liftweb.json.JsonDSL._
 import predef._
 import biosim.client.messages.model.MAgent
+import biosim.client.messages.protocol.QueryResponse
+import biosim.client.messages.model.FilterAcceptCriteria
 
 object SwitchBoard extends Logging {
 
@@ -74,7 +76,22 @@ object SwitchBoard extends Logging {
               map(n=>toClientNode(n, dao))
             Some(new FetchResponse(nodes))
           }
-          case qr: QueryRequest => None
+          case qr: QueryRequest => {
+            val nodes = qr.getNodes.asScala.map(uid=>db.fetch(uid))
+            val labels = nodes.collect { case l: Label => l}
+            val conns = nodes.collect { case c: Connection => c}
+            val responseCriteria = dao.
+              query(labels, conns).
+              map { sfac =>
+                val mfac = new FilterAcceptCriteria()
+                mfac.setConnections(sfac.connections.map(toClientUid).toList.asJava)
+                mfac.setLabels(sfac.labels.map(toClientUid).toList.asJava)
+                mfac.setPaths(sfac.paths.toList.asJava)
+                mfac.setNode(sfac.node)
+                mfac
+              }
+            Some(new QueryResponse(qr.getQueryUid, responseCriteria.toList.asJava))
+          }
           case sr: SelectRequest => {
             sr.getShortClassname match {
               case "MConnection" => {

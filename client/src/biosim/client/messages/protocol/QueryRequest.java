@@ -2,51 +2,64 @@ package biosim.client.messages.protocol;
 
 import java.util.List;
 
+import m3.gwt.lang.ListX;
 import m3.gwt.props.ApplyCodeGeneration;
+import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.Uid;
 
 @ApplyCodeGeneration
 public class QueryRequest extends ConnectionScopedRequestBody {
 
-	private List<Uid> _labels;
-	private List<Uid> _connections;
+	private List<Uid> _nodes = ListX.create();
+	private Uid _queryUid;
+	
+	
+	private QueryRequest() {
+	}
+	
+	public QueryRequest(Uid queryUid, Iterable<MNode> nodes) {
+		_queryUid = queryUid;
+		for ( MNode n : nodes ) {
+			_nodes.add(n.getUid());
+		}
+	}
 	
 	// BEGIN_GENERATED_CODE
 	
-	public java.util.List<biosim.client.messages.model.Uid> getLabels() {
-	    return _labels;
+	public java.util.List<biosim.client.messages.model.Uid> getNodes() {
+	    return _nodes;
 	}
-	public void setLabels(java.util.List<biosim.client.messages.model.Uid> labels0) {
-	    _setLabels(labels0);
+	public void setNodes(java.util.List<biosim.client.messages.model.Uid> nodes0) {
+	    _setNodes(nodes0);
 	}
-	protected void _setLabels(java.util.List<biosim.client.messages.model.Uid> labels0) {
-	    java.util.List<biosim.client.messages.model.Uid> before = _labels;
-	     _labels = labels0;
-	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.labels, before, labels0);
+	protected void _setNodes(java.util.List<biosim.client.messages.model.Uid> nodes0) {
+	    java.util.List<biosim.client.messages.model.Uid> before = _nodes;
+	     _nodes = nodes0;
+	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.nodes, before, nodes0);
 	}
-	public java.util.List<biosim.client.messages.model.Uid> getConnections() {
-	    return _connections;
+	public biosim.client.messages.model.Uid getQueryUid() {
+	    return _queryUid;
 	}
-	public void setConnections(java.util.List<biosim.client.messages.model.Uid> connections0) {
-	    _setConnections(connections0);
+	public void setQueryUid(biosim.client.messages.model.Uid queryUid0) {
+	    _setQueryUid(queryUid0);
 	}
-	protected void _setConnections(java.util.List<biosim.client.messages.model.Uid> connections0) {
-	    java.util.List<biosim.client.messages.model.Uid> before = _connections;
-	     _connections = connections0;
-	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.connections, before, connections0);
+	protected void _setQueryUid(biosim.client.messages.model.Uid queryUid0) {
+	    biosim.client.messages.model.Uid before = _queryUid;
+	     _queryUid = queryUid0;
+	    m3.gwt.props.Txn.getPropertyChangeManager().fireChangeEvent(this, Context.queryUid, before, queryUid0);
 	}
 	@Override
 	public String toString() {
 	    return m3.gwt.props.ToStringBuilder.toString(this, Context);
 	}
 	public static class QueryRequestContainerContext extends m3.gwt.props.impl.AbstractContainerContext {
-	    public m3.gwt.props.PropertyContext labels = new m3.gwt.props.impl.AbstractPropertyContext<QueryRequest,java.util.List<biosim.client.messages.model.Uid>>(this, "labels", java.util.List.class, 0, biosim.client.messages.model.Uid.class, false) {
-	    	    protected java.util.List<biosim.client.messages.model.Uid> getImpl(QueryRequest bean) { return bean.getLabels(); }
-	    	    protected void setImpl(QueryRequest bean, java.util.List<biosim.client.messages.model.Uid> value ) { bean.setLabels(value);}
+	    public m3.gwt.props.PropertyContext nodes = new m3.gwt.props.impl.AbstractPropertyContext<QueryRequest,java.util.List<biosim.client.messages.model.Uid>>(this, "nodes", java.util.List.class, 0, biosim.client.messages.model.Uid.class, false) {
+	    	    protected java.util.List<biosim.client.messages.model.Uid> getImpl(QueryRequest bean) { return bean.getNodes(); }
+	    	    protected void setImpl(QueryRequest bean, java.util.List<biosim.client.messages.model.Uid> value ) { bean.setNodes(value);}
 	    };
-	    public m3.gwt.props.PropertyContext connections = new m3.gwt.props.impl.AbstractPropertyContext<QueryRequest,java.util.List<biosim.client.messages.model.Uid>>(this, "connections", java.util.List.class, 1, biosim.client.messages.model.Uid.class, false) {
-	    	    protected java.util.List<biosim.client.messages.model.Uid> getImpl(QueryRequest bean) { return bean.getConnections(); }
-	    	    protected void setImpl(QueryRequest bean, java.util.List<biosim.client.messages.model.Uid> value ) { bean.setConnections(value);}
+	    public m3.gwt.props.PropertyContext queryUid = new m3.gwt.props.impl.AbstractPropertyContext<QueryRequest,biosim.client.messages.model.Uid>(this, "queryUid", biosim.client.messages.model.Uid.class, 1, null, false) {
+	    	    protected biosim.client.messages.model.Uid getImpl(QueryRequest bean) { return bean.getQueryUid(); }
+	    	    protected void setImpl(QueryRequest bean, biosim.client.messages.model.Uid value ) { bean.setQueryUid(value);}
 	    };
 	    public m3.gwt.props.PropertyContext connectionUid = ConnectionScopedRequestBody.Context.connectionUid;
 	    protected m3.fj.data.FSet<String> createImplementsList() {
@@ -59,8 +72,8 @@ public class QueryRequest extends ConnectionScopedRequestBody {
 	    }
 	    protected m3.fj.data.FList<m3.gwt.props.PropertyContext> createPropertyList() {
 	        m3.fj.data.FList<m3.gwt.props.PropertyContext> list = m3.fj.data.FList.nil();
-	        list = list.cons(this.labels);
-	        list = list.cons(this.connections);
+	        list = list.cons(this.nodes);
+	        list = list.cons(this.queryUid);
 	        list = list.cons(this.connectionUid);
 	        return list;
 	    }

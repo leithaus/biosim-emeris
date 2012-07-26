@@ -8,11 +8,14 @@ import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
+import biosim.client.messages.model.FilterAcceptCriteria;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
 import biosim.client.messages.model.MNode;
-import biosim.client.ui.ContentCriteria;
+import biosim.client.messages.model.Uid;
+import biosim.client.ui.FilterBar;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.ui.dnd.DropAction;
@@ -51,8 +54,10 @@ public class DndController {
 		}
 	};
 	
+	final Callback _callback;
 	
-	public DndController(final Biosim biosim, AbsolutePanel boundaryPanel) {
+	public DndController(AbsolutePanel boundaryPanel, final Callback callback) {
+		_callback = callback;
 		_delegate = new MyDragController(boundaryPanel, false) {
 			public void dragStart() {
 			    LogTool.debug("dragStart() override start");
@@ -60,7 +65,7 @@ public class DndController {
 				super.dragStart();
 				for ( DropSite ds : _dropSites ) {
 					if ( canDrop(context, ds) ) {
-						ds.widget.addStyleName(Biosim._connectionIconDragging);
+						ds.widget.addStyleName(Globals._connectionIconDragging);
 						_styledWidgets.add(ds.widget);
 					}
 				}
@@ -69,7 +74,7 @@ public class DndController {
 			public void dragEnd() {
 				super.dragEnd();
 				for ( Widget w : _styledWidgets ) {
-					w.removeStyleName(Biosim._connectionIconDragging);
+					w.removeStyleName(Globals._connectionIconDragging);
 				}
 			}
 		};
@@ -84,7 +89,7 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MNode dragee, MLabel dropTarget) {
-				Biosim.get().getLocalAgent().insertOrUpdate(new MLink(dropTarget, dragee));
+				callback.getLocalAgent().insertOrUpdate(new MLink(dropTarget, dragee));
 			}
 		}; 
 		registerDropAction(DndType.Content, DndType.Label, labelAction);
@@ -97,7 +102,7 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MNode dragee, MConnection dropTarget) {
-				Biosim.get().getLocalAgent().insertOrUpdate(new MLink(dropTarget, dragee));
+				callback.getLocalAgent().insertOrUpdate(new MLink(dropTarget, dragee));
 			}
 		}; 
 		registerDropAction(DndType.Label, DndType.Connection, authorizeAction);
@@ -110,7 +115,7 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MConnection dragee, MNode dropTarget) {
-				Biosim.get().getLocalAgent().insertOrUpdate(new MLink(dragee, dropTarget));
+				callback.getLocalAgent().insertOrUpdate(new MLink(dragee, dropTarget));
 			}
 		}; 
 		registerDropAction(DndType.Connection, DndType.Label, authorizeReverseDndAction);
@@ -119,11 +124,11 @@ public class DndController {
 		DropAction<MNode, MNode> addToFilterAction = new DropAction<MNode, MNode>() {
 			@Override
 			public boolean canDrop(MNode dragee, MNode dropTarget) {
-				return biosim._filtersBar.getFilter().canAddFilter(dragee);
+				return callback.getFilterBar().getFilter().canAddFilter(dragee);
 			}
 			@Override
 			public void processDrop(MNode dragee, MNode dropTarget) {
-				biosim._filtersBar.addToFilter(dragee);
+				callback.getFilterBar().addToFilter(dragee);
 			}
 		}; 
 		registerDropAction(DndType.Label, DndType.Filter, addToFilterAction);
@@ -139,14 +144,15 @@ public class DndController {
 					node = dropTarget;
 				}
 								
-				NodeWidgetBuilder builder = biosim._contentController.builder(node);
-				ContentCriteria criteria = builder.getFilterAcceptCriteria();
+				NodeWidgetBuilder builder = callback.getContentController().builder(node);
+				FilterAcceptCriteria criteria = builder.getFilterAcceptCriteria();
 
 				if ( criteria == null ) {
 					return false;
-				} else if ( criteria.connections.size() > 0 ) {
+				} else if ( criteria.getConnections().size() > 0 ) {
 					boolean r = true;
-					for ( MConnection p : criteria.connections ) {
+					for ( Uid connUid : criteria.getConnections() ) {
+						MConnection p = _callback.getLocalAgent().getAgentServices().cacheFetch(connUid);
 						if ( !p.isParentOf(node) ) {
 							r = false;
 							break;
@@ -187,8 +193,8 @@ public class DndController {
 				
 				DialogHelper.confirm(alertText.toString(), new Function1<String,Void>() {
 					public Void apply(String s) {
-						biosim.removeContentLinks(DRAGEE);
-						biosim.removeContentLinks(DROP_TARGET);
+						callback.removeContentLinks(DRAGEE);
+						callback.removeContentLinks(DROP_TARGET);
 						return null;
 					}
 				});
@@ -209,7 +215,7 @@ public class DndController {
 		}; 
 		registerDropAction(DndType.Connection, DndType.ViewConnection, viewConnectionAction);
 		
-		registerDropSite(DndType.Filter, null, biosim._filtersBar.getPanel());
+		registerDropSite(DndType.Filter, null, callback.getFilterBar().getPanel());
 	}
 	
 	MNode node(DragContext dc) {
@@ -271,18 +277,18 @@ public class DndController {
 			@Override
 			public void onEnter(DragContext context) {
 				if ( canDrop(context, dropSite) ) {
-					predropStyle = Biosim.getCurrentUiStateCssClass(getDropTarget().getStyleName());
+					predropStyle = Globals.get().getCurrentUiStateCssClass(getDropTarget().getStyleName());
 					if(predropStyle != null) {
 						getDropTarget().removeStyleName(predropStyle);
 					}
 					_enteredDropTarget = getDropTarget();
-					_enteredDropTarget.addStyleName(Biosim._connectionDropHover);
+					_enteredDropTarget.addStyleName(Globals._connectionDropHover);
 				}
 			}
 			@Override
 			public void onLeave(DragContext context) {
 				if ( _enteredDropTarget != null ) {
-					getDropTarget().removeStyleName(Biosim._connectionDropHover);
+					getDropTarget().removeStyleName(Globals._connectionDropHover);
 					if(predropStyle != null) {
 						getDropTarget().addStyleName(predropStyle);
 					}
@@ -334,6 +340,13 @@ public class DndController {
 			this.widget = widget;
 		}
 		
+	}
+	
+	public static interface Callback {
+		FilterBar getFilterBar();
+		void removeContentLinks(MNode node);
+		ContentController getContentController();
+		LocalAgent getLocalAgent();
 	}
 	
 }

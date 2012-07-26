@@ -3,6 +3,7 @@ package biosim.client.messages.model;
 import m3.fj.data.FList;
 import m3.gwt.lang.ClassX;
 import m3.gwt.lang.Function1;
+import m3.gwt.lang.Function2;
 import biosim.client.messages.protocol.ConnectionScopedRequestBody;
 import biosim.client.messages.protocol.FetchRequest;
 import biosim.client.messages.protocol.FetchResponse;
@@ -61,7 +62,14 @@ public class AgentServicesImpl implements AgentServices {
 
 	private void insertOrUpdate(Iterable<MNode> nodes) {
 		for ( MNode n : nodes ) {
-			insertOrUpdate(n);
+			if ( !(n instanceof MLink) ) {
+				insertOrUpdate(n);
+			}
+		}
+		for ( MNode n : nodes ) {
+			if ( n instanceof MLink ) {
+				insertOrUpdate(n);
+			}
 		}
 	}
 
@@ -126,11 +134,11 @@ public class AgentServicesImpl implements AgentServices {
 	}
 	
 	@Override
-	public void query(Iterable<MNode> labels, Uid uid, final Function1<Iterable<FilterAcceptCriteria>, Void> asyncCallback) {
-		send(new QueryRequest(), new Function1<QueryResponse, Void>() {
+	public void query(Iterable<MNode> nodes, Uid queryUid, final Function2<Uid,Iterable<FilterAcceptCriteria>, Void> asyncCallback) {
+		send(new QueryRequest(queryUid, nodes), new Function1<QueryResponse, Void>() {
 			@Override
 			public Void apply(QueryResponse response) {
-				asyncCallback.apply(response.getResults());
+				asyncCallback.apply(response.getQueryUid(), response.getResults());
 				return null;
 			}
 		});
@@ -159,4 +167,16 @@ public class AgentServicesImpl implements AgentServices {
 	public NodeContainer getNodeContainer() {
 		return _nodeContainer;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends MNode> T cacheFetch(Uid uid) {
+		T t = (T) _nodeContainer.nodesByUid.get(uid);
+		if ( t == null ) {
+			throw new RuntimeException("unable to find " + uid + " in cache for " + _agentUid);
+		} else {
+			return t;
+		}
+	}
+	
 }
