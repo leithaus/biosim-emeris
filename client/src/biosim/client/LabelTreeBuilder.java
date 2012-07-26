@@ -19,6 +19,7 @@ import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MAgent;
 import biosim.client.messages.model.MBlob;
+import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MLink;
@@ -242,14 +243,25 @@ public class LabelTreeBuilder {
 	}
 	
 	void onAddedLink(MLink link) {
-		// Get a tree item associated with the from node
-		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
-		for (TreeItem ti : treeItems) {
-			MLabel label = (MLabel)NodeContainer.get().nodesByUid.get(link.getTo());
-			if (label == null) {
-				GWT.log("Label is null for uid: " + link.getTo().toString(), new Throwable("bad label"));
-			} else {
-				addChildIfNecessary(ti, label);
+		MNode fromNode = NodeContainer.get().nodesByUid.get(link.getFrom());
+		MNode toNode = NodeContainer.get().nodesByUid.get(link.getTo());
+		MNode node = null;
+		
+		List<TreeItem> treeItems = null;
+		if (toNode instanceof MConnection) {
+			treeItems = treeItemsFromUid(link.getTo());
+			node = fromNode;
+		} else {
+			treeItems = treeItemsFromUid(link.getFrom());
+			node = toNode;
+		}
+
+		if (node == null) {
+			GWT.log("node is null for uid: " + link.getTo().toString(), new Throwable("null node"));
+		} else {
+			// Get a tree item associated with the from node
+			for (TreeItem ti : treeItems) {
+				addChildIfNecessary(ti, (MLabel)node);
 			}
 		}
 	}
