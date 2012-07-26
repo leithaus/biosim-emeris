@@ -5,14 +5,13 @@ import static com.google.gwt.query.client.GQuery.$;
 import java.util.Map;
 
 import m3.gwt.lang.MapX;
+import m3.gwt.lang.Pair;
 import biosim.client.eventlist.FineGrainedListListener;
 import biosim.client.eventlist.ListEvent;
-import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
+import biosim.client.messages.model.FilterAcceptCriteria;
 import biosim.client.messages.model.MNode;
-import biosim.client.messages.model.NodeContainer;
-import biosim.client.ui.ContentCriteria;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
 import biosim.client.utils.GqueryUtils;
@@ -26,8 +25,7 @@ public class ContentController {
 	
 	private Map<MNode,NodeWidgetBuilder> _nodeToWidgetBuilderMap = MapX.create();
 	FlowPanel _contentPanel = new FlowPanel();
-	ObservableList<MNode> _contentList;
-	Biosim _biosim;
+	ObservableList<Pair<FilterAcceptCriteria,MNode>> _contentList = Observables.create();
 	
 	Function _nullCompletionCallback = new Function() {
 		@Override
@@ -35,67 +33,35 @@ public class ContentController {
 		}
 	};
 
-	ListListener<MNode> _listener = new FineGrainedListListener<MNode>() {
-		@Override
-		public void added(ListEvent<MNode> event) {
-			NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
-			if ( !nwb.isVisible() ) {
-				show(nwb, null);
-			}
-		}
-		public void removed(ListEvent<MNode> event) {
-			NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
-			if ( nwb.isVisible() ) {
-				hide(nwb, null);
-			}
-		}
-	};
-
-	ContentController(Biosim biosim, ObservableList<MNode> allNodes, final DndController dndController) {
-		_biosim = biosim;
-		allNodes.addListener(new FineGrainedListListener<MNode>() {
+	ContentController(final DndController dndController) {
+		_contentList.addListener(new FineGrainedListListener<Pair<FilterAcceptCriteria,MNode>>() {
 			@Override
-			public void added(ListEvent<MNode> event) {
-				NodeWidgetBuilder nwb = new NodeWidgetBuilder(event.getElement(), dndController, DndType.Content);
+			public void added(ListEvent<Pair<FilterAcceptCriteria,MNode>> event) {
+				MNode node = event.getElement().getRight();
+				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content);
+				nwb.setFilterAcceptCriteria(event.getElement().getLeft());
 				_contentPanel.add(nwb.getPanel());
 				nwb.getPanel().setVisible(false);
-				_nodeToWidgetBuilderMap.put(event.getElement(), nwb);
-			}
-			public void changed(biosim.client.eventlist.ListEvent<MNode> event) {
-				NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
-				nwb.rebuild();
+				_nodeToWidgetBuilderMap.put(node, nwb);
 			}
 			@Override
-			public void removed(ListEvent<MNode> event) {
-				final NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(event.getElement());
+			public void changed(ListEvent<Pair<FilterAcceptCriteria, MNode>> event) {
+				MNode node = event.getElement().getRight();
+				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content);
+				nwb.setFilterAcceptCriteria(event.getElement().getLeft());
+			}
+			@Override
+			public void removed(ListEvent<Pair<FilterAcceptCriteria,MNode>> event) {
+				MNode node = event.getElement().getRight();
+				final NodeWidgetBuilder nwb = _nodeToWidgetBuilderMap.get(node);
 				hide(nwb, new Function() {
 					public void f() {
 						_contentPanel.remove(nwb.getPanel());							
 					}
 				});
+				_nodeToWidgetBuilderMap.remove(node);
 			}
 		});
-		_contentList = allNodes;
-	}
-	
-	public void setContentList(ObservableList<MNode> newList) {
-		ObservableList<MNode> oldList = _contentList;
-		
-		oldList.removeListener(_listener);
-		
-		Observables.diff(oldList, newList, new Observables.DiffHandler<MNode>() {
-			@Override
-			public void added(MNode t) {
-				show(_nodeToWidgetBuilderMap.get(t), null);
-			}
-			@Override
-			public void removed(MNode t) {
-				hide(_nodeToWidgetBuilderMap.get(t), null);
-			}
-		});
-		
-		_contentList = newList;
-		_contentList.addListener(_listener);
 	}
 	
 	void show(NodeWidgetBuilder nwb, Function completionCallback) {
@@ -116,6 +82,10 @@ public class ContentController {
 			}
 		});
 	}
+	
+	public ObservableList<Pair<FilterAcceptCriteria,MNode>> getContent() {
+		return _contentList;
+	}
 
 	void hide(NodeWidgetBuilder nwb, Function completionCallback) {
 		nwb.setFilterAcceptCriteria(null);
@@ -129,18 +99,5 @@ public class ContentController {
 	public NodeWidgetBuilder builder(MNode node) {
 		return _nodeToWidgetBuilderMap.get(node);
 	}
-
-	public void refilterContent() {
-		final ObservableList<MNode> content = Observables.create();
-		for ( MNode node : NodeContainer.get().nodes ) {
-			ContentCriteria accept = _biosim._filtersBar.getFilter().acceptVerbose(node);
-			NodeWidgetBuilder builder = builder(node);
-			if ( accept != null && builder != null ) {
-				content.add(node);
-				builder.setFilterAcceptCriteria(accept);
-			}			
-		}
-		setContentList(content);
-	}
-
+	
 }

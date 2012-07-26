@@ -3,8 +3,9 @@ package biosim.client.ui;
 import java.util.List;
 
 import m3.gwt.lang.ListX;
-import biosim.client.Biosim;
 import biosim.client.DndController;
+import biosim.client.Globals;
+import biosim.client.messages.model.FilterAcceptCriteria;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MNode;
 import biosim.client.ui.dnd.DndType;
@@ -40,7 +41,7 @@ public class NodeWidgetBuilder {
 	Widget _content;
 	CustomFlowPanel _sourceLabels = new CustomFlowPanel();
 	List<Widget> _sourceLabelWidgets = ListX.create();
-	ContentCriteria _filterAcceptCriteria;
+	FilterAcceptCriteria _filterAcceptCriteria;
 
 	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType) {
 		_node = node;
@@ -52,7 +53,7 @@ public class NodeWidgetBuilder {
 	public void rebuild() {
 		
 		_widget = new CustomFlowPanel();
-		_widget.setStyleName(Biosim._boxStyle, true);
+		_widget.setStyleName(Globals._boxStyle, true);
 		
 		HTMLPanel dragHandle = new HTMLPanel("div", "");
 //		Style style = dragHandle.getElement().getStyle();
@@ -138,21 +139,21 @@ public class NodeWidgetBuilder {
 		
 	}
 	
-	public void setFilterAcceptCriteria(ContentCriteria filterAcceptCriteria) {
+	public void setFilterAcceptCriteria(FilterAcceptCriteria filterAcceptCriteria) {
 		_filterAcceptCriteria = filterAcceptCriteria;
 		for ( Widget w : _sourceLabelWidgets ) {
 			_sourceLabels.remove(w);
 		}
 		_sourceLabelWidgets.clear();
 		if ( _filterAcceptCriteria != null ) {
-			for ( String p : _filterAcceptCriteria.paths ) {
+			for ( String p : _filterAcceptCriteria.getPaths() ) {
 				Widget w = FilterBar.createFilterWidget(p);
 				_sourceLabelWidgets.add(w);
 				_sourceLabels.add(w);
 			}
 		}
 	}
-	public ContentCriteria getFilterAcceptCriteria() {
+	public FilterAcceptCriteria getFilterAcceptCriteria() {
 		return _filterAcceptCriteria;
 	}
 	

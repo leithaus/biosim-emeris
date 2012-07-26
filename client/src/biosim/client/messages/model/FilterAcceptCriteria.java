@@ -12,6 +12,7 @@ public class FilterAcceptCriteria {
 	private List<Uid> _labels;
 	private List<Uid> _connections;
 
+
 	// BEGIN_GENERATED_CODE
 	
 	public biosim.client.messages.model.Uid getNode() {

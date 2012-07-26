@@ -1,14 +1,24 @@
 package biosim.client.ui;
 
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import m3.gwt.lang.Function1;
+import m3.gwt.lang.Function2;
+import m3.gwt.lang.ListX;
 import m3.gwt.lang.MapX;
+import m3.gwt.lang.Pair;
+import m3.gwt.lang.SetX;
+import biosim.client.AsyncCallback;
 import biosim.client.NodeBuilder;
+import biosim.client.eventlist.ObservableList;
+import biosim.client.messages.model.AgentServices;
+import biosim.client.messages.model.FilterAcceptCriteria;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MNode;
+import biosim.client.messages.model.Uid;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.FontWeight;
@@ -36,10 +46,17 @@ public class FilterBar {
 	Button _addToScore = new Button("Add to Event Score");
 	
 	HorizontalPanel _buttons = new HorizontalPanel();
-	Function1<Filter,Void> _eventScoreCallback;
 	
-	public FilterBar(Function1<Filter,Void> eventScoreCallback) {
-		_eventScoreCallback = eventScoreCallback;
+	LocalAgent _localAgent;
+	
+	Uid _mostRecentRequestUid;
+	
+	final Callback _callback;
+	
+	public FilterBar(Callback callback) {
+		
+		_callback = callback;
+		
 		_panel.setStylePrimaryName("tabFilterBar");
 		_panel.addStyleName("ui-widget-content biosimbox ui-corner-all titledBorderDiv fixedHeight");
 		_panel.add(new TitledBorderDiv("Filters"));
@@ -63,7 +80,7 @@ public class FilterBar {
 		initializeButton(_addToScore, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent e) {
-				_eventScoreCallback.apply(_filter);
+				_callback.addToEventScore(_filter);
 			}
 		});
 		
@@ -113,10 +130,6 @@ public class FilterBar {
 		_filter = new Filter();
 		_buttons.getElement().getStyle().setDisplay(Display.NONE);
 		refresh();
-	}
-
-	private void refresh() {
-		GWT.log("implement me", new RuntimeException("implement me"));
 	}
 	
 	public void addToFilter(MNode node) {
@@ -171,4 +184,79 @@ public class FilterBar {
 		}
 	}
 	
+	public void refresh() {
+		_mostRecentRequestUid = Uid.random();
+
+		if ( _filter._nodes.length() > 0 ) {
+			_callback.getContentList().clear();
+		} else {
+			
+			final AgentServices agentServices = _localAgent.getAgentServices();
+			
+			agentServices.query(_filter._nodes, _mostRecentRequestUid, new Function2<Uid, Iterable<FilterAcceptCriteria>, Void>() {
+				@Override
+				public Void apply(Uid requestUid, final Iterable<FilterAcceptCriteria> facIter) {
+					
+					// make sure this is still the most recent request
+					if ( !requestUid.equals(_mostRecentRequestUid) ) {
+						return null;
+					}
+					
+					List<Uid> uids = ListX.create();
+					for ( FilterAcceptCriteria fac : facIter ) {
+						uids.add(fac.getNode());
+					}
+					
+					agentServices.fetch(uids, false, new AsyncCallback<Iterable<MNode>>() {
+						@Override
+						public Void apply(Iterable<MNode> newContent) {
+							
+							Map<Uid,MNode> nodesByUid = MapX.create();
+							for ( MNode n : newContent ) {
+								nodesByUid.put(n.getUid(), n);
+							}
+							
+							ObservableList<Pair<FilterAcceptCriteria,MNode>> content = _callback.getContentList();
+							Set<Pair<FilterAcceptCriteria,MNode>> removeUs = SetX.create();
+							
+							for ( FilterAcceptCriteria fac : facIter ) {
+								MNode node = nodesByUid.get(fac.getNode());
+								Pair<FilterAcceptCriteria, MNode> pair = Pair.create(fac,node);
+								int index = -1;
+								for ( int i = 0 ; i < content.size() ; i++ ) {
+									if ( content.get(0).getRight().equals(node) ) {
+										index = i;
+										removeUs.remove(i);
+										break;
+									}
+								}
+								if ( index == -1 ) {
+									content.add(pair);
+								} else {
+									content.set(index, pair);
+								}
+								
+								content.removeAll(removeUs);
+								
+							}
+							
+							return null;
+						}
+					});
+	
+					return null;
+				}
+			});
+		}
+	}
+	
+	public void setLocalAgent(LocalAgent localAgent) {
+		_localAgent = localAgent;
+	}
+	
+	public static interface Callback {
+		void addToEventScore(Filter filter);
+		ObservableList<Pair<FilterAcceptCriteria,MNode>> getContentList();
+	}
+
 }

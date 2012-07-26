@@ -3,17 +3,18 @@ package biosim.client.messages.model;
 import java.util.Map;
 
 import m3.gwt.lang.MapX;
-import biosim.client.Biosim;
 import biosim.client.messages.protocol.CreateNodesRequest;
 import biosim.client.utils.BiosimWebSocket;
 
 public class LocalAgent {
 	
-	BiosimWebSocket _socket;
-	AgentServices _agentServices;
-	Map<Uid,AgentServices> _remoteAgentServices = MapX.create();
+	final Uid _agentUid;
+	final BiosimWebSocket _socket;
+	final AgentServices _agentServices;
+	final Map<Uid,AgentServices> _remoteAgentServices = MapX.create();
 	
 	public LocalAgent(Uid agentUid, BiosimWebSocket _socket) {
+		this._agentUid = agentUid;
 		this._socket = _socket;
 		this._agentServices = new AgentServicesImpl(agentUid, _socket, NodeContainer.get());
 	}
@@ -32,8 +33,11 @@ public class LocalAgent {
 	}
 	
 	public void removeLink(MNode p, MNode node) {
-		// TDGlen implement me
 		throw new RuntimeException("implement me");
+	}
+
+	public void removeLink(Uid connUid, MNode node) {
+		throw new RuntimeException("implement me");		
 	}
 
 	public AgentServices getAgentServices() {
@@ -76,10 +80,11 @@ public class LocalAgent {
 
 	public boolean isEditable(MLabel n) {
 		Uid owner = getOwner(n);
-		if ( owner != null && owner.equals(Biosim.get().getAgentUid()) ) {
+		if ( owner != null && owner.equals(_agentUid) ) {
 			return true;
 		} else {
 			return false;
 		}
 	}
+	
 }

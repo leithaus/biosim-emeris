@@ -6,7 +6,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 public class MLabel extends MNode {
 
-	public final String defaultIconUrl = "/images/tag.png";
+	public static final String defaultIconUrl = "/images/tag.png";
 	
 	private BlobRef _icon;
 	private String _name;

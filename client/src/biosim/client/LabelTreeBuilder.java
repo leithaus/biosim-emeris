@@ -243,26 +243,18 @@ public class LabelTreeBuilder {
 	}
 	
 	void onAddedLink(MLink link) {
-		MNode fromNode = NodeContainer.get().nodesByUid.get(link.getFrom());
-		MNode toNode = NodeContainer.get().nodesByUid.get(link.getTo());
-		MNode node = null;
-		
-		List<TreeItem> treeItems = null;
-		if (toNode instanceof MConnection) {
-			treeItems = treeItemsFromUid(link.getTo());
-			node = fromNode;
-		} else {
-			treeItems = treeItemsFromUid(link.getFrom());
-			node = toNode;
-		}
-
-		if (node == null) {
-			GWT.log("node is null for uid: " + link.getTo().toString(), new Throwable("null node"));
-		} else {
-			// Get a tree item associated with the from node
-			for (TreeItem ti : treeItems) {
-				addChildIfNecessary(ti, (MLabel)node);
-			}
+		// Get a tree item associated with the from node
+		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
+		for (TreeItem ti : treeItems) {
+			final TreeItem ti_f = ti;
+			link.linkTo(new Function1<MNode, Void>() {
+				@Override
+				public Void apply(MNode node) {
+					MLabel label = (MLabel) node;
+					addChildIfNecessary(ti_f, label);
+					return null;
+				}
+			});
 		}
 	}
 

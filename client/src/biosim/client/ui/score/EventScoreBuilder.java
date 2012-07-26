@@ -9,9 +9,7 @@ import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
 import biosim.client.eventlist.ui.ObservableListPanelAdapter;
 import biosim.client.eventlist.ui.VerticalPanelBuilder;
-import biosim.client.fun.None;
 import biosim.client.fun.Option;
-import biosim.client.fun.Some;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
 import biosim.client.ui.Filter;
@@ -32,8 +30,9 @@ public class EventScoreBuilder {
 			return _visibleEvents.map(new Function1<MNode, Option<MNode>>() {
 				@Override
 				public Option<MNode> apply(MNode node) {
-					if ( filter.accept(node) ) return Some.create(node);
-					else return None.apply();
+					throw new RuntimeException("fix me");
+//					if ( filter.accept(node) ) return Some.create(node);
+//					else return None.apply();
 				}
 			});
 		}

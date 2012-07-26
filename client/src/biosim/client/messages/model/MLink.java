@@ -1,5 +1,7 @@
 package biosim.client.messages.model;
 
+import m3.gwt.lang.Function1;
+
 public class MLink extends MNode {
 
 	private Uid _from;
@@ -15,6 +17,14 @@ public class MLink extends MNode {
 	
 	public MLink(MNode from, MNode to) {
 		this(from.getUid(), to.getUid());
+	}
+	
+	public void linkTo(Function1<MNode, Void> asyncCallback) {
+		getAgentServices().fetch(_to, asyncCallback);
+	}
+	
+	public void linkFrom(Function1<MNode, Void> asyncCallback) {
+		getAgentServices().fetch(_from, asyncCallback);		
 	}
 	
 	@Override
