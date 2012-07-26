@@ -1,5 +1,7 @@
 package biosim.client.messages.model;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+
 
 
 public class MLabel extends MNode {
@@ -23,7 +25,7 @@ public class MLabel extends MNode {
 	
 	@Override
 	public String toHtmlString() {
-		return _name;
+		return SafeHtmlUtils.htmlEscape(_name);
 	}
 	
 	@Override
