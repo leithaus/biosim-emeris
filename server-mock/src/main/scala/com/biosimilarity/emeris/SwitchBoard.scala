@@ -72,6 +72,7 @@ object SwitchBoard extends Logging {
               getUids.
               asScala.
               flatMap(uid=>db.fetch[Node](uid)).
+              filter(n=>!n.isInstanceOf[Blob]).
               distinct.
               map(n=>toClientNode(n, dao))
             Some(new FetchResponse(nodes))

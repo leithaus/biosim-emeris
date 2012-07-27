@@ -242,42 +242,20 @@ public class LabelTreeBuilder {
 		
 		return false;
 	}
-	
-	void onAddedLink(MLink link) {
-		
-		final MNode[] fromNode = new MNode[1];
-		link.linkFrom(new Function1<MNode, Void>() {
-			@Override
-			public Void apply(MNode node) {
-				fromNode[0] = node;
-				return null;
-			}
-		});
-		
-		final MNode[] toNode = new MNode[1];
-		link.linkTo(new Function1<MNode, Void>() {
-			@Override
-			public Void apply(MNode node) {
-				toNode[0] = node;
-				return null;
-			}
-		});
-		
-		MIconNode startNode, endNode = null;
-		if (fromNode[0] instanceof MLabel){
-			startNode = (MIconNode)fromNode[0];
-			endNode = (MIconNode)toNode[0];
-		} else if (fromNode[0] instanceof MConnection){
-			startNode = (MIconNode)toNode[0];
-			endNode = (MIconNode)fromNode[0];
-		} else {
-			return;
-		}
 
+	void onAddedLink(MLink link) {
 		// Get a tree item associated with the from node
-		List<TreeItem> treeItems = treeItemsFromUid(startNode.getUid());
+		List<TreeItem> treeItems = treeItemsFromUid(link.getFrom());
 		for (TreeItem ti : treeItems) {
-			addChildIfNecessary(ti, endNode);
+			final TreeItem ti_f = ti;
+			link.linkTo(new Function1<MNode, Void>() {
+				@Override
+				public Void apply(MNode node) {
+					MLabel label = (MLabel) node;
+					addChildIfNecessary(ti_f, label);
+					return null;
+				}
+			});
 		}
 	}
 
