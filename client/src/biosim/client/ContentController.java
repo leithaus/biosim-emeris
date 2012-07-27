@@ -41,7 +41,6 @@ public class ContentController {
 				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content);
 				nwb.setFilterAcceptCriteria(event.getElement().getLeft());
 				_contentPanel.add(nwb.getPanel());
-				nwb.getPanel().setVisible(false);
 				_nodeToWidgetBuilderMap.put(node, nwb);
 			}
 			@Override
