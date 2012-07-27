@@ -10,8 +10,13 @@ import biosim.client.messages.model.Uid;
 import biosim.client.utils.DialogHelper;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONParser;
@@ -22,6 +27,8 @@ import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -36,24 +43,44 @@ public class AgentManagerPanel {
 	
 	AgentManagerPanel() {
 		
+		_mainPanel.setSpacing(4);
+		
 		HorizontalPanel formFieldsPanel = new HorizontalPanel();
+		formFieldsPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		final FormPanel form = new FormPanel();
 	    form.setAction(getUrl("/api/loadMultiAgentDataSet"));
 	    form.setWidget(formFieldsPanel);
 	    form.setEncoding(FormPanel.ENCODING_MULTIPART);
 	    form.setMethod(FormPanel.METHOD_POST);
+	    form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+	        public void onSubmitComplete(SubmitCompleteEvent event) {
+				loadAgentInfo();
+				form.reset();
+	        }
+	      });
 	    
+	    // Create the submit button
+	    final Button submitButton = new Button("Load Multi Agent Data Set", 
+	    	new ClickHandler() {
+		      public void onClick(ClickEvent event) {
+			        form.submit();
+			      }
+			    });
+	    submitButton.setEnabled(false);
 	    // Create a FileUpload widget.
-	    FileUpload upload = new FileUpload();
+	    final FileUpload upload = new FileUpload();
 	    upload.setName("dataset");
+	    upload.addChangeHandler(new ChangeHandler(){
+			@Override
+			public void onChange(ChangeEvent event) {
+				submitButton.setEnabled(!upload.getFilename().isEmpty());
+			}
+	    });
 	    formFieldsPanel.add(upload);
 
 	    // Add a 'submit' button.
-	    formFieldsPanel.add(new Button("Load Multi Agent Data Set", new ClickHandler() {
-	      public void onClick(ClickEvent event) {
-	        form.submit();
-	      }
-	    }));
+	    formFieldsPanel.add(submitButton);
+	    
 	    form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
 	      public void onSubmitComplete(SubmitCompleteEvent event) {
 	        DialogHelper.alert("Multi Agent Data Set has been loaded");
@@ -63,12 +90,11 @@ public class AgentManagerPanel {
 	    form.setWidget(formFieldsPanel);
 	    
 	    _mainPanel.add(form);
-	    _mainPanel.add(
-	    		new Anchor(
-	    				"Download Multi Agent Data Set"
-	    				, getUrl("/api/dumpMultiAgentDataSet")
-	    		)
-	    );
+	    
+	    _mainPanel.add(new Anchor(
+				"Download Multi Agent Data Set"
+				, getUrl("/api/dumpMultiAgentDataSet")
+		));
 
 	    _mainPanel.add(_agentCrudPanel);
 	    
@@ -78,7 +104,6 @@ public class AgentManagerPanel {
 	    }
 	    
 	    loadAgentInfo();
-	    
 	}
 	
 	void loadAgentInfo() {
@@ -121,7 +146,7 @@ public class AgentManagerPanel {
 	
 	public void setAgentInfo(List<String> agents) {
 		Grid grid = new Grid(agents.size()+1, 2);
-		grid.setWidget(0, 0, new Label("Agent Name"));
+		grid.setWidget(0, 0, new HTML("<h3>Agents:</h3>"));
 		for ( int i = 0 ; i < agents.size() ; i++ ) {
 			final String agentName = agents.get(i);
 			final Uid agentUid = new Uid(agentName);
@@ -173,13 +198,22 @@ public class AgentManagerPanel {
 		}
 		
 		VerticalPanel vert = new VerticalPanel();
+		vert.setSpacing(4);
 		
 		HorizontalPanel createAgent = new HorizontalPanel();
-		
+		createAgent.setSpacing(4);
+		createAgent.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		createAgent.add(new Label("Name:"));
+		final Button addAgent = new Button("Add Agent");
+		addAgent.setEnabled(false);
 		final TextBox agentName = new TextBox();
+		agentName.addKeyUpHandler(new KeyUpHandler() {			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				addAgent.setEnabled(!agentName.getText().trim().isEmpty());
+			}
+		});
 		createAgent.add(agentName);
-		Button addAgent = new Button("Add Agent");
 		createAgent.add(addAgent);
 		addAgent.addClickHandler(new ClickHandler() {
 			@Override
@@ -192,7 +226,7 @@ public class AgentManagerPanel {
 		});
 		
 		vert.add(grid);
-		vert.add(new Label("Add Agent"));
+		vert.add(new HTML("<h3>Add Agent:</h3>"));
 		vert.add(createAgent);
 		
 		_agentCrudPanel.setWidget(vert);
