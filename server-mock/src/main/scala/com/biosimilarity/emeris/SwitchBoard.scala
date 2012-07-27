@@ -28,6 +28,9 @@ import predef._
 import biosim.client.messages.model.MAgent
 import biosim.client.messages.protocol.QueryResponse
 import biosim.client.messages.model.FilterAcceptCriteria
+import biosim.client.messages.model.MBlob
+import biosim.client.messages.model.MBlob
+import biosim.client.messages.model.MImage
 
 object SwitchBoard extends Logging {
 
@@ -38,10 +41,15 @@ object SwitchBoard extends Logging {
     case null => None
     case _ => Some(BlobRef(cbr.getAgentUid, cbr.getBlobUid, cbr.getFilename))
   }
+  implicit def toServerBlobRef2(cbr: ClientBlobRef) = 
+    BlobRef(cbr.getAgentUid, cbr.getBlobUid, cbr.getFilename)
+    
   implicit def toClientBlobRef(bro: Option[BlobRef]) = bro match {
     case None => null
     case Some(br) =>new ClientBlobRef(br.agentUid, br.blobUid, br.filename)
   }
+  implicit def toClientBlobRef(br: BlobRef) = 
+    new ClientBlobRef(br.agentUid, br.blobUid, br.filename)
 
   def onConnect(socket: Socket) = {}
   
@@ -78,7 +86,7 @@ object SwitchBoard extends Logging {
             Some(new FetchResponse(nodes))
           }
           case qr: QueryRequest => {
-            val nodes = qr.getNodes.asScala.map(uid=>db.fetch(uid))
+            val nodes = qr.getNodes.asScala.flatMap(uid=>db.fetch[Node](uid))
             val labels = nodes.collect { case l: Label => l}
             val conns = nodes.collect { case c: Connection => c}
             val responseCriteria = dao.
@@ -138,8 +146,21 @@ object SwitchBoard extends Logging {
   def toClientNode(sn: Node, dao: AgentDAO)(implicit db: AgentDatabase): MNode = {
     val cn = sn match {
       
+      case blob: Blob =>
+        new MBlob(
+          blob.uid
+          , blob.asBlobRef
+        )
+      
       case agent: Agent => 
         new MAgent
+      
+      case image: Image => {
+        val i = new MImage
+        i.setUid(image.uid)
+        i.setBlobRef(image.blobRef)
+        i
+      }
       
       case link: Link => 
         new MLink(link.from, link.to)
@@ -159,6 +180,7 @@ object SwitchBoard extends Logging {
   }
   
   def toServerNode(cn: MNode): Node = cn match {
+    case i: MImage => Image(i.getBlobRef, i.getUid)
     case b: MBlob => Blob(b.getRef.getAgentUid, b.getRef.getFilename, b.getDataInBase64, b.getUid)
     case l: MLabel => Label(l.getName, l.getIcon, l.getUid)
     case l: MLink => Link(l.getFrom, l.getTo)

@@ -176,7 +176,10 @@ object Model {
 
     override def query(labels: Iterable[Label], connections: Iterable[Connection]): Iterable[FilterAcceptCriteria] = {
       val filter = Filter(labels, connections, database)
-      database.nodes.flatMap(filter.accept)
+      database.
+        nodes.
+        filter(!_.isInstanceOf[Link]).
+        flatMap(filter.accept)
     }
 
     override def childLabels(parent: Node): Iterable[Label] = {

@@ -82,7 +82,7 @@ public class LabelTreeBuilder {
 			public void event(ListEvent<MNode> event) {
 				
 				if (event.getElement() instanceof MLabel) {
-					GWT.log("Label " + event.getType().toString());
+//					GWT.log("Label " + event.getType().toString());
 					MIconNode node = (MIconNode)event.getElement();
 
 					switch(event.getType()) {
@@ -97,7 +97,7 @@ public class LabelTreeBuilder {
 						break;
 					}
 				} else if (event.getElement() instanceof MLink) {
-					GWT.log("Link " + event.getType().toString());
+//					GWT.log("Link " + event.getType().toString());
 					MLink link = (MLink)event.getElement();
 
 					switch(event.getType()) {

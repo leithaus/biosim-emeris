@@ -3,8 +3,6 @@ package biosim.client.ui.dnd;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import m3.gwt.lang.LogTool;
-
 import com.allen_sauer.gwt.dnd.client.AbstractDragController;
 import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
@@ -144,7 +142,7 @@ public class MyDragController extends AbstractDragController {
 	}
 
 	public void dragMove() {
-	    LogTool.debug("dragMove() start");
+//	    LogTool.debug("dragMove() start");
 		// may have changed due to scrollIntoView(), developer driven changes
 		// or manual user scrolling
 		long timeMillis = System.currentTimeMillis();
@@ -187,12 +185,12 @@ public class MyDragController extends AbstractDragController {
 		if (context.dropController != null) {
 			context.dropController.onMove(context);
 		}
-		LogTool.debug("dragMove() end");
+//		LogTool.debug("dragMove() end");
 	}
 
 	@Override
 	public void dragStart() {
-	    LogTool.debug("dragStart() start");
+//	    LogTool.debug("dragStart() start");
 		long start = System.currentTimeMillis();
 		log("dragStart() start");
 		super.dragStart();
@@ -251,7 +249,7 @@ public class MyDragController extends AbstractDragController {
 		dropTargetClientHeight = DOMUtil.getClientHeight(getBoundaryPanel()
 				.getElement());
 		log("dragStart() end " + (System.currentTimeMillis()-start));
-		LogTool.debug("dragStart() end");
+//		LogTool.debug("dragStart() end");
 	}
 
 	/**

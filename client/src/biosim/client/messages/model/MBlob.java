@@ -7,8 +7,13 @@ public class MBlob extends MNode {
 	private String _dataInBase64;
 	private BlobRef _ref;
 
-    private MBlob() {
+	private MBlob() {
     }
+
+	public MBlob(Uid uid, BlobRef _ref) {
+		super(uid);
+		this._ref = _ref;
+	}
 
 	public MBlob(Uid agentUid, String filename) {
 		_ref = new BlobRef(agentUid, getUid(), filename);
