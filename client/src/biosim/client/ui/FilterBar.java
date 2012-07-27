@@ -191,7 +191,7 @@ public class FilterBar {
 			_callback.getContentList().clear();
 		} else {
 			
-			final AgentServices agentServices = _localAgent.getAgentServices();
+			final AgentServices agentServices = _filter._nodes.head().getAgentServices();
 			
 			agentServices.query(_filter._nodes, _mostRecentRequestUid, new Function2<Uid, Iterable<FilterAcceptCriteria>, Void>() {
 				@Override
