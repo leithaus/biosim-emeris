@@ -59,7 +59,7 @@ public class LocalAgent {
 	public AgentServices getAgentServices(MConnection conn) {
 		AgentServices ras = _remoteAgentServices.get(conn.getUid());
 		if ( ras == null ) {
-			ras = new AgentServicesImpl(conn.getUid(), _socket, new NodeContainer(conn));
+			ras = new AgentServicesImpl(conn, _socket, new NodeContainer(conn));
 			_remoteAgentServices.put(conn.getUid(), ras);
 		}
 		return ras;

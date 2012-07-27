@@ -211,7 +211,7 @@ public class DndController {
 			@Override
 			public void processDrop(MNode dragee, MNode dropTarget) {
 				if (dragee instanceof MConnection) {
-					Biosim.get().getLabelTreeBuilder().addRootLabelsForAgent(((MConnection) dragee).getRemoteAgent());
+					Biosim.get().getLabelTreeBuilder().addRootLabelsForConnection((MConnection) dragee);
 				}
 			}
 		}; 

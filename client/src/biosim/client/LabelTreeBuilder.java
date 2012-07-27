@@ -16,9 +16,11 @@ import org.vectomatic.file.events.LoadEndHandler;
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
 import biosim.client.eventlist.ui.PopupMenu;
+import biosim.client.messages.model.AgentServices;
 import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MAgent;
 import biosim.client.messages.model.MBlob;
+import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MIconNode;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;
@@ -503,6 +505,17 @@ public class LabelTreeBuilder {
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
 		_localAgent.getAgentServices().fetch(agentUid, new Function1<MAgent, Void>() {
+			@Override
+			public Void apply(MAgent agent) {
+				addChildren(agent, null);
+				return null;
+			}
+		});
+	}
+	
+	public void addRootLabelsForConnection(MConnection connection) {
+		AgentServices agentServices = _localAgent.getAgentServices(connection);
+		agentServices.fetch(connection.getRemoteAgent(), new Function1<MAgent, Void>() {
 			@Override
 			public Void apply(MAgent agent) {
 				addChildren(agent, null);

@@ -68,7 +68,7 @@ object SwitchBoard extends Logging {
           case uid => {
             val localConn = localAgentDb.fetch[Connection](uid).get
             val remoteAgentDb = DatabaseFactory.database(localConn.remoteAgent)
-            val remoteConn = remoteAgentDb.fetch[Connection](uid).get
+            val remoteConn = remoteAgentDb.nodes.collect { case c: Connection => c }.find(_.remoteAgent == socket.agentUid).get
             new FilteredDatabase(remoteAgentDb, remoteConn)
           }
         }
