@@ -157,6 +157,10 @@ public class Biosim implements EntryPoint {
 				public LocalAgent getLocalAgent() {
 					return _localAgent;
 				}
+				@Override
+				public LabelTreeBuilder getLabelTreeBuilder() {
+					return _labelTreeBuilder;
+				}
 			});
 			
 			_contentController = new ContentController(_dndController);

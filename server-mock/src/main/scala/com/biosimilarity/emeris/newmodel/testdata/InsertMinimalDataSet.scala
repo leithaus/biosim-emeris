@@ -15,13 +15,14 @@ object InsertMinimalDataSet extends App {
   
   def apply(agentUid: Uid) = {
 
-    val db = DatabaseFactory.
+    DatabaseFactory.
       databases.
       find(_.uid == agentUid) match {
-        case Some(db) => db
-        case None => DatabaseFactory.createDatabase(agentUid)
+        case Some(db) => db.dropDatabase
+        case None => 
       }
-      
+   
+    val db = DatabaseFactory.createDatabase(agentUid)
       
 	def add[T<:Node](n: T) = {
       db.insert(n)

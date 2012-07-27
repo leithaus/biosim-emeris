@@ -515,10 +515,10 @@ public class LabelTreeBuilder {
 	
 	public void addRootLabelsForConnection(MConnection connection) {
 		AgentServices agentServices = _localAgent.getAgentServices(connection);
-		agentServices.fetch(connection.getRemoteAgent(), new Function1<MAgent, Void>() {
+		agentServices.getRemoteConnection(new Function1<MConnection, Void>() {
 			@Override
-			public Void apply(MAgent agent) {
-				addChildren(agent, null);
+			public Void apply(MConnection conn) {
+				addChildren(conn, null);
 				return null;
 			}
 		});

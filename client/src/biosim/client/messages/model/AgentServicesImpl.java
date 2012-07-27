@@ -4,9 +4,12 @@ import m3.fj.data.FList;
 import m3.gwt.lang.ClassX;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.Function2;
+import biosim.client.AsyncCallback;
 import biosim.client.messages.protocol.ConnectionScopedRequestBody;
 import biosim.client.messages.protocol.FetchRequest;
 import biosim.client.messages.protocol.FetchResponse;
+import biosim.client.messages.protocol.GetRemoteConnectionRequest;
+import biosim.client.messages.protocol.GetRemoteConnectionResponse;
 import biosim.client.messages.protocol.QueryRequest;
 import biosim.client.messages.protocol.QueryResponse;
 import biosim.client.messages.protocol.RequestBody;
@@ -34,6 +37,17 @@ public class AgentServicesImpl implements AgentServices {
 		_connection = connection;
 		_socket = socket;
 		_nodeContainer = nodeContainer;
+	}
+	
+	@Override
+	public void getRemoteConnection(final Function1<MConnection, Void> asyncCallback) {
+		send(new GetRemoteConnectionRequest(), new AsyncCallback<GetRemoteConnectionResponse>() {
+			@Override
+			public Void apply(GetRemoteConnectionResponse response) {
+				fetch(response.getConnectionUid(), asyncCallback);
+				return null;
+			}
+		});
 	}
 
 	@Override

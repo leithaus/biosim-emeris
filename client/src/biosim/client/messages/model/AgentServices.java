@@ -18,6 +18,8 @@ public interface AgentServices {
 	NodeContainer getNodeContainer();
 		
 	<T extends MNode> T cacheFetch(Uid uid);
+
+	void getRemoteConnection(Function1<MConnection,Void> asyncCallback);
 	
 }
 

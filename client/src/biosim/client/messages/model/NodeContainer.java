@@ -83,12 +83,6 @@ public class NodeContainer {
 	
 	public void insertOrUpdate(MNode node) {
 		MNode localNode = nodesByUid.get(node.getUid());
-		if ( localNode == null ) {
-			nodes.add(node);
-		} else {
-			int i = nodes.indexOf(localNode);
-			nodes.set(i, node);
-		}
 		if ( node instanceof MLink ) {
 			MLink link = (MLink) node;
 			updateLinks(linksByFrom, link.getFrom(), link);
@@ -96,6 +90,12 @@ public class NodeContainer {
 		} else {
 			updateLinks(linksByFrom, node.getUid(), null);
 			updateLinks(linksByTo, node.getUid(), null);
+		}
+		if ( localNode == null ) {
+			nodes.add(node);
+		} else {
+			int i = nodes.indexOf(localNode);
+			nodes.set(i, node);
 		}
 	}
 	

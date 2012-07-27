@@ -6,7 +6,6 @@ import java.util.Set;
 
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
-import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
 import biosim.client.messages.model.FilterAcceptCriteria;
 import biosim.client.messages.model.LocalAgent;
@@ -60,7 +59,7 @@ public class DndController {
 		_callback = callback;
 		_delegate = new MyDragController(boundaryPanel, false) {
 			public void dragStart() {
-			    LogTool.debug("dragStart() override start");
+//			    LogTool.debug("dragStart() override start");
 				_styledWidgets.clear();
 				super.dragStart();
 				for ( DropSite ds : _dropSites ) {
@@ -69,7 +68,7 @@ public class DndController {
 						_styledWidgets.add(ds.widget);
 					}
 				}
-                LogTool.debug("dragStart() override end");
+//                LogTool.debug("dragStart() override end");
 			}
 			public void dragEnd() {
 				super.dragEnd();
@@ -211,7 +210,7 @@ public class DndController {
 			@Override
 			public void processDrop(MNode dragee, MNode dropTarget) {
 				if (dragee instanceof MConnection) {
-					Biosim.get().getLabelTreeBuilder().addRootLabelsForConnection((MConnection) dragee);
+					_callback.getLabelTreeBuilder().addRootLabelsForConnection((MConnection) dragee);
 				}
 			}
 		}; 
@@ -349,6 +348,7 @@ public class DndController {
 		void removeContentLinks(MNode node);
 		ContentController getContentController();
 		LocalAgent getLocalAgent();
+		LabelTreeBuilder getLabelTreeBuilder();
 	}
 	
 }

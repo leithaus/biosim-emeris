@@ -70,13 +70,21 @@ object Model {
       def canBeSeenBy0(viewee: Node, stack0: Stack[Uid]): Boolean = {
         if (voyeur === viewee) true
         else {
-          val il = viewee.incomingLinks
           val stack = stack0.push(viewee.uid)
-          il.filterNot(l => stack.contains(l.from))
-            .exists(l => canBeSeenBy0(l.from.node, stack))
+          val il = viewee.
+            incomingLinks.
+            filterNot(l => stack.contains(l.from))
+          il.exists(l => canBeSeenBy0(l.from.node, stack))
         }
       }
-      canBeSeenBy0(this, Stack())
+      if ( this.isInstanceOf[Agent] ) true
+      else {
+        val startNode = this match {
+	      case l: Link => l.from.node
+	      case _ => this
+	    }
+	    canBeSeenBy0(startNode, Stack())
+      }
     }
 
     //	public String canBeSeenBy(Node n) {
@@ -207,6 +215,8 @@ object Model {
     def delete(uid: Uid)
     def dropDatabase()
 
+    def connections = nodes.collect{ case c: Connection => c }
+    
     def incomingLinks(uid: Uid): Iterable[Link] = links.filter(_.to === uid)
     def outgoingLinks(uid: Uid): Iterable[Link] = links.filter(_.from === uid)
     def node[T <: Node](uid: Uid): T =

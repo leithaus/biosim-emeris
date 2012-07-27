@@ -31,6 +31,8 @@ import biosim.client.messages.model.FilterAcceptCriteria
 import biosim.client.messages.model.MBlob
 import biosim.client.messages.model.MBlob
 import biosim.client.messages.model.MImage
+import biosim.client.messages.protocol.GetRemoteConnectionRequest
+import biosim.client.messages.protocol.GetRemoteConnectionResponse
 
 object SwitchBoard extends Logging {
 
@@ -76,6 +78,7 @@ object SwitchBoard extends Logging {
         csrb match {
           case req: FetchRequest => {
             val body = new FetchResponse
+            val allNodes = db.nodes.toIndexedSeq
             val nodes = req.
               getUids.
               asScala.
@@ -99,6 +102,10 @@ object SwitchBoard extends Logging {
                 mfac
               }
             Some(new QueryResponse(qr.getQueryUid, responseCriteria.toList.asJava))
+          }
+          case grc: GetRemoteConnectionRequest => {
+            val conn = db.connections.find(_.remoteAgent == socket.agentUid).get
+            Some(new GetRemoteConnectionResponse(conn.uid))
           }
           case sr: SelectRequest => {
             sr.getShortClassname match {

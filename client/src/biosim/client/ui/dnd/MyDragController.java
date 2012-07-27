@@ -191,8 +191,8 @@ public class MyDragController extends AbstractDragController {
 	@Override
 	public void dragStart() {
 //	    LogTool.debug("dragStart() start");
-		long start = System.currentTimeMillis();
-		log("dragStart() start");
+//		long start = System.currentTimeMillis();
+//		log("dragStart() start");
 		super.dragStart();
 
 		lastResetCacheTimeMillis = System.currentTimeMillis();
@@ -248,7 +248,7 @@ public class MyDragController extends AbstractDragController {
 				.getElement());
 		dropTargetClientHeight = DOMUtil.getClientHeight(getBoundaryPanel()
 				.getElement());
-		log("dragStart() end " + (System.currentTimeMillis()-start));
+//		log("dragStart() end " + (System.currentTimeMillis()-start));
 //		LogTool.debug("dragStart() end");
 	}
 
