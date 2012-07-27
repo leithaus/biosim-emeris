@@ -134,7 +134,7 @@ public class Biosim implements EntryPoint {
 			NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
 				@Override
 				public void event(ListEvent<MNode> event) {
-					_filtersBar.refresh();
+//					_filtersBar.refresh();
 				}
 			});
 	

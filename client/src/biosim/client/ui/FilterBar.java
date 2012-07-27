@@ -187,7 +187,7 @@ public class FilterBar {
 	public void refresh() {
 		_mostRecentRequestUid = Uid.random();
 
-		if ( _filter._nodes.length() > 0 ) {
+		if ( _filter._nodes.isEmpty() ) {
 			_callback.getContentList().clear();
 		} else {
 			
