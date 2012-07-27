@@ -19,7 +19,6 @@ import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MAgent;
 import biosim.client.messages.model.MBlob;
-import biosim.client.messages.model.MConnection;
 import biosim.client.messages.model.MIconNode;
 import biosim.client.messages.model.MImage;
 import biosim.client.messages.model.MLabel;

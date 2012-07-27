@@ -210,7 +210,9 @@ public class DndController {
 			}
 			@Override
 			public void processDrop(MNode dragee, MNode dropTarget) {
-				DialogHelper.alert("not supported, aka re-implement me");
+				if (dragee instanceof MConnection) {
+					Biosim.get().getLabelTreeBuilder().addRootLabelsForAgent(((MConnection) dragee).getRemoteAgent());
+				}
 			}
 		}; 
 		registerDropAction(DndType.Connection, DndType.ViewConnection, viewConnectionAction);
