@@ -85,7 +85,7 @@ object SwitchBoard extends Logging {
             Some(new FetchResponse(nodes))
           }
           case qr: QueryRequest => {
-            val nodes = qr.getNodes.asScala.map(uid=>db.fetch(uid))
+            val nodes = qr.getNodes.asScala.flatMap(uid=>db.fetch[Node](uid))
             val labels = nodes.collect { case l: Label => l}
             val conns = nodes.collect { case c: Connection => c}
             val responseCriteria = dao.
