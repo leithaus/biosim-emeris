@@ -1,5 +1,8 @@
 
+set -e
+
 pushd client
+mvn-sk clean install dependency:copy-dependencies
 ant clean build
 popd
 

@@ -1,5 +1,6 @@
 package biosim.client;
 
+import biosim.client.ui.Html5DndDemoBuilder;
 import biosim.client.utils.DialogHelper;
 
 import com.google.gwt.core.client.GWT;
@@ -64,6 +65,8 @@ public class DeveloperPanel {
 	    
 //	    _mainPanel.add(new ObservableListDivWidgetDemo().getPanel());
 		
+//	    _mainPanel.add(Html5DndDemoBuilder.create());
+	    
 	}
 	
 	String getUrl(String href) {
