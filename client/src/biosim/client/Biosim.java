@@ -140,7 +140,7 @@ public class Biosim implements EntryPoint {
 	
 			_instance = this;
 			
-			_dndController = new DndController(RootPanel.get(), new DndController.Callback() {
+			DndController.Callback dndControllerCallback = new DndController.Callback() {
 				@Override
 				public void removeContentLinks(MNode node) {
 					removeContentLinks(node);
@@ -161,7 +161,10 @@ public class Biosim implements EntryPoint {
 				public LabelTreeBuilder getLabelTreeBuilder() {
 					return _labelTreeBuilder;
 				}
-			});
+			};
+
+//			_dndController = new DndControllerOldSchool(RootPanel.get(), dndControllerCallback);
+			_dndController = new DndControllerHtml5(dndControllerCallback);
 			
 			_contentController = new ContentController(_dndController);
 	

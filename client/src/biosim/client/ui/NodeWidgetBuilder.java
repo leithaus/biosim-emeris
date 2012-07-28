@@ -48,6 +48,7 @@ public class NodeWidgetBuilder {
 		_dndType = dndType;
 		_dndController = dndController;
 		rebuild();
+//		_dndController.makeDraggable(_dndType, _node, _wrapper, _wrapper);
 	}
 	
 	public void rebuild() {
@@ -74,7 +75,7 @@ public class NodeWidgetBuilder {
 			_icon = new Image(_node.getIconUrl());
 			_icon.addStyleName("node-icon");
 			_widget.add(_icon);
-			_dndController.makeDraggable(_dndType, _node, _widget, _icon);
+//			_dndController.makeDraggable(_dndType, _node, _widget, _icon);
 		}
 		
 		if ( _node instanceof MImage ) {
@@ -111,11 +112,11 @@ public class NodeWidgetBuilder {
 
 		if ( _content != null ) {
 			_widget.add(_content);
-			_dndController.makeDraggable(_dndType, _node, _widget, _content);
+//			_dndController.makeDraggable(_dndType, _node, _widget, _content);
 		}
 		
 //		dndController.makeDraggable(_dndType, _node, _widget, _widget.getClearPanel());
-		_dndController.makeDraggable(_dndType, _node, _widget, _widget);
+//		_dndController.makeDraggable(_dndType, _node, _widget, _widget);
 		
 		_dndController.registerDropSite(_dndType, _node, _widget);
 		

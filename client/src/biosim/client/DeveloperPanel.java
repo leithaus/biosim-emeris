@@ -1,6 +1,5 @@
 package biosim.client;
 
-import biosim.client.ui.Html5DndDemoBuilder;
 import biosim.client.utils.DialogHelper;
 
 import com.google.gwt.core.client.GWT;
