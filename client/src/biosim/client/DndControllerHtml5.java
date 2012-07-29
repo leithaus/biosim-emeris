@@ -297,13 +297,7 @@ public class DndControllerHtml5 implements DndController {
 			public void onDragLeave(DragLeaveEvent event) {
 				event.preventDefault();
 				LogTool.debug("onDragLeave for " + dropTargetNode);
-				if ( dropSite.enteredDropTarget != null ) {
-					dropTargetWidget.removeStyleName(Globals._connectionDropHover);
-					if(dropSite.preDropStyle != null) {
-						dropTargetWidget.addStyleName(dropSite.preDropStyle);
-					}
-				}
-				dropSite.enteredDropTarget = null;
+				dropSite.dragLeave();
 			}
 		}, DragLeaveEvent.getType());
 		
@@ -313,6 +307,7 @@ public class DndControllerHtml5 implements DndController {
 				LogTool.debug("onDrop for " + dropTargetNode);
 				event.preventDefault();
 				dropAction(dropSite).processDrop(_currentDragSite.node, dropSite.node);
+				dropSite.dragLeave();
 			}
 		}, DropEvent.getType());
 		
@@ -391,6 +386,16 @@ public class DndControllerHtml5 implements DndController {
 			this.type = type;
 			this.node = node;
 			this.widget = widget;
+		}
+		
+		void dragLeave() {
+			if ( enteredDropTarget != null ) {
+				widget.removeStyleName(Globals._connectionDropHover);
+				if(preDropStyle != null) {
+					widget.addStyleName(preDropStyle);
+				}
+				enteredDropTarget = null;
+			}
 		}
 		
 	}

@@ -5,6 +5,12 @@ html,body {
 	overflow: auto;
 }
 
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 .sendButton {
 	display: block;
 	font-size: 16pt;

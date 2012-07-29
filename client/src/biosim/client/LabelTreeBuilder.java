@@ -2,6 +2,7 @@ package biosim.client;
 
 import java.util.List;
 
+import m3.fj.F1;
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
@@ -66,6 +67,17 @@ public class LabelTreeBuilder {
 	final LocalAgent _localAgent;
 //	final AgentServices _remoteServices;
 	final BiosimWebSocket _socket;
+	
+	final F1<MNode,String> _labelProvider = new F1<MNode, String>() {
+		@Override
+		public String f(MNode a) {
+			if ( a instanceof MConnection ) {
+				return a.getAgentServices().getAgentUid().getValue();
+			} else {
+				return a.toHtmlString();
+			}
+		}
+	};
 	
 	LabelTreeBuilder(
 			Uid agentUid, 
@@ -286,7 +298,7 @@ public class LabelTreeBuilder {
 	
     void updateTreeItem(final TreeItem ti) {
 		final MIconNode node = getUserObject(ti);
-		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label); 
+		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label, _labelProvider); 
 		final FlowPanel w = nwbuilder.getFlowPanel();
 		final PopupMenu popup = new PopupMenu();
 		ti.setWidget(w);
@@ -518,10 +530,10 @@ public class LabelTreeBuilder {
 		agentServices.getRemoteConnection(new Function1<MConnection, Void>() {
 			@Override
 			public Void apply(MConnection conn) {
-				addChildren(conn, null);
+				addChild(conn, null);
 				return null;
 			}
-		});
+		});		
 	}
 
 	MIconNode getUserObject(TreeItem ti) {

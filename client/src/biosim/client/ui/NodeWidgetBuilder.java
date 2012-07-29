@@ -2,6 +2,7 @@ package biosim.client.ui;
 
 import java.util.List;
 
+import m3.fj.F1;
 import m3.gwt.lang.ListX;
 import biosim.client.DndController;
 import biosim.client.Globals;
@@ -42,11 +43,25 @@ public class NodeWidgetBuilder {
 	CustomFlowPanel _sourceLabels = new CustomFlowPanel();
 	List<Widget> _sourceLabelWidgets = ListX.create();
 	FilterAcceptCriteria _filterAcceptCriteria;
+	final F1<MNode,String> _labelProvider;
 
 	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType) {
+		this(node, dndController, dndType, null);
+	}
+	
+	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType, F1<MNode,String> labelProvider) {
 		_node = node;
 		_dndType = dndType;
 		_dndController = dndController;
+		if ( labelProvider == null ) {
+			labelProvider = new F1<MNode, String>() {
+				@Override
+				public String f(MNode a) {
+					return a.toHtmlString();
+				}
+			};
+		}
+		_labelProvider = labelProvider;
 		rebuild();
 //		_dndController.makeDraggable(_dndType, _node, _wrapper, _wrapper);
 	}
@@ -78,6 +93,8 @@ public class NodeWidgetBuilder {
 //			_dndController.makeDraggable(_dndType, _node, _widget, _icon);
 		}
 		
+		String label = _labelProvider.f(_node);
+		
 		if ( _node instanceof MImage ) {
 			
 			// Create a FlexTable into which the image will be displayed
@@ -105,8 +122,8 @@ public class NodeWidgetBuilder {
 			
 			_content = p;
 			_widget.setHeight("175px");
-		} else if ( _node.toHtmlString() != null ) {
-			_content = new HTML(_node.toHtmlString());
+		} else if ( label != null ) {
+			_content = new HTML(label);
 			_widget.setHeight("70px");
 		}
 
