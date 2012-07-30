@@ -7,6 +7,7 @@ import java.util.Set;
 
 import m3.gwt.lang.Function2;
 import m3.gwt.lang.ListX;
+import m3.gwt.lang.LogTool;
 import m3.gwt.lang.MapX;
 import m3.gwt.lang.Pair;
 import m3.gwt.lang.SetX;
@@ -224,7 +225,10 @@ public class FilterBar {
 							
 							for ( FilterAcceptCriteria fac : facIter ) {
 								MNode node = nodesByUid.get(fac.getNode());
-								if (node == null) continue;
+								if (node == null) {
+									LogTool.warn("uid " + fac.getNode() + " not found", new Throwable());
+									continue;
+								}
 								Pair<FilterAcceptCriteria, MNode> pair = Pair.create(fac,node);
 								int index = -1;
 								for ( int i = 0 ; i < content.size() ; i++ ) {
