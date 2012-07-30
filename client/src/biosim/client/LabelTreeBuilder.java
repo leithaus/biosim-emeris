@@ -264,8 +264,10 @@ public class LabelTreeBuilder {
 			link.linkTo(new Function1<MNode, Void>() {
 				@Override
 				public Void apply(MNode node) {
-					MLabel label = (MLabel) node;
-					addChildIfNecessary(ti_f, label);
+					if (node instanceof MLabel) {
+						MLabel label = (MLabel) node;
+						addChildIfNecessary(ti_f, label);
+					}
 					return null;
 				}
 			});

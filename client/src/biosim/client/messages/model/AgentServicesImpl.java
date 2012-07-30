@@ -1,5 +1,7 @@
 package biosim.client.messages.model;
 
+import com.google.gwt.core.client.GWT;
+
 import m3.fj.data.FList;
 import m3.gwt.lang.ClassX;
 import m3.gwt.lang.Function1;
@@ -55,7 +57,9 @@ public class AgentServicesImpl implements AgentServices {
 		fetch(FList.create(uid), false, new Function1<Iterable<T>, Void>() {
 			@Override
 			public Void apply(Iterable<T> list) {
-				asyncCallback.apply(list.iterator().next());
+				if (list.iterator().hasNext()) {
+					asyncCallback.apply(list.iterator().next());
+				}
 				return null;
 			}
 		});
