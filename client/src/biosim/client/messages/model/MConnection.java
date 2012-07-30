@@ -3,6 +3,8 @@ package biosim.client.messages.model;
 
 public class MConnection extends MIconNode {
 
+	public static final String defaultIconUrl = "/images/connection.png";
+
 	private Uid _remoteAgent;
 	
 	public MConnection() {
@@ -20,7 +22,7 @@ public class MConnection extends MIconNode {
 
 	@Override
 	public String getDefaultIconUrl() {
-		return null;
+		return defaultIconUrl;
 	}
 	
 	// BEGIN_GENERATED_CODE
