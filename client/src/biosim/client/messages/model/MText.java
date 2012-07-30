@@ -10,6 +10,11 @@ public class MText extends MNode {
 	public MText(String _text) {
 		this._text = _text;
 	}
+	
+	public MText(String _text, Uid uid) {
+		super(uid);
+		this._text = _text;
+	}
 
 	// BEGIN_GENERATED_CODE
 	
