@@ -72,6 +72,7 @@ public class NodeWidgetBuilder {
 		_widget.setStyleName(Globals._boxStyle, true);
 		
 		HTMLPanel dragHandle = new HTMLPanel("div", "");
+		dragHandle.getElement().getStyle().setHeight(100.0, Unit.PCT);
 //		Style style = dragHandle.getElement().getStyle();
 //		style.setBackgroundImage("url('images/drag_background_wide.png')");
 //		style.setPadding(10, Unit.PX);
