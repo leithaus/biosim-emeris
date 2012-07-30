@@ -33,6 +33,7 @@ import biosim.client.messages.model.MBlob
 import biosim.client.messages.model.MImage
 import biosim.client.messages.protocol.GetRemoteConnectionRequest
 import biosim.client.messages.protocol.GetRemoteConnectionResponse
+import biosim.client.messages.model.MText
 
 object SwitchBoard extends Logging {
 
@@ -152,6 +153,8 @@ object SwitchBoard extends Logging {
   def toClientNode(sn: Node, dao: AgentDAO)(implicit db: AgentDatabase): MNode = {
     val cn = sn match {
       
+      case t: TextMessage => new MText(t.value, t.uid)
+      
       case blob: Blob =>
         new MBlob(
           blob.uid
@@ -186,6 +189,7 @@ object SwitchBoard extends Logging {
   }
   
   def toServerNode(cn: MNode): Node = cn match {
+    case t: MText => TextMessage(t.getText, t.getUid)
     case i: MImage => Image(i.getBlobRef, i.getUid)
     case b: MBlob => Blob(b.getRef.getAgentUid, b.getRef.getFilename, b.getDataInBase64, b.getUid)
     case l: MLabel => Label(l.getName, l.getIcon, l.getUid)
