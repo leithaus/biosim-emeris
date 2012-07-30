@@ -16,6 +16,7 @@ import biosim.client.eventlist.ObservableList;
 import biosim.client.messages.model.AgentServices;
 import biosim.client.messages.model.FilterAcceptCriteria;
 import biosim.client.messages.model.LocalAgent;
+import biosim.client.messages.model.MAgent;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.Uid;
 
@@ -213,7 +214,9 @@ public class FilterBar {
 							
 							Map<Uid,MNode> nodesByUid = MapX.create();
 							for ( MNode n : newContent ) {
-								nodesByUid.put(n.getUid(), n);
+								if (!(n instanceof MAgent)) {
+									nodesByUid.put(n.getUid(), n);
+								}
 							}
 							
 							ObservableList<Pair<FilterAcceptCriteria,MNode>> content = _callback.getContentList();
@@ -221,6 +224,7 @@ public class FilterBar {
 							
 							for ( FilterAcceptCriteria fac : facIter ) {
 								MNode node = nodesByUid.get(fac.getNode());
+								if (node == null) continue;
 								Pair<FilterAcceptCriteria, MNode> pair = Pair.create(fac,node);
 								int index = -1;
 								for ( int i = 0 ; i < content.size() ; i++ ) {
