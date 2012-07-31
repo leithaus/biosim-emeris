@@ -59,9 +59,9 @@ object Model {
 
     def parentLabels(implicit ad: AgentDatabase) = (
       incomingLinks
-      .flatMap {
-        _.to.node match {
-          case l: Label => Some(l)
+      .flatMap { link =>
+        link.from.node match {
+          case label: Label => Some(label)
           case _ => None
         }
       })

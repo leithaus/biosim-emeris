@@ -28,7 +28,7 @@ case class Filter(labels: Iterable[Label], connections: Iterable[Connection], im
   }
   
   def accept(node: Node): List[FilterAcceptCriteria] = {
-
+    
     // labels are OR'ed and no label filters means show anything
     val labelPass = labels.isEmpty || node.parentLabels.exists(labelsAndChildren.contains)
     

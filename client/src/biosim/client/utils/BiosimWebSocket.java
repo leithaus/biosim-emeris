@@ -30,13 +30,13 @@ public class BiosimWebSocket {
             }
             @Override
             public void onOpen() {
-                GWT.log("websocket openned");
+            	LogTool.debug("websocket openned");
                 messageHandler.connect(BiosimWebSocket.this);
                 onConnect.apply(null);
             }
             @Override
             public IncomingMessage deserialize(String jsonMsg) {
-                GWT.log("received message " + jsonMsg);
+                LogTool.debug("received message " + jsonMsg);
                 Response msg = BiosimSerializer.get().fromJson(jsonMsg, Response.class);
                 return msg.asIncomingMessage();
             }

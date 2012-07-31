@@ -16,6 +16,11 @@ public class MText extends MNode {
 		this._text = _text;
 	}
 
+	@Override
+	public String toHtmlString() {
+		return _text;
+	}
+	
 	// BEGIN_GENERATED_CODE
 	
 	public java.lang.String getText() {
