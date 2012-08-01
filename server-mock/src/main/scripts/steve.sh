@@ -1,6 +1,6 @@
 
 
-export DATABASE_ROOT=database-steve
+export DATABASE_ROOT=/opt/biosim-databases/steve
 export PORTS=http:8081
 
 . run.sh

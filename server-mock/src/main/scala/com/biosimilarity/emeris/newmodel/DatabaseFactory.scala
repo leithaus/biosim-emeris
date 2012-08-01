@@ -54,7 +54,7 @@ trait FileSystemDatabaseFactory extends DatabaseFactory with Logging {
 
   lazy val databasesRootDirectory = {
     val rootDirName = getConfigProperty("DATABASE_ROOT", "database")
-    val d = Directory("database")
+    val d = Directory(rootDirName)
     logger.debug("database root = " + d.canonicalPath)
     d.makeDirectories
     d

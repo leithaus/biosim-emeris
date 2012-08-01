@@ -23,7 +23,7 @@ mv dist/webapp/WEB-INF/lib/*.jar dist/lib/
 rm -rf dist/webapp/WEB-INF
 cp -r server-mock/src/main/webapp/WEB-INF/ dist/webapp/WEB-INF/
 cp -r server-mock/log.conf dist/
-cp -r server-mock/src/main/scripts/run.sh dist/
+cp -r server-mock/src/main/scripts/* dist/
 cp -r server-mock/database dist/webapp/database
 
 find dist -name .svn | xargs rm -rf
