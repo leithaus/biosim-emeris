@@ -4,6 +4,7 @@ package com.biosimilarity.emeris.newmodel
 import com.biosimilarity.emeris.newmodel.Model._
 import m3.predef._
 import m3.FileSystem.Directory
+import com.biosimilarity.emeris.predef._
 
 object DatabaseFactory extends FileSystemDatabaseFactory
 
@@ -46,13 +47,15 @@ trait LoggingDatabaseFactory extends DatabaseFactory with Logging {
     logger.debug("databases")
     super.databases
   }
-
+  
 }
 
 trait FileSystemDatabaseFactory extends DatabaseFactory with Logging {
 
   lazy val databasesRootDirectory = {
+    val rootDirName = getConfigProperty("DATABASE_ROOT", "database")
     val d = Directory("database")
+    logger.debug("database root = " + d.canonicalPath)
     d.makeDirectories
     d
   }

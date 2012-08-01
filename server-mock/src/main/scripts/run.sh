@@ -5,4 +5,4 @@ do
   CLASSPATH="$CLASSPATH:$F"
 done
 
-java com.biosimilarity.emeris.RunBiosimServer
+java "-Dports=${PORTS}" com.biosimilarity.emeris.RunBiosimServer

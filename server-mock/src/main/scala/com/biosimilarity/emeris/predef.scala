@@ -14,4 +14,10 @@ object predef {
     def asScala = l.asScala.toList
   }
   
+  def getConfigProperty(propName: String, defaultValue: String) = {
+    Option(System.getProperty(propName)).
+      orElse(Option(System.getenv.get(propName))).
+      getOrElse(defaultValue)
+  }
+
 }
