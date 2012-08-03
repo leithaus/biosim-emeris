@@ -1,7 +1,5 @@
 package biosim.client.messages.model;
 
-import com.google.gwt.core.client.GWT;
-
 import m3.fj.data.FList;
 import m3.gwt.lang.ClassX;
 import m3.gwt.lang.Function1;
