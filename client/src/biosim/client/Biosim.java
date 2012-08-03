@@ -163,7 +163,6 @@ public class Biosim implements EntryPoint {
 				}
 			};
 
-//			_dndController = new DndControllerOldSchool(RootPanel.get(), dndControllerCallback);
 			_dndController = new DndControllerHtml5(dndControllerCallback);
 			
 			_contentController = new ContentController(_dndController);
