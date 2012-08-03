@@ -21,6 +21,7 @@ import biosim.client.utils.DialogHelper;
 import biosim.client.utils.Pair;
 import biosim.client.utils.SetX;
 
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.DragEndEvent;
 import com.google.gwt.event.dom.client.DragEndHandler;
 import com.google.gwt.event.dom.client.DragEnterEvent;
@@ -35,13 +36,15 @@ import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.user.client.ui.Widget;
 
+import static com.google.gwt.query.client.GQuery.*;
+import com.google.gwt.query.client.Function;
 
 public class DndControllerHtml5 implements DndController {
 	
 	final List<DropSite> _dropSites = ListX.create();
 	final List<DragSite> _dragSites = ListX.create();
 
-	final Set<Widget> _styledWidgets = SetX.create();
+	final Set<DropSite> _activeDropSites = SetX.create();
 	
 	final Map<Pair<DndType,DndType>, DropAction<?, ?>> _actionGrid = MapX.create();
 	
@@ -274,13 +277,9 @@ public class DndControllerHtml5 implements DndController {
 			public void onDragEnter(DragEnterEvent event) {
 				LogTool.debug("onDragEnter for " + dropTargetNode);
 				event.preventDefault();
-				if ( canDrop(dropSite) ) {
-					dropSite.preDropStyle = Globals.get().getCurrentUiStateCssClass(dropTargetWidget.getStyleName());
-					if(dropSite.preDropStyle != null) {
-						dropTargetWidget.removeStyleName(dropSite.preDropStyle);
-					}
-					dropSite.enteredDropTarget = dropTargetWidget;
-					dropSite.enteredDropTarget.addStyleName(Globals._connectionDropHover);
+				
+				if (canDrop(dropSite)) {
+					dropSite.dragEnter();
 				}
 			}
 		}, DragEnterEvent.getType());
@@ -295,33 +294,21 @@ public class DndControllerHtml5 implements DndController {
 		dropTargetWidget.addDomHandler(new DragLeaveHandler() {
 			@Override
 			public void onDragLeave(DragLeaveEvent event) {
-				event.preventDefault();
 				LogTool.debug("onDragLeave for " + dropTargetNode);
-				dropSite.dragLeave();
+				event.preventDefault();
+				dropSite.dragLeave(event);
 			}
 		}, DragLeaveEvent.getType());
 		
 		dropTargetWidget.addDomHandler(new DropHandler() {
 			@Override
 			public void onDrop(DropEvent event) {
-				LogTool.debug("onDrop for " + dropTargetNode);
+				LogTool.debug("onDrop for " + dropSite);
 				event.preventDefault();
 				dropAction(dropSite).processDrop(_currentDragSite.node, dropSite.node);
-				dropSite.dragLeave();
+				dropSite.drop();
 			}
-		}, DropEvent.getType());
-		
-//		_delegate.registerDropController(new AbstractDropController(dropTargetWidget) {
-//			Widget _enteredDropTarget;
-//			String predropStyle = null;
-//			@Override
-//			public void onPreviewDrop(DragContext context) throws VetoDragException {
-//				if ( !canDrop(context, dropSite) ) {
-//					throw new VetoDragException();
-//				}
-//			}
-//		});
-		
+		}, DropEvent.getType());		
 	}
 
 	public void addDropHandler(DndType dragType, DndType dropType, DropAction<?, ?> dropAction) {
@@ -341,41 +328,27 @@ public class DndControllerHtml5 implements DndController {
 			this.draggable = draggable;
 			this.dragHandle = dragHandle;
 		}
-
-		@SuppressWarnings("unchecked")
-		public boolean isDroppable(DropSite dropSite) {
-			DropAction<MNode, MNode> da = (DropAction<MNode, MNode>) _actionGrid.get(Pair.create(type, dropSite.type));
-			if ( da != null && da.canDrop(node, dropSite.node) ) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
 	}
 	
 	void dragStart() {
 	    LogTool.debug("dragStart()");
-		_styledWidgets.clear();
-		for ( DropSite ds : _dropSites ) {
-			if ( canDrop(ds) ) {
-				ds.widget.addStyleName(Globals._connectionIconDragging);
-				_styledWidgets.add(ds.widget);
+	    _activeDropSites.clear();
+		for (DropSite ds : _dropSites) {
+			if (canDrop(ds)) {
+				ds.dragStart();
+				_activeDropSites.add(ds);
 			}
 		}
-//        LogTool.debug("dragStart() override end");
 	}
 	
 	void dragEnd() {
 	    LogTool.debug("dragEnd()");
-		for ( Widget w : _styledWidgets ) {
-			w.removeStyleName(Globals._connectionIconDragging);
+		for (DropSite ds : _activeDropSites) {
+			ds.dragEnd();
 		}
 	}
 
 	class DropSite {
-		
-		protected Widget enteredDropTarget;
 		final DndType type;
 		final MNode node;
 		final Widget widget;
@@ -388,16 +361,61 @@ public class DndControllerHtml5 implements DndController {
 			this.widget = widget;
 		}
 		
-		void dragLeave() {
-			if ( enteredDropTarget != null ) {
-				widget.removeStyleName(Globals._connectionDropHover);
-				if(preDropStyle != null) {
-					widget.addStyleName(preDropStyle);
-				}
-				enteredDropTarget = null;
-			}
+		void dragStart() {
+			widget.addStyleName(Globals._connectionIconDragging);
 		}
 		
+		void dragEnter() {
+			if (preDropStyle == null) {
+				preDropStyle = Globals.get().getCurrentUiStateCssClass(widget.getStyleName());
+			}
+			if (preDropStyle != null) {
+				widget.removeStyleName(preDropStyle);
+			}
+			widget.addStyleName(Globals._connectionDropHover);
+		}
+		
+		private void resetDragStyle() {
+			widget.removeStyleName(Globals._connectionDropHover);
+			if (preDropStyle != null) {
+				widget.addStyleName(preDropStyle);
+			}			
+		}
+
+		void dragLeave(DragLeaveEvent event) {
+			Integer top    = widget.getAbsoluteTop();
+			Integer left   = widget.getAbsoluteLeft();
+			Integer width  = widget.getOffsetWidth();
+			Integer height = widget.getOffsetHeight();
+			
+			NativeEvent e = event.getNativeEvent();
+
+			// Check the mouseEvent coordinates are outside of the rectangle
+            if (e.getClientX() > left + width  || e.getClientX() < left
+             || e.getClientY() > top  + height || e.getClientY() < top) {
+            	resetDragStyle();
+            }				
+		}
+
+		void drop() {
+			resetDragStyle();
+			/*
+			//display the text with effects and animate its background color
+	        $(widget.getElement()).as(Effects)
+	          .clipDown()
+	          .animate("backgroundColor: 'yellow'", 500)
+	          .delay(1000)
+	          .animate("backgroundColor: '#fff'", 1500, new Function(){
+	        	  public void f(){
+	        	       resetDragStyle();
+	        	  }
+	          });
+	          */	        
+		}
+		
+		void dragEnd() {
+			widget.removeStyleName(Globals._connectionIconDragging);
+		}
 	}
 	
 }

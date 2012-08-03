@@ -63,42 +63,41 @@ public class NodeWidgetBuilder {
 		}
 		_labelProvider = labelProvider;
 		rebuild();
-//		_dndController.makeDraggable(_dndType, _node, _wrapper, _wrapper);
 	}
 	
-	public void rebuild() {
-		
-		_widget = new CustomFlowPanel();
-		_widget.setStyleName(Globals._boxStyle, true);
-		
+	HTMLPanel createDragHandle() {
 		HTMLPanel dragHandle = new HTMLPanel("div", "");
 		dragHandle.getElement().getStyle().setHeight(100.0, Unit.PCT);
-//		Style style = dragHandle.getElement().getStyle();
-//		style.setBackgroundImage("url('images/drag_background_wide.png')");
-//		style.setPadding(10, Unit.PX);
+		
 		Image dragTexture = new Image("images/drag_background_wide.png");
 		dragTexture.setWidth("20px");
 		dragTexture.setHeight("100%");
 		dragTexture.addStyleName("ui-corner-tl ui-corner-bl");
 		Style textureStyle = dragTexture.getElement().getStyle();
 		textureStyle.setMargin(0, Unit.PX);
-//		textureStyle.setMarginBottom(-3, Unit.PX);
+
 		dragHandle.add(dragTexture);
-		_widget.add(dragHandle, "vertFill fleft ui-corner-tl ui-corner-bl");
 		_dndController.makeDraggable(_dndType, _node, _widget, dragTexture);
+
+		return dragHandle;
+	}
+	public void rebuild() {
+		
+		_widget = new CustomFlowPanel();
+		_widget.setStyleName(Globals._boxStyle, true);
+		
+		_widget.add(createDragHandle(), "vertFill fleft ui-corner-tl ui-corner-bl");
 
 		if ( _node.getIconUrl() != null ) {
 			_icon = new Image(_node.getIconUrl());
 			_icon.addStyleName("node-icon");
 			_widget.add(_icon);
-//			_dndController.makeDraggable(_dndType, _node, _widget, _icon);
 		}
 		
 		String label = _labelProvider.f(_node);
 		
 		if ( _node instanceof MImage ) {
 			
-			// Create a FlexTable into which the image will be displayed
 			HorizontalPanel p = new HorizontalPanel();
 			p.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 			
