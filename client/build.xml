@@ -4,7 +4,8 @@
   <property file="build.properties" />	
 	
   <!-- Arguments to gwtc and devmode targets -->
-  <property name="gwt.args" value="-style DETAILED" />
+  <!--property name="gwt.args" value="-style DETAILED" /-->
+  <property name="gwt.args" value="" />
 
   <!-- Configure path to GWT SDK -->
   <property name="gwt.sdk" location="/Users/glen/sandbox/gwt/gwt-2.4.0" />
@@ -44,9 +45,6 @@
       <classpath>
         <pathelement location="src"/>
         <path refid="project.class.path"/>
-        <pathelement location="/Users/glen/.m2/repository/net/model3/m3-gwt/1.0-SNAPSHOT/m3-gwt-1.0-SNAPSHOT.jar" />
-        <pathelement location="/Users/glen/sandbox/gwt/gwt-2.4.0/validation-api-1.0.0.GA.jar" />
-        <pathelement location="/Users/glen/sandbox/gwt/gwt-2.4.0/validation-api-1.0.0.GA-sources.jar" />
       </classpath>
       <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
       <jvmarg value="-Xmx256M"/>
@@ -64,8 +62,6 @@
       <classpath>
         <pathelement location="src"/>
         <path refid="project.class.path"/>
-        <pathelement location="/Users/glen/sandbox/gwt/gwt-2.4.0/validation-api-1.0.0.GA.jar" />
-        <pathelement location="/Users/glen/sandbox/gwt/gwt-2.4.0/validation-api-1.0.0.GA-sources.jar" />
       </classpath>
       <jvmarg value="-Xmx256M"/>
       <arg value="-startupUrl"/>
