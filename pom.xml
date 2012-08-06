@@ -15,4 +15,12 @@
         <module>server-mock</module>
     </modules>
 
+    <repositories>
+      <repository>
+        <id>emeris</id>
+        <name>emeris repo</name>
+        <url>http://ratchet.model3.net:8081/nexus/content/groups/public</url>
+      </repository>    
+    </repositories>
+
 </project>
