@@ -1,5 +1,0 @@
-#! /bin/sh
-mvn clean compile install
-mvn dependency:copy-dependencies
-ant devmode
-mvn exec:java -Dexec.mainClass=com.biosimilarity.emeris.RunBiosimServer
