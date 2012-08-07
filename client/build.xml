@@ -8,7 +8,7 @@
   <property name="gwt.args" value="" />
 
   <!-- Configure path to GWT SDK -->
-  <property name="gwt.sdk" location="/Users/glen/sandbox/gwt/gwt-2.4.0" />
+  <property name="gwt.sdk" location="/Users/lgm/work/src/devtools/GWT/gwt-2.4.0" />
 
   <path id="project.class.path">
     <pathelement location="war/WEB-INF/classes"/>
