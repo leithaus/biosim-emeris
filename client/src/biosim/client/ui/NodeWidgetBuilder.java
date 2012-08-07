@@ -2,22 +2,44 @@ package biosim.client.ui;
 
 import java.util.List;
 
+import org.vectomatic.file.File;
+import org.vectomatic.file.FileList;
+import org.vectomatic.file.FileReader;
+import org.vectomatic.file.FileUploadExt;
+import org.vectomatic.file.events.LoadEndEvent;
+import org.vectomatic.file.events.LoadEndHandler;
+
 import m3.fj.F1;
+import m3.gwt.lang.Function0;
+import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
+import biosim.client.Biosim;
 import biosim.client.DndController;
 import biosim.client.Globals;
+import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.FilterAcceptCriteria;
+import biosim.client.messages.model.MBlob;
+import biosim.client.messages.model.MIconNode;
 import biosim.client.messages.model.MImage;
+import biosim.client.messages.model.MLabel;
 import biosim.client.messages.model.MNode;
 import biosim.client.ui.dnd.DndType;
+import biosim.client.utils.Base64;
+import biosim.client.utils.DialogHelper;
 import biosim.client.utils.GqueryUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -27,6 +49,8 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class NodeWidgetBuilder {
@@ -81,6 +105,117 @@ public class NodeWidgetBuilder {
 
 		return dragHandle;
 	}
+	
+	void addChildLabel(final MIconNode parent) {
+		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
+			public Void apply(final String t) {
+				if ( t != null && t.trim().length() > 0 ) {
+					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {						
+						@Override
+						public void execute() {
+							Biosim.get().getLocalAgent().insertChild(parent, new MLabel(t));
+						}
+					});
+				}
+				return null;
+			}
+		});
+	}
+	
+	void editLabel(final MIconNode node) {
+		final VerticalPanel panel = new VerticalPanel();
+		HTML l1 = new HTML("Name:");
+		panel.add(l1);
+		final TextBox textBox = new TextBox();
+		textBox.setText(node.getName());
+		panel.add(textBox);
+		
+		HTML l2 = new HTML("Icon:");
+		panel.add(l2);
+        final FileUploadExt fileUploadExt = new FileUploadExt();
+		panel.add(fileUploadExt);
+		DialogHelper.showWidgetPrompt("Edit Label", panel, "200px 20px", new Function1<VerticalPanel,Void>() {
+			public Void apply(VerticalPanel p) {
+				if (p != null) {
+					// Set the new name the node, if it is set
+					if (!textBox.getText().isEmpty()) {
+						node.setName(textBox.getText());
+						Biosim.get().getLocalAgent().insertOrUpdate(node);
+					}
+					
+					// Get the files that were selected 
+                    FileList fileList = fileUploadExt.getFiles();
+                    for ( File file0 : fileList ) {
+                        final File file = file0;
+                        final FileReader reader = new FileReader();
+                        reader.addLoadEndHandler(new LoadEndHandler() {
+                            @Override
+                            public void onLoadEnd(LoadEndEvent event) {
+                                try {
+                                    String buffer = reader.getStringResult();
+                                    String base64 = Base64.toBase64(buffer);
+                                    MBlob blob = new MBlob(_node.getAgentServices().getAgentUid(), file.getName());
+                                    blob.setDataInBase64(base64);
+                                    node.setIcon(blob.getRef());
+                                    Biosim.get().getLocalAgent().insertOrUpdate(blob, node);
+                                } catch ( Exception e ) {
+                                    GWT.log("something bad happened", e);
+                                }
+                            }
+                        });
+                        reader.readAsBinaryString(file);
+                    }
+				}
+				return null;
+			}
+		});		
+	}
+	
+	void createPopupMenu() {
+		if (!_node.isEditable() || !(_node instanceof MIconNode)) return;
+		
+		final PopupMenu popup = new PopupMenu();
+		final Button pop = new Button("&raquo;");			
+		_widget.add(pop);
+		pop.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+			    popup.show(event);
+			}
+		});
+		popup.addOption("Add Child Label...", new Function0<Void>() {
+            @Override
+            public Void apply() {
+			    addChildLabel((MIconNode)_node);
+                return null;
+            }
+        });
+
+		popup.addOption("Edit...", new Function0<Void>() {
+            @Override
+            public Void apply() {
+			    editLabel((MIconNode)_node);
+                return null;
+            }
+        });
+		
+		_widget.addDomHandler(new MouseOutHandler() {
+			@Override
+			public void onMouseOut(MouseOutEvent event) {
+				GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
+			}
+		},  MouseOutEvent.getType());
+		
+		_widget.addDomHandler(new MouseOverHandler() {
+			@Override
+			public void onMouseOver(MouseOverEvent event) {
+				GqueryUtils.setVisibility(pop.getElement(), Visibility.VISIBLE);
+			}
+		},  MouseOverEvent.getType());
+		
+		GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
+	}
+	
 	public void rebuild() {
 		
 		_widget = new CustomFlowPanel();
@@ -129,12 +264,8 @@ public class NodeWidgetBuilder {
 
 		if ( _content != null ) {
 			_widget.add(_content);
-//			_dndController.makeDraggable(_dndType, _node, _widget, _content);
 		}
-		
-//		dndController.makeDraggable(_dndType, _node, _widget, _widget.getClearPanel());
-//		_dndController.makeDraggable(_dndType, _node, _widget, _widget);
-		
+
 		_dndController.registerDropSite(_dndType, _node, _widget);
 		
 		_widget.add(_sourceLabels);
@@ -143,9 +274,6 @@ public class NodeWidgetBuilder {
 			Scheduler.get().scheduleFinally(new ScheduledCommand() {
 		        @Override
 		        public void execute() {
-	//	        	if(_icon != null) {
-	//	        		GqueryUtils.center(_icon.getElement());
-	//	        	}
 		        	GqueryUtils.center(_content.getElement());
 		        }
 		    });
@@ -153,8 +281,9 @@ public class NodeWidgetBuilder {
 			toString();
 		}
 		
-		_wrapper.setWidget(_widget);
+		createPopupMenu();
 		
+		_wrapper.setWidget(_widget);
 	}
 	
 	public void setFilterAcceptCriteria(FilterAcceptCriteria filterAcceptCriteria) {

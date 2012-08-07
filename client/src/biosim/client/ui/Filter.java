@@ -44,14 +44,10 @@ public class Filter {
     }
 
 	public boolean canAddFilter(MNode node) {
-//		if ( _nodes.contains(node) ) {
-//			return false;
-//		}
-//		for ( MNode f : _labels ) {
-//			if ( f.equals(node) || f.isAncestorOf(node) ) {
-//				return false;
-//			}
-//		}
+		if ( _nodes.contains(node) ) {
+			return false;
+		}
+		
 		return true;
 	}
 	

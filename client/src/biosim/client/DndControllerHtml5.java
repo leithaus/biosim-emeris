@@ -303,7 +303,7 @@ public class DndControllerHtml5 implements DndController {
 		dropTargetWidget.addDomHandler(new DropHandler() {
 			@Override
 			public void onDrop(DropEvent event) {
-				LogTool.debug("onDrop for " + dropSite);
+				LogTool.debug("onDrop for " + dropTargetNode);
 				event.preventDefault();
 				dropAction(dropSite).processDrop(_currentDragSite.node, dropSite.node);
 				dropSite.drop();
@@ -379,7 +379,8 @@ public class DndControllerHtml5 implements DndController {
 			widget.removeStyleName(Globals._connectionDropHover);
 			if (preDropStyle != null) {
 				widget.addStyleName(preDropStyle);
-			}			
+			}
+			preDropStyle = null;
 		}
 
 		void dragLeave(DragLeaveEvent event) {

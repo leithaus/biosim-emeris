@@ -3,7 +3,6 @@ package biosim.client;
 import java.util.List;
 
 import m3.fj.F1;
-import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
 
@@ -16,7 +15,6 @@ import org.vectomatic.file.events.LoadEndHandler;
 
 import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ListListener;
-import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.AgentServices;
 import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MAgent;
@@ -34,23 +32,11 @@ import biosim.client.ui.dnd.DndType;
 import biosim.client.utils.Base64;
 import biosim.client.utils.BiosimWebSocket;
 import biosim.client.utils.DialogHelper;
-import biosim.client.utils.GqueryUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Style.Visibility;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -65,16 +51,15 @@ public class LabelTreeBuilder {
 	final Uid _agentUid;
 	final DndController _dndController;
 	final LocalAgent _localAgent;
-//	final AgentServices _remoteServices;
 	final BiosimWebSocket _socket;
 	
 	final F1<MNode,String> _labelProvider = new F1<MNode, String>() {
 		@Override
-		public String f(MNode a) {
-			if ( a instanceof MConnection ) {
-				return a.getAgentServices().getAgentUid().getValue();
+		public String f(MNode node) {
+			if ( node instanceof MConnection ) {
+				return node.getAgentServices().getAgentUid().getValue();
 			} else {
-				return a.toHtmlString();
+				return node.toHtmlString();
 			}
 		}
 	};
@@ -302,133 +287,19 @@ public class LabelTreeBuilder {
 		final MIconNode node = getUserObject(ti);
 		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label, _labelProvider); 
 		final FlowPanel w = nwbuilder.getFlowPanel();
-		final PopupMenu popup = new PopupMenu();
 		ti.setWidget(w);
-				
-		if ( node.isEditable() ) {	
-			final Button pop = new Button("&raquo;");			
-			w.add(pop);
-			pop.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-				    popup.show(event);
-				}
-			});
-			popup.addOption("Add Child Label...", new Function0<Void>() {
-	            @Override
-	            public Void apply() {
-				    addLeaf(node);
-	                return null;
-	            }
-	        });
 
-			popup.addOption("Edit...", new Function0<Void>() {
-	            @Override
-	            public Void apply() {
-				    editLabel(node);
-	                return null;
-	            }
-	        });
-			
-			w.addDomHandler(new MouseOutHandler() {
-				@Override
-				public void onMouseOut(MouseOutEvent event) {
-					GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
-				}
-			},  MouseOutEvent.getType());
-			
-			w.addDomHandler(new MouseOverHandler() {
-				@Override
-				public void onMouseOver(MouseOverEvent event) {
-					GqueryUtils.setVisibility(pop.getElement(), Visibility.VISIBLE);
-				}
-			},  MouseOverEvent.getType());
-			
-			GqueryUtils.setVisibility(pop.getElement(), Visibility.HIDDEN);
-			
-			// Make sure that the open/close button is set properly
-			node.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
-				@Override
-				public Void apply(Iterable<MLabel> labels) {
-					// If the tree item is not expanded
-					if (!ti.getState()) {
-						// If there are now no children in the model and the first 
-						// child is the dummy node, remove it.
-						if (!labels.iterator().hasNext()) {
-							if (hasDummyNode(ti)) {
-								ti.getChild(0).remove();
-							}
-						}
-					}
-					return null;
-				}				
-			});
-		}
-	}
-	
-	void addLeaf(final MIconNode parent) {
-		DialogHelper.showSingleLineTextPrompt("Enter the name of child label to add:", "", "200px 20px", new Function1<String,Void>() {
-			public Void apply(final String t) {
-				if ( t != null && t.trim().length() > 0 ) {
-					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {						
-						@Override
-						public void execute() {
-							_localAgent.insertChild(parent, new MLabel(t));
-						}
-					});
+		// Make sure that the open/close button is set properly
+		node.getChildLabels(new AsyncCallback<Iterable<MLabel>>() {
+			@Override
+			public Void apply(Iterable<MLabel> labels) {
+				// If there are no children in the model, remove them from the tree
+				if (!labels.iterator().hasNext()) {
+					ti.removeItems();					
 				}
 				return null;
-			}
+			}				
 		});
-	}
-	
-	void editLabel(final MIconNode node) {
-		final VerticalPanel panel = new VerticalPanel();
-		HTML l1 = new HTML("Name:");
-		panel.add(l1);
-		final TextBox textBox = new TextBox();
-		textBox.setText(node.getName());
-		panel.add(textBox);
-		
-		HTML l2 = new HTML("Icon:");
-		panel.add(l2);
-        final FileUploadExt fileUploadExt = new FileUploadExt();
-		panel.add(fileUploadExt);
-		DialogHelper.showWidgetPrompt("Edit Label", panel, "200px 20px", new Function1<VerticalPanel,Void>() {
-			public Void apply(VerticalPanel p) {
-				if (p != null) {
-					// Set the new name the node, if it is set
-					if (!textBox.getText().isEmpty()) {
-						node.setName(textBox.getText());
-						_localAgent.insertOrUpdate(node);
-					}
-					
-					// Get the files that were selected 
-                    FileList fileList = fileUploadExt.getFiles();
-                    for ( File file0 : fileList ) {
-                        final File file = file0;
-                        final FileReader reader = new FileReader();
-                        reader.addLoadEndHandler(new LoadEndHandler() {
-                            @Override
-                            public void onLoadEnd(LoadEndEvent event) {
-                                try {
-                                    String buffer = reader.getStringResult();
-                                    String base64 = Base64.toBase64(buffer);
-                                    MBlob blob = new MBlob(_agentUid, file.getName());
-                                    blob.setDataInBase64(base64);
-                                    node.setIcon(blob.getRef());
-                                    _localAgent.insertOrUpdate(blob, node);
-                                } catch ( Exception e ) {
-                                    GWT.log("something bad happened", e);
-                                }
-                            }
-                        });
-                        reader.readAsBinaryString(file);
-                    }
-				}
-				return null;
-			}
-		});		
 	}
 
     void addPhone(final MNode parent) {
