@@ -4,6 +4,7 @@ import biosim.client.messages.model.AgentServices;
 import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MNode;
 import biosim.client.messages.model.NodeContainer;
+import biosim.client.messages.model.Uid;
 import biosim.client.utils.BiosimWebSocket;
 
 
@@ -31,6 +32,14 @@ public class MessageHandler {
 				newNode.setAgentServices(agentServices);
 			}
 			_nodeContainer.insertOrUpdate(((CreateNodesResponse) body).getNodes());
+		} else if ( body instanceof DeleteNodesResponse ) {
+			DeleteNodesResponse dnr = (DeleteNodesResponse) body;
+			for ( Uid uid : dnr.getNodes() ) {
+				MNode node = _nodeContainer.fetch(uid);
+				if ( node != null ) {
+					_nodeContainer.delete(node);
+				}
+			}
 		} else {
 			throw new RuntimeException("don't know how to handle type " + response.getClass());
 		}

@@ -36,9 +36,6 @@ import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.user.client.ui.Widget;
 
-import static com.google.gwt.query.client.GQuery.*;
-import com.google.gwt.query.client.Function;
-
 public class DndControllerHtml5 implements DndController {
 	
 	final List<DropSite> _dropSites = ListX.create();
@@ -161,7 +158,7 @@ public class DndControllerHtml5 implements DndController {
 				}
 
 				if ( Boolean.TRUE ) {
-					throw new RuntimeException("implement a proper algorithm to determine if we create any orphans with this action");
+					LogTool.warn("", new RuntimeException("implement a proper algorithm to determine if we create any orphans with this action"));
 				}
 				List<String> strings = ListX.create(); //DndController.this.getNodeChildStrings();
 				
@@ -239,7 +236,7 @@ public class DndControllerHtml5 implements DndController {
 			public void onDragStart(DragStartEvent event) {
 				_currentDragSite = dragSite;
 				dragStart();
-				event.setData("text", node.getUid().getValue());
+				event.setData("text", "blah blah");
 				
 				int x = event.getNativeEvent().getClientX();
 				int y = event.getNativeEvent().getClientY();

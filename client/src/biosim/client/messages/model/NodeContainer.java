@@ -81,6 +81,19 @@ public class NodeContainer {
 		}
 	}
 	
+	public void delete(MNode node) {
+		if ( node instanceof MConnection ) {
+			connections.remove(node);
+		}
+		nodes.remove(node);
+		nodesByUid.remove(node.getUid());
+		if ( node instanceof MLink ) {
+			MLink l = (MLink) node;
+			linksByFrom.remove(l.getFrom());
+			linksByTo.remove(l.getTo());
+		}
+	}
+	
 	public void insertOrUpdate(MNode node) {
 		MNode localNode = nodesByUid.get(node.getUid());
 		if ( node instanceof MLink ) {

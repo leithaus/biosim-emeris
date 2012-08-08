@@ -4,6 +4,7 @@ import static com.google.gwt.query.client.GQuery.$;
 
 import java.util.Map;
 
+import m3.gwt.lang.Function0;
 import m3.gwt.lang.MapX;
 import m3.gwt.lang.Pair;
 import biosim.client.eventlist.FineGrainedListListener;
@@ -11,6 +12,7 @@ import biosim.client.eventlist.ListEvent;
 import biosim.client.eventlist.ObservableList;
 import biosim.client.eventlist.Observables;
 import biosim.client.messages.model.FilterAcceptCriteria;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MNode;
 import biosim.client.ui.NodeWidgetBuilder;
 import biosim.client.ui.dnd.DndType;
@@ -33,12 +35,12 @@ public class ContentController {
 		}
 	};
 
-	ContentController(final DndController dndController) {
+	ContentController(final DndController dndController, final Function0<LocalAgent> localAgentGetter) {
 		_contentList.addListener(new FineGrainedListListener<Pair<FilterAcceptCriteria,MNode>>() {
 			@Override
 			public void added(ListEvent<Pair<FilterAcceptCriteria,MNode>> event) {
 				MNode node = event.getElement().getRight();
-				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content);
+				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content, localAgentGetter);
 				nwb.setFilterAcceptCriteria(event.getElement().getLeft());
 				_contentPanel.add(nwb.getPanel());
 				_nodeToWidgetBuilderMap.put(node, nwb);
@@ -46,7 +48,7 @@ public class ContentController {
 			@Override
 			public void changed(ListEvent<Pair<FilterAcceptCriteria, MNode>> event) {
 				MNode node = event.getElement().getRight();
-				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content);
+				NodeWidgetBuilder nwb = new NodeWidgetBuilder(node, dndController, DndType.Content, localAgentGetter);
 				nwb.setFilterAcceptCriteria(event.getElement().getLeft());
 			}
 			@Override

@@ -211,6 +211,10 @@ object Model {
     
     def insert[T <: Node](n: T): T
     def fetch[T <: Node](uid: Uid)(implicit mf: Manifest[T]): Option[T]
+    
+    def fetchLink(from: Uid, to: Uid): Option[Link] = 
+      links.find(l=>l.from === from && l.to === to)
+      
     def nodes: Iterable[Node]
     def delete(uid: Uid)
     def dropDatabase()

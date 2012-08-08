@@ -13,11 +13,11 @@ import m3.fj.F1;
 import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
-import biosim.client.Biosim;
 import biosim.client.DndController;
 import biosim.client.Globals;
 import biosim.client.eventlist.ui.PopupMenu;
 import biosim.client.messages.model.FilterAcceptCriteria;
+import biosim.client.messages.model.LocalAgent;
 import biosim.client.messages.model.MBlob;
 import biosim.client.messages.model.MIconNode;
 import biosim.client.messages.model.MImage;
@@ -68,12 +68,13 @@ public class NodeWidgetBuilder {
 	List<Widget> _sourceLabelWidgets = ListX.create();
 	FilterAcceptCriteria _filterAcceptCriteria;
 	final F1<MNode,String> _labelProvider;
+	final Function0<LocalAgent> _localAgentGetter;
 
-	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType) {
-		this(node, dndController, dndType, null);
+	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType, Function0<LocalAgent> localAgentGetter) {
+		this(node, dndController, dndType, null, localAgentGetter);
 	}
 	
-	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType, F1<MNode,String> labelProvider) {
+	public NodeWidgetBuilder(MNode node, DndController dndController, DndType dndType, F1<MNode,String> labelProvider, Function0<LocalAgent> localAgentGetter) {
 		_node = node;
 		_dndType = dndType;
 		_dndController = dndController;
@@ -86,6 +87,7 @@ public class NodeWidgetBuilder {
 			};
 		}
 		_labelProvider = labelProvider;
+		_localAgentGetter = localAgentGetter;
 		rebuild();
 	}
 	
@@ -113,7 +115,7 @@ public class NodeWidgetBuilder {
 					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {						
 						@Override
 						public void execute() {
-							Biosim.get().getLocalAgent().insertChild(parent, new MLabel(t));
+							_localAgentGetter.apply().insertChild(parent, new MLabel(t));
 						}
 					});
 				}
@@ -140,7 +142,7 @@ public class NodeWidgetBuilder {
 					// Set the new name the node, if it is set
 					if (!textBox.getText().isEmpty()) {
 						node.setName(textBox.getText());
-						Biosim.get().getLocalAgent().insertOrUpdate(node);
+						_localAgentGetter.apply().insertOrUpdate(node);
 					}
 					
 					// Get the files that were selected 
@@ -157,7 +159,7 @@ public class NodeWidgetBuilder {
                                     MBlob blob = new MBlob(_node.getAgentServices().getAgentUid(), file.getName());
                                     blob.setDataInBase64(base64);
                                     node.setIcon(blob.getRef());
-                                    Biosim.get().getLocalAgent().insertOrUpdate(blob, node);
+                                    _localAgentGetter.apply().insertOrUpdate(blob, node);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }

@@ -3,6 +3,7 @@ package biosim.client;
 import java.util.List;
 
 import m3.fj.F1;
+import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.ListX;
 
@@ -50,7 +51,7 @@ public class LabelTreeBuilder {
 
 	final Uid _agentUid;
 	final DndController _dndController;
-	final LocalAgent _localAgent;
+	final Function0<LocalAgent> _localAgentGetter;
 	final BiosimWebSocket _socket;
 	
 	final F1<MNode,String> _labelProvider = new F1<MNode, String>() {
@@ -67,12 +68,12 @@ public class LabelTreeBuilder {
 	LabelTreeBuilder(
 			Uid agentUid, 
 			DndController dndController, 
-			LocalAgent localAgent,
+			Function0<LocalAgent> localAgentGetter,
 			BiosimWebSocket socket
 	) {
 		_agentUid = agentUid;
 		_dndController = dndController;
-		_localAgent = localAgent;
+		_localAgentGetter = localAgentGetter;
 		_socket = socket;
 
 		NodeContainer.get().nodes.addListener(new ListListener<MNode>() {
@@ -283,9 +284,13 @@ public class LabelTreeBuilder {
 		return (ti.getChildCount() == 1 && ti.getChild(0).getText().equals(DUMMY_TREE_NODE));
 	}
 	
+	LocalAgent getLocalAgent() {
+		return _localAgentGetter.apply();
+	}
+	
     void updateTreeItem(final TreeItem ti) {
 		final MIconNode node = getUserObject(ti);
-		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label, _labelProvider); 
+		final NodeWidgetBuilder nwbuilder = new NodeWidgetBuilder(node, _dndController, DndType.Label, _labelProvider, _localAgentGetter); 
 		final FlowPanel w = nwbuilder.getFlowPanel();
 		ti.setWidget(w);
 
@@ -306,7 +311,7 @@ public class LabelTreeBuilder {
         DialogHelper.showSingleLineTextPrompt("Enter the Phone #:", "", "200px 20px", new Function1<String,Void>() {
             public Void apply(String t) {
                 if ( t != null && t.trim().length() > 0 ) {
-                	_localAgent.insertTextNode(parent, t);
+                	getLocalAgent().insertTextNode(parent, t);
                 }
                 return null;
             }
@@ -336,7 +341,7 @@ public class LabelTreeBuilder {
                                     image.setBlob(blob);
                                     MLink link = new MLink(parent, image);
                                     // order is important here (create links last)
-                                    _localAgent.insertOrUpdate(blob, image, link);
+                                    getLocalAgent().insertOrUpdate(blob, image, link);
                                 } catch ( Exception e ) {
                                     GWT.log("something bad happened", e);
                                 }
@@ -355,7 +360,7 @@ public class LabelTreeBuilder {
 			public Void apply(String s) {
 				if ( s != null && s.trim().length() > 0 ) {
 					MNode child = instantiator.apply(s);
-					_localAgent.insertChild(parent, child);					
+					getLocalAgent().insertChild(parent, child);					
 				}
 				return null;
 			}
@@ -366,7 +371,7 @@ public class LabelTreeBuilder {
 		DialogHelper.showTextPrompt("Enter the message text.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_localAgent.insertTextNode(parent, t);					
+					getLocalAgent().insertTextNode(parent, t);					
 				}
 				return null;
 			}
@@ -377,7 +382,7 @@ public class LabelTreeBuilder {
 		DialogHelper.showTextPrompt("Enter the info.", "", "300px 200px", new Function1<String,Void>() {
 			public Void apply(String t) {
 				if ( t != null && t.trim().length() > 0 ) {
-					_localAgent.insertTextNode(parent, t);					
+					getLocalAgent().insertTextNode(parent, t);					
 				}
 				return null;
 			}
@@ -389,7 +394,7 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForAgent(Uid agentUid) {
-		_localAgent.getAgentServices().fetch(agentUid, new Function1<MAgent, Void>() {
+		getLocalAgent().getAgentServices().fetch(agentUid, new Function1<MAgent, Void>() {
 			@Override
 			public Void apply(MAgent agent) {
 				addChildren(agent, null);
@@ -399,7 +404,7 @@ public class LabelTreeBuilder {
 	}
 	
 	public void addRootLabelsForConnection(MConnection connection) {
-		AgentServices agentServices = _localAgent.getAgentServices(connection);
+		AgentServices agentServices = getLocalAgent().getAgentServices(connection);
 		agentServices.getRemoteConnection(new Function1<MConnection, Void>() {
 			@Override
 			public Void apply(MConnection conn) {

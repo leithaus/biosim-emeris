@@ -1,6 +1,7 @@
 package biosim.client;
 
 import static com.google.gwt.query.client.GQuery.$;
+import m3.gwt.lang.Function0;
 import m3.gwt.lang.Function1;
 import m3.gwt.lang.LogTool;
 import m3.gwt.lang.Pair;
@@ -82,6 +83,11 @@ public class Biosim implements EntryPoint {
 	
 	BiosimWebSocket _socket;
 	LocalAgent _localAgent;
+	Function0<LocalAgent> _localAgentGetter = new Function0<LocalAgent>() {
+		public LocalAgent apply() {
+			return _localAgent;
+		}
+	};
 	
 	AgentManagerPanel _agentManagerPanel;
 	
@@ -143,7 +149,7 @@ public class Biosim implements EntryPoint {
 			DndController.Callback dndControllerCallback = new DndController.Callback() {
 				@Override
 				public void removeContentLinks(MNode node) {
-					removeContentLinks(node);
+					Biosim.this.removeContentLinks(node);
 				}
 				@Override
 				public FilterBar getFilterBar() {
@@ -165,7 +171,7 @@ public class Biosim implements EntryPoint {
 
 			_dndController = new DndControllerHtml5(dndControllerCallback);
 			
-			_contentController = new ContentController(_dndController);
+			_contentController = new ContentController(_dndController, _localAgentGetter);
 	
 			DockPanel dock = new DockPanel();
 	    
@@ -201,7 +207,7 @@ public class Biosim implements EntryPoint {
 	
 			contentSectionContent.add(_contentController._contentPanel);
 			
-			connectionsSectionContent.add(NodePanel.create(getNodeContainer().connections, _dndController, DndType.Connection));
+			connectionsSectionContent.add(NodePanel.create(getNodeContainer().connections, _dndController, DndType.Connection, _localAgentGetter));
 			
 			_scissors.addStyleName("fright");
 			_contentSection.getTabBar().add(_scissors);
@@ -292,7 +298,7 @@ public class Biosim implements EntryPoint {
 						new LabelTreeBuilder(
 								getAgentUid()
 								, _dndController
-								, _localAgent
+								, _localAgentGetter
 								, _socket
 						);
 				_labelsSectionContent.add(_labelTreeBuilder.getTree());
@@ -321,11 +327,11 @@ public class Biosim implements EntryPoint {
 			
 			if ( ac.getConnections().size() > 0 ) {
 				for ( Uid connUid : ac.getConnections() ) {
-					getLocalAgent().removeLink(connUid, node);
+					getLocalAgent().removeLink(connUid, node.getUid());
 				}
 			} else {
 				for ( Uid labelUid : ac.getLabels() ) {
-					getLocalAgent().removeLink(labelUid, node);
+					getLocalAgent().removeLink(labelUid, node.getUid());
 				}
 			}
 		}
