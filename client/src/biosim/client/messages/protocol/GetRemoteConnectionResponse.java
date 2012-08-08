@@ -6,7 +6,7 @@ import biosim.client.messages.model.Uid;
 @ApplyCodeGeneration
 public class GetRemoteConnectionResponse extends ResponseBody {
 
-	Uid _connectionUid;
+	private Uid _connectionUid;
 	
 	private GetRemoteConnectionResponse() {
 	}

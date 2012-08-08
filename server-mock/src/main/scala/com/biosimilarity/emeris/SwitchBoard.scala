@@ -34,6 +34,8 @@ import biosim.client.messages.model.MImage
 import biosim.client.messages.protocol.GetRemoteConnectionRequest
 import biosim.client.messages.protocol.GetRemoteConnectionResponse
 import biosim.client.messages.model.MText
+import biosim.client.messages.protocol.DeleteLinkRequest
+import biosim.client.messages.protocol.DeleteNodesResponse
 
 object SwitchBoard extends Logging {
 
@@ -64,7 +66,7 @@ object SwitchBoard extends Logging {
 
   def onRequest(socket: Socket, request: Request) = {
   	val localAgentDb = DatabaseFactory.database(socket.agentUid)
-    val responseBody = request.getRequestBody match {
+    val responseBody: Option[ResponseBody] = request.getRequestBody match {
       case csrb: ConnectionScopedRequestBody => {
         implicit val db = csrb.getConnectionUid match {
           case null => localAgentDb
@@ -124,6 +126,17 @@ object SwitchBoard extends Logging {
             }
           }
         }
+      }
+      case dlr: DeleteLinkRequest => {
+        localAgentDb.
+          fetchLink(dlr.getFrom, dlr.getTo).
+          map { link =>
+            localAgentDb.delete(link.uid)
+            val dnr = new DeleteNodesResponse()
+            dnr.setAgentUid(localAgentDb.uid)
+            dnr.getNodes.add(link.uid)
+            dnr
+          }
       }
       case cnr: CreateNodesRequest => {
         val nodes = cnr.

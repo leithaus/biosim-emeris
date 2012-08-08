@@ -4,6 +4,7 @@ import java.util.Map;
 
 import m3.gwt.lang.MapX;
 import biosim.client.messages.protocol.CreateNodesRequest;
+import biosim.client.messages.protocol.DeleteLinkRequest;
 import biosim.client.utils.BiosimWebSocket;
 
 public class LocalAgent {
@@ -31,13 +32,9 @@ public class LocalAgent {
 	public void insertTextNode(MNode parent, String text) {
 		insertChild(parent, new MText(text));
 	}
-	
-	public void removeLink(MNode p, MNode node) {
-		throw new RuntimeException("implement me");
-	}
 
-	public void removeLink(Uid connUid, MNode node) {
-		throw new RuntimeException("implement me");		
+	public void removeLink(Uid fromUid, Uid toUid) {
+		_socket.send(new DeleteLinkRequest(fromUid, toUid));
 	}
 
 	public AgentServices getAgentServices() {
