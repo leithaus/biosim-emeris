@@ -400,18 +400,20 @@ public class DndControllerHtml5 implements DndController {
 
 		void drop() {
 			resetDragStyle();
-			/*
+			String borderColor = widget.getElement().getStyle().getBorderColor();
+
 			//display the text with effects and animate its background color
-	        $(widget.getElement()).as(Effects)
-	          .clipDown()
-	          .animate("backgroundColor: 'yellow'", 500)
-	          .delay(1000)
-	          .animate("backgroundColor: '#fff'", 1500, new Function(){
-	        	  public void f(){
-	        	       resetDragStyle();
-	        	  }
-	          });
-	          */	        
+	        $(widget.getElement())
+	          .animate("borderColor: '#FF0000'", 250);
+	        
+	        $(widget.getElement())
+	          .animate("borderColor: '" + borderColor + "'", 250);
+	        
+	        $(widget.getElement())
+	          .animate("borderColor: '#FF0000'", 250);
+	        
+	        $(widget.getElement())
+	          .animate("borderColor: '" + borderColor + "'", 250);
 		}
 		
 		void dragEnd() {
