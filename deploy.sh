@@ -26,6 +26,8 @@ cp -r server-mock/log.conf dist/
 cp -r server-mock/src/main/scripts/* dist/
 cp -r server-mock/database dist/webapp/database
 
+rm dist/lib/gwt-user*
+
 find dist -name .svn | xargs rm -rf
 
 rsyncx --delete dist/ ratchet:/opt/biosim-demo/

@@ -242,7 +242,7 @@ public class Biosim implements EntryPoint {
 	
 			RootPanel developerTab = RootPanel.get("devTab");
 			if ( developerTab != null ) {
-				DeveloperPanel developerPanel = new DeveloperPanel();
+				DeveloperPanel developerPanel = new DeveloperPanel(getAgentUid().getValue());
 				developerTab.add(developerPanel.getPanel());
 			}
 	    }

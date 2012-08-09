@@ -19,9 +19,7 @@ public class DeveloperPanel {
 	VerticalPanel _mainPanel = new VerticalPanel();
 	HorizontalPanel _formFieldsPanel = new HorizontalPanel();
 	
-	DeveloperPanel() {
-		
-		String agentUid = Biosim.get().getAgentUid().asString();
+	DeveloperPanel(String agentUid) {
 		
 		final FormPanel form = new FormPanel();
 	    form.setAction(getUrl("/loadDataSet"));

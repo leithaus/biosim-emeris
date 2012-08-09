@@ -87,38 +87,6 @@ object Model {
       }
     }
 
-    //	public String canBeSeenBy(Node n) {
-    //		Stack<Node> s = canBeSeenByImpl(n, new Stack<Node>());
-    //		if ( s != null ) {
-    //			List<Node> list = ListX.create();
-    //			s.remove(this);
-    //			list.addAll(s);
-    //			list.add(n);
-    //			java.util.Collections.reverse(list);
-    //			return ListX.join(list, ":");
-    //		} else {
-    //			return null;
-    //		}
-    //	}
-    //
-    //	private Stack<Node> canBeSeenByImpl(final Node n, Stack<Node> stackState) {
-    //		if ( this.equals(n) ) {
-    //			return stackState;
-    //		}
-    //		for ( Link l : getIncomingLinks() ) {
-    //			if ( !stackState.contains(l.getTo()) ) {
-    //				stackState.add(l.getTo());
-    //				Stack<Node> s = l.getFrom().canBeSeenByImpl(n, stackState);
-    //				if ( s != null ) {
-    //					return s;
-    //				} else {
-    //					stackState.pop();
-    //				}
-    //			}
-    //		}
-    //		return null;
-    //	}
-
   }
 
   val types = List(
