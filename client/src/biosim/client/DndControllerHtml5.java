@@ -34,7 +34,12 @@ import com.google.gwt.event.dom.client.DragStartEvent;
 import com.google.gwt.event.dom.client.DragStartHandler;
 import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
+
+import static com.google.gwt.query.client.GQuery.*;
+import com.google.gwt.query.client.Function;
+
 
 public class DndControllerHtml5 implements DndController {
 	
@@ -400,18 +405,24 @@ public class DndControllerHtml5 implements DndController {
 
 		void drop() {
 			resetDragStyle();
-			/*
+			final String bc = widget.getElement().getStyle().getBorderColor();
+			final String borderWidth = widget.getElement().getStyle().getBorderWidth();
+			
+			final int fade_interval = 250;
+			
 			//display the text with effects and animate its background color
-	        $(widget.getElement()).as(Effects)
-	          .clipDown()
-	          .animate("backgroundColor: 'yellow'", 500)
-	          .delay(1000)
-	          .animate("backgroundColor: '#fff'", 1500, new Function(){
-	        	  public void f(){
-	        	       resetDragStyle();
-	        	  }
-	          });
-	          */	        
+	        $(widget.getElement())
+	          	.animate("borderColor: '#000000'", fade_interval)
+	          	.animate("borderColor: '#FF0000'", fade_interval)
+	          	.animate("borderColor: '#000000'", fade_interval)
+	          	.animate("borderColor: '#FF0000'", fade_interval)
+	          	.animate("borderColor: '#000000'", fade_interval)
+	        	.animate("borderColor: '#FF0000'", fade_interval, new Function() {
+	        		@Override
+	        		public void f() {
+	        			widget.getElement().getStyle().setBorderColor(bc);
+	        		}
+	        	});	        		   
 		}
 		
 		void dragEnd() {
