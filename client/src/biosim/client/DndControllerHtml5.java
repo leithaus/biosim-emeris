@@ -302,7 +302,10 @@ public class DndControllerHtml5 implements DndController {
 			public void onDrop(DropEvent event) {
 				LogTool.debug("onDrop for " + dropTargetNode);
 				event.preventDefault();
-				dropAction(dropSite).processDrop(_currentDragSite.node, dropSite.node);
+				DropAction<MNode, MNode> dropAction = dropAction(dropSite);
+				if ( dropAction.canDrop(_currentDragSite.node, dropSite.node) ) {
+					dropAction.processDrop(_currentDragSite.node, dropSite.node);
+				}
 				dropSite.drop();
 			}
 		}, DropEvent.getType());		
