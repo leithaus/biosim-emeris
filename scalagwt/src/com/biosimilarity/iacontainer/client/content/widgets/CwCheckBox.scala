@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.biosimilarity.iacontainer;
+package com.biosimilarity.iacontainer.client.content.widgets;
 
 import com.google.gwt.i18n.client.Constants;
 import com.biosimilarity.iacontainer.client.ContentWidget;
