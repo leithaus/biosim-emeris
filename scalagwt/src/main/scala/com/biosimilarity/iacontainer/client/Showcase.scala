@@ -18,6 +18,8 @@ package com.biosimilarity.iacontainer.client
 
 import com.google.gwt.core.client.EntryPoint
 import com.google.gwt.core.client.GWT
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element
 import com.google.gwt.dom.client.HeadElement
 import com.google.gwt.dom.client.Node
@@ -26,12 +28,17 @@ import com.google.gwt.event.dom.client.ChangeEvent
 import com.google.gwt.event.dom.client.ChangeHandler
 import com.google.gwt.event.dom.client.ClickEvent
 import com.google.gwt.event.dom.client.ClickHandler
+import com.google.gwt.event.dom.client.KeyCodes
+import com.google.gwt.event.dom.client.KeyDownEvent
+import com.google.gwt.event.dom.client.KeyDownHandler
+import com.google.gwt.logging.client.HasWidgetsLogHandler
 import com.google.gwt.event.logical.shared.SelectionEvent
 import com.google.gwt.event.logical.shared.SelectionHandler
 import com.google.gwt.event.logical.shared.ValueChangeEvent
 import com.google.gwt.event.logical.shared.ValueChangeHandler
 import com.google.gwt.http.client.UrlBuilder
 import com.google.gwt.i18n.client.LocaleInfo
+import com.google.gwt.i18n.client.DateTimeFormat
 import com.google.gwt.resources.client.ImageResource
 import com.biosimilarity.iacontainer.client.content.i18n.CwConstantsExample
 import com.biosimilarity.iacontainer.client.content.i18n.CwConstantsWithLookupExample
@@ -87,9 +94,19 @@ import com.google.gwt.user.client.ui.ToggleButton
 import com.google.gwt.user.client.ui.Tree
 import com.google.gwt.user.client.ui.TreeItem
 import com.google.gwt.user.client.ui.VerticalPanel
+
+import org.atmosphere.gwt.client.AtmosphereClient
+import org.atmosphere.gwt.client.AtmosphereGWTSerializer
+import org.atmosphere.gwt.client.AtmosphereListener
+
+import java.io.Serializable
+
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.Map
+
+import java.util.logging.Level
+import java.util.logging.Logger
 
 object Showcase {
    /**
@@ -145,9 +162,17 @@ object Showcase {
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 class Showcase extends EntryPoint {
-   import Showcase._
-   import Handlers._
+  import Showcase._
+  import Handlers._
 
+  var atmClient : AtmosphereClient;
+  var atmAuthor : String;
+
+  val atmCometListener : MyCometListener = new MyCometListener();
+  val atmSerializer : AtmosphereGWTSerializer = GWT.create(classOf[EventSerializer]);
+
+  val logger : Logger = Logger.getLogger( classOf[Showcase].getName );
+      
    /**
     * The {@link Application}.
     */
@@ -251,6 +276,63 @@ class Showcase extends EntryPoint {
       gwtRef
    }
 
+  def setupChatPanel( constants : ShowcaseConstants ) : Unit = {
+    val roomSelect : ListBox = new ListBox()
+    roomSelect.addItem( constants.cwChatRoomOneTitle, constants.cwChatRoomOneName )
+    roomSelect.addItem( constants.cwChatRoomTwoTitle, constants.cwChatRoomTwoName )
+    roomSelect.addItem( constants.cwChatRoomThreeTitle, constants.cwChatRoomThreeName )
+    roomSelect.addItem( constants.cwChatRoomFourTitle, constants.cwChatRoomFourName )
+    roomSelect.setSelectedIndex( 0 )
+    roomSelect.addChangeHandler(
+      new ChangeHandler() {      
+	override def onChange( event : ChangeEvent ) : Unit = {
+          val room : String =
+	    roomSelect.getValue( roomSelect.getSelectedIndex() );
+          changeRoom( room, constants )
+	}
+      })
+    RootPanel.get( "room" ).add( roomSelect )
+        
+    chat = Document.get().getElementById( "chat" )
+        
+    label = new Label( constants.ChatRoomEnterRoom )
+    RootPanel.get( "label" ).add( label )
+        
+    input = new TextBox()
+    input.addKeyDownHandler(
+      new KeyDownHandler() {      
+        override def onKeyDown( event : KeyDownEvent ) : Unit = {
+          if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
+            sendMessage( input.getValue() )
+            input.setText( "" )
+          }
+        }
+      })
+
+    RootPanel.get( "input" ).add( input )
+
+    Button send = new Button( constants.cwChatRoomSendButton )
+    send.addClickHandler(
+      new ClickHandler() {
+        override def onClick( event : ClickEvent ) : Unit = {
+          sendMessage( input.getValue() )
+          input.setText( "" )
+        }
+      })
+    RootPanel.get( "send" ).add( send )
+        
+    HTMLPanel logPanel = new HTMLPanel("") {
+      override def add( widget : Widget ) : Unit = {
+        super.add(widget)
+        widget.getElement().scrollIntoView()
+      }
+    }
+    RootPanel.get( "logger" ).add( logPanel )
+    Logger.getLogger( "" ).addHandler( new HasWidgetsLogHandler( logPanel ) )
+    
+    changeRoom( room, constants )
+  }
+
    /**
     * Create the main links at the top of the application.
     *
@@ -333,6 +415,12 @@ class Showcase extends EntryPoint {
       List(new CwAnimation(constants), new CwCookies(constants)) foreach {
          setupMainMenuOption(catOther, _, images.catOther)
       }
+
+     // Atmosphere chat
+     val atmChat = mainMenu.addItem( constants.categoryAtm )
+     List( new CwRichText(constants) ) foreach {
+       setupMainMenuOption( atmChat, _, images.atmChat )
+     }
    }
 
    /**
@@ -508,6 +596,100 @@ class Showcase extends EntryPoint {
       StyleSheetLoader.loadStyleSheet(modulePath + showcaseStyleSheet,
                                       getCurrentReferenceStyleName("Application"), callback)
    }
+
+  def changeRoom( newRoom : String, constants : ShowcaseConstants ) : Unit = {
+    if (client != null) {
+      if (author != null) {
+        client.broadcast( new Event( author, constants.cwChatJoinedRoom ) );
+      }
+      client.stop();
+      client = null;
+    }
+    author = null;
+    Scheduler.get().scheduleDeferred(
+      new Scheduler.ScheduledCommand() {       
+	override def execute() : Unit = {
+          room = newRoom;
+          client =
+	    new AtmosphereClient(
+	      getUrl(), serializer, cometListener
+	    )
+          clearChat()
+          label.setText( constants.cwChatEnterRoom )
+          client.start()
+	}
+      })
+  }
+
+  class MyCometListener() extends AtmosphereListener {
+        
+    val timeFormat : DateTimeFormat =
+      DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.TIME_MEDIUM)
+    
+    override def onConnected(int heartbeat, int connectionID) : Unit = {
+      logger.info("comet.connected [" + heartbeat + ", " + connectionID + "]");
+      addChatLine(MESSAGE_ROOM_CONNECTED, COLOR_SYSTEM_MESSAGE);
+    }
+
+    override def onBeforeDisconnected() : Unit = {
+      logger.log(Level.INFO, "comet.beforeDisconnected");
+      if (author != null) {
+        client.broadcast(new Event(author, MESSAGE_LEFT_ROOM));
+      }
+    }
+    
+    override def onDisconnected() : Unit = {
+      logger.info("comet.disconnected");
+      addChatLine(MESSAGE_ROOM_DISCONNECTED, COLOR_SYSTEM_MESSAGE);
+    }
+    
+    override def onError(Throwable exception, boolean connected) : Unit = {
+      int statuscode = -1;
+      if (exception instanceof StatusCodeException) {
+        statuscode = ((StatusCodeException) exception).getStatusCode();
+      }
+      logger.log(Level.SEVERE, "comet.error [connected=" + connected + "] (" + statuscode + ")", exception);
+      addChatLine(MESSAGE_ROOM_ERROR + exception.getMessage(), COLOR_SYSTEM_MESSAGE);
+    }
+    
+    override def onHeartbeat() : Unit = {
+      logger.info("comet.heartbeat [" + client.getConnectionID() + "]");
+    }
+    
+    override def onRefresh() : Unit = {
+      logger.info("comet.refresh [" + client.getConnectionID() + "]");
+    }
+    
+    override def onAfterRefresh() : Unit = {
+      logger.info("comet.afterRefresh [" + client.getConnectionID() + "]");
+    }
+    
+    override def onMessage( messages : List[_] ) : Unit = {
+      for ( obj <- messages ) {
+	obj match {
+	  case e : Event => {
+	    val line : String =
+	      (
+		timeFormat.format( e.getTime() )
+		+ " <b>" + e.getAuthor() + "</b> "
+		+ e.getMessage()
+	      );
+	    if ( e.getAuthor().equals( author ) ) {
+              addChatLine( line, COLOR_MESSAGE_SELF )
+            } else {
+              addChatLine(line, COLOR_MESSAGE_OTHERS)
+            }
+	  }
+	  case _ => {
+	    logger.log(
+	      Level.SEVERE,
+	      "unexpected message: " + obj + "."
+	    )
+	  }
+	}
+      }
+    }
+  }
 }
 
 
