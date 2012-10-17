@@ -1,0 +1,31 @@
+// -*- mode: Scala;-*- 
+// Filename:    AtmChat.scala 
+// Authors:     luciusmeredith                                                    
+// Creation:    Tue Oct 16 20:30:18 2012 
+// Copyright:   Not supplied 
+// Description: 
+// ------------------------------------------------------------------------
+
+package com.biosimilarity.iacontainer.client.content.chat
+
+import com.google.gwt.i18n.client.Constants
+import com.biosimilarity.iacontainer.client.ContentWidget
+
+object AtmChat {
+  trait AtmChatConstants extends Constants with ContentWidget.CwConstants {
+    def cwChatRoomConnected() : String
+    def cwChatRoomDisconnected() : String
+    def cwChatRoomError() : String
+    def cwChatRoomOneTitle() : String
+    def cwChatRoomOneName() : String
+    def cwChatRoomTwoTitle() : String
+    def cwChatRoomTwoName() : String
+    def cwChatRoomThreeTitle() : String
+    def cwChatRoomThreeName() : String
+    def cwChatRoomFourTitle() : String
+    def cwChatRoomFourName() : String
+    def cwChatRoomEnterRoom() : String
+    def cwChatRoomSendButton() : String
+    def cwChatRoomInputLabel() : String    
+  }
+}

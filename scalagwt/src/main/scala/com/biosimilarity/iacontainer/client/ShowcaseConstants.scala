@@ -55,6 +55,34 @@ import com.biosimilarity.iacontainer.client.content.widgets.CwFileUpload
 import com.biosimilarity.iacontainer.client.content.widgets.CwHyperlink
 import com.biosimilarity.iacontainer.client.content.widgets.CwRadioButton
 
+//import com.biosimilarity.iacontainer.client.content.chat
+
+object AtmChat {
+  trait AtmChatConstants extends Constants with ContentWidget.CwConstants {
+    def cwChatEnterRoom() : String
+    def cwChatTypeMessage() : String
+    def cwChatLeftRoom() : String
+    def cwChatRoomConnected() : String
+    def cwChatRoomDisconnected() : String
+    def cwChatRoomError() : String
+    def cwChatRoomOneTitle() : String
+    def cwChatRoomOneName() : String
+    def cwChatRoomTwoTitle() : String
+    def cwChatRoomTwoName() : String
+    def cwChatRoomThreeTitle() : String
+    def cwChatRoomThreeName() : String
+    def cwChatRoomFourTitle() : String
+    def cwChatRoomFourName() : String
+    def cwChatJoinedRoom() : String
+    def cwChatRoomSendButton() : String
+    def cwChatRoomInputLabel() : String    
+    def cwChatColorSystemMessage() : String
+    def cwChatColorMessageSelf() : String
+    def cwChatColorMessageOthers() : String
+    def categoryAtm() : String
+  }
+}
+
 object ShowcaseConstants {
   /**
    * The path to source code for examples, raw files, and style definitions.
@@ -113,7 +141,7 @@ trait ShowcaseConstants extends Constants with
     CwConstantsExample.CwConstants with CwConstantsWithLookupExample.CwConstants with
     CwDictionaryExample.CwConstants with CwDecoratorPanel.CwConstants with
     CwAnimation.CwConstants with CwDatePicker.CwConstants with
-    CwPluralFormsExample.CwConstants {
+    CwPluralFormsExample.CwConstants with AtmChat.AtmChatConstants {
 
   def categoryI18N(): String
 

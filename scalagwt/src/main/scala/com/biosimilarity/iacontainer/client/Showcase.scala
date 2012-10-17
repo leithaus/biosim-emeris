@@ -95,6 +95,15 @@ import com.google.gwt.user.client.ui.Tree
 import com.google.gwt.user.client.ui.TreeItem
 import com.google.gwt.user.client.ui.VerticalPanel
 
+// From Atmosphere GWTDemo
+import com.google.gwt.user.client.ui.Label
+import com.google.gwt.user.client.ui.TextBox
+import com.google.gwt.user.client.ui.Button
+import com.google.gwt.user.client.ui.HTML
+import com.google.gwt.user.client.ui.HTMLPanel
+import com.google.gwt.user.client.ui.Widget
+import com.google.gwt.user.client.rpc.StatusCodeException
+
 import org.atmosphere.gwt.client.AtmosphereClient
 import org.atmosphere.gwt.client.AtmosphereGWTSerializer
 import org.atmosphere.gwt.client.AtmosphereListener
@@ -165,8 +174,16 @@ class Showcase extends EntryPoint {
   import Showcase._
   import Handlers._
 
-  var atmClient : AtmosphereClient;
-  var atmAuthor : String;
+  // Mutable state picked up GWT Demo design... sigh
+  var atmClient : AtmosphereClient = null
+  var atmAuthor : String = null
+
+  var atmRoom : String = null
+  var atmChat : Element = null
+  var atmLabel : Label = null
+  //var atmInput : TextBox
+
+  var constants : ShowcaseConstants = null
 
   val atmCometListener : MyCometListener = new MyCometListener();
   val atmSerializer : AtmosphereGWTSerializer = GWT.create(classOf[EventSerializer]);
@@ -196,7 +213,7 @@ class Showcase extends EntryPoint {
       GWT.create(classOf[GeneratorInfo])
 
       // Create the constants
-      val constants = GWT.create(classOf[ShowcaseConstants]).asInstanceOf[ShowcaseConstants]
+      constants = GWT.create(classOf[ShowcaseConstants]).asInstanceOf[ShowcaseConstants]
 
       // Swap out the style sheets for the RTL versions if needed.
       updateStyleSheets;
@@ -286,24 +303,23 @@ class Showcase extends EntryPoint {
     roomSelect.addChangeHandler(
       new ChangeHandler() {      
 	override def onChange( event : ChangeEvent ) : Unit = {
-          val room : String =
-	    roomSelect.getValue( roomSelect.getSelectedIndex() );
-          changeRoom( room, constants )
+          atmRoom = roomSelect.getValue( roomSelect.getSelectedIndex() );
+          changeRoom( atmRoom, constants )
 	}
       })
     RootPanel.get( "room" ).add( roomSelect )
         
-    chat = Document.get().getElementById( "chat" )
+    atmChat = Document.get().getElementById( "chat" )
         
-    label = new Label( constants.ChatRoomEnterRoom )
-    RootPanel.get( "label" ).add( label )
+    atmLabel = new Label( constants.cwChatEnterRoom )
+    RootPanel.get( "label" ).add( atmLabel )
         
-    input = new TextBox()
+    val input = new TextBox()
     input.addKeyDownHandler(
       new KeyDownHandler() {      
         override def onKeyDown( event : KeyDownEvent ) : Unit = {
           if ( event.getNativeKeyCode() == KeyCodes.KEY_ENTER ) {
-            sendMessage( input.getValue() )
+            sendMessage( constants, input.getValue() )
             input.setText( "" )
           }
         }
@@ -311,17 +327,17 @@ class Showcase extends EntryPoint {
 
     RootPanel.get( "input" ).add( input )
 
-    Button send = new Button( constants.cwChatRoomSendButton )
+    val send : Button = new Button( constants.cwChatRoomSendButton )
     send.addClickHandler(
       new ClickHandler() {
         override def onClick( event : ClickEvent ) : Unit = {
-          sendMessage( input.getValue() )
+          sendMessage( constants, input.getValue() )
           input.setText( "" )
         }
       })
     RootPanel.get( "send" ).add( send )
         
-    HTMLPanel logPanel = new HTMLPanel("") {
+    val logPanel : HTMLPanel = new HTMLPanel("") {
       override def add( widget : Widget ) : Unit = {
         super.add(widget)
         widget.getElement().scrollIntoView()
@@ -330,7 +346,21 @@ class Showcase extends EntryPoint {
     RootPanel.get( "logger" ).add( logPanel )
     Logger.getLogger( "" ).addHandler( new HasWidgetsLogHandler( logPanel ) )
     
-    changeRoom( room, constants )
+    changeRoom( atmRoom, constants )
+  }
+
+  def getUrl() : String =    {
+    GWT.getModuleBaseURL() + "gwtComet/" + atmRoom
+  }
+
+  def sendMessage( constants : ShowcaseConstants, message : String ) : Unit = {
+    if (atmAuthor == null) {
+      atmAuthor = message;
+      atmClient.broadcast( Event( atmAuthor, constants.cwChatJoinedRoom ) );
+      atmLabel.setText( constants.cwChatTypeMessage );
+    } else {
+      atmClient.broadcast( Event( atmAuthor, message ) );
+    }
   }
 
    /**
@@ -598,86 +628,103 @@ class Showcase extends EntryPoint {
    }
 
   def changeRoom( newRoom : String, constants : ShowcaseConstants ) : Unit = {
-    if (client != null) {
-      if (author != null) {
-        client.broadcast( new Event( author, constants.cwChatJoinedRoom ) );
+    if (atmClient != null) {
+      if (atmAuthor != null) {
+        atmClient.broadcast( Event( atmAuthor, constants.cwChatJoinedRoom ) );
       }
-      client.stop();
-      client = null;
+      atmClient.stop();
+      atmClient = null;
     }
-    author = null;
+    atmAuthor = null;
     Scheduler.get().scheduleDeferred(
       new Scheduler.ScheduledCommand() {       
 	override def execute() : Unit = {
-          room = newRoom;
-          client =
+          atmRoom = newRoom;
+          atmClient =
 	    new AtmosphereClient(
-	      getUrl(), serializer, cometListener
+	      getUrl(), atmSerializer, atmCometListener
 	    )
           clearChat()
-          label.setText( constants.cwChatEnterRoom )
-          client.start()
+          atmLabel.setText( constants.cwChatEnterRoom )
+          atmClient.start()
 	}
       })
   }
 
+  def clearChat() : Unit = {
+    atmChat.setInnerHTML("");
+  }
+
+  def addChatLine( line : String, color : String ) : Unit = {
+    val newLine : HTML = new HTML(line)
+    newLine.getElement().getStyle().setColor(color)
+    atmChat.appendChild(newLine.getElement())
+    newLine.getElement().scrollIntoView()
+  }
+
   class MyCometListener() extends AtmosphereListener {
         
-    val timeFormat : DateTimeFormat =
-      DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.TIME_MEDIUM)
+    //val timeFormat : DateTimeFormat =
+    //  DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.TIME_MEDIUM)
     
-    override def onConnected(int heartbeat, int connectionID) : Unit = {
+    override def onConnected( heartbeat : Int, connectionID : Int ) : Unit = {
       logger.info("comet.connected [" + heartbeat + ", " + connectionID + "]");
-      addChatLine(MESSAGE_ROOM_CONNECTED, COLOR_SYSTEM_MESSAGE);
+      addChatLine( constants.cwChatRoomConnected, constants.cwChatColorSystemMessage);
     }
 
     override def onBeforeDisconnected() : Unit = {
       logger.log(Level.INFO, "comet.beforeDisconnected");
-      if (author != null) {
-        client.broadcast(new Event(author, MESSAGE_LEFT_ROOM));
+      if (atmAuthor != null) {
+        atmClient.broadcast( Event( atmAuthor, constants.cwChatRoomDisconnected ) );
       }
     }
     
     override def onDisconnected() : Unit = {
       logger.info("comet.disconnected");
-      addChatLine(MESSAGE_ROOM_DISCONNECTED, COLOR_SYSTEM_MESSAGE);
+      addChatLine( constants.cwChatRoomDisconnected, constants.cwChatColorSystemMessage);
     }
     
-    override def onError(Throwable exception, boolean connected) : Unit = {
-      int statuscode = -1;
-      if (exception instanceof StatusCodeException) {
-        statuscode = ((StatusCodeException) exception).getStatusCode();
-      }
+    override def onError( exception : Throwable, connected : Boolean ) : Unit = {
+      val statuscode : Int =
+	exception match {
+	  case scException : StatusCodeException => {
+            scException.getStatusCode()
+	  }
+	  case _ => { -1 }
+	}
       logger.log(Level.SEVERE, "comet.error [connected=" + connected + "] (" + statuscode + ")", exception);
-      addChatLine(MESSAGE_ROOM_ERROR + exception.getMessage(), COLOR_SYSTEM_MESSAGE);
+      addChatLine( constants.cwChatRoomError + exception.getMessage(), constants.cwChatColorSystemMessage);
     }
     
     override def onHeartbeat() : Unit = {
-      logger.info("comet.heartbeat [" + client.getConnectionID() + "]");
+      logger.info("comet.heartbeat [" + atmClient.getConnectionID() + "]");
     }
     
     override def onRefresh() : Unit = {
-      logger.info("comet.refresh [" + client.getConnectionID() + "]");
+      logger.info("comet.refresh [" + atmClient.getConnectionID() + "]");
     }
     
     override def onAfterRefresh() : Unit = {
-      logger.info("comet.afterRefresh [" + client.getConnectionID() + "]");
+      logger.info("comet.afterRefresh [" + atmClient.getConnectionID() + "]");
     }
     
-    override def onMessage( messages : List[_] ) : Unit = {
-      for ( obj <- messages ) {
+    override def onMessage( messages : java.util.List[_] ) : Unit = {
+      val msgItr = messages.listIterator
+      //for ( obj <- messages ) {
+      while( msgItr.hasNext ) {
+	val obj = msgItr.next
 	obj match {
 	  case e : Event => {
 	    val line : String =
 	      (
-		timeFormat.format( e.getTime() )
-		+ " <b>" + e.getAuthor() + "</b> "
-		+ e.getMessage()
+		e.time //timeFormat.format(  )
+		+ " <b>" + e.author + "</b> "
+		+ e.message
 	      );
-	    if ( e.getAuthor().equals( author ) ) {
-              addChatLine( line, COLOR_MESSAGE_SELF )
+	    if ( e.author.equals( atmAuthor ) ) {
+              addChatLine( line, constants.cwChatColorMessageSelf )
             } else {
-              addChatLine(line, COLOR_MESSAGE_OTHERS)
+              addChatLine( line, constants.cwChatColorMessageOthers )
             }
 	  }
 	  case _ => {
