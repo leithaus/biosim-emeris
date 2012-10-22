@@ -63,6 +63,11 @@
             <id>maven.java.net</id>
             <url>https://maven.java.net/content/groups/public/</url>
         </repository>
+	<repository>
+	  <id>googlecode</id>
+	  <name>jWebSocket Repository</name>
+	  <url>http://jwebsocket.googlecode.com/svn/repo</url>
+	</repository>
     </repositories>
 
     <dependencies>
@@ -97,32 +102,57 @@
 	<artifactId>gwt-maven-plugin</artifactId>
 	<version>2.5.0-rc1</version>
       </dependency>            
+
+      <!-- Atmosphere -->
+      <!-- dependency>
+	<groupId>org.atmosphere</groupId>
+	<artifactId>atmosphere-gwt-client</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+	<scope>provided</scope>
+      </dependency>
       <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-gwt-client</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-gwt-server</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-gwt-poll</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
-        </dependency>
-	<dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>${slf4j-version}</version>
-        </dependency>
-	<dependency>
-	  <groupId>org.apache.geronimo.specs</groupId>
-	  <artifactId>geronimo-servlet_3.0_spec</artifactId>
-	  <version>1.0</version>
-	</dependency>
+	<groupId>org.atmosphere</groupId>
+	<artifactId>atmosphere-gwt-server</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+	<groupId>org.atmosphere</groupId>
+	<artifactId>atmosphere-gwt-poll</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+      </dependency -->
+
+      <!-- gwt-websockets -->
+      <dependency>
+	<groupId>com.sksamuel.gwt</groupId>
+	<artifactId>gwt-websockets</artifactId>
+	<version>1.0.0</version>
+      </dependency>
+
+      <!-- jWebSocket -->
+      <dependency>
+	<groupId>org.jwebsocket</groupId>
+	<artifactId>jWebSocketServerAPI</artifactId>
+	<version>0.10</version>
+      </dependency>
+      <dependency>
+	<groupId>org.jwebsocket</groupId>
+	<artifactId>jWebSocketServer</artifactId>
+	<version>0.10</version>
+      </dependency>
+
+      <!-- slf4j -->
+      <dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-jdk14</artifactId>
+	<version>${slf4j-version}</version>
+      </dependency>
+
+      <!-- servlet 3.0 -->
+      <dependency>
+	<groupId>org.apache.geronimo.specs</groupId>
+	<artifactId>geronimo-servlet_3.0_spec</artifactId>
+	<version>1.0</version>
+      </dependency>
     </dependencies>
 
     <build>
