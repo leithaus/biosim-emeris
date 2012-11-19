@@ -110,7 +110,8 @@ import com.google.gwt.user.client.rpc.StatusCodeException
 //import org.atmosphere.gwt.client.AtmosphereGWTSerializer
 //import org.atmosphere.gwt.client.AtmosphereListener
 
-import com.sksamuel.gwt.websockets._
+//import com.sksamuel.gwt.websockets._
+import m3.gwt.websocket._
 
 import java.io.Serializable
 

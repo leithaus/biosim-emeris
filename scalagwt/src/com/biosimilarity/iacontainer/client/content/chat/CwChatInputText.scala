@@ -41,60 +41,126 @@ import com.google.gwt.user.client.ui.Widget
 
 import com.biosimilarity.iacontainer.client.content.text.RichTextToolbar
 
-import com.sksamuel.gwt.websockets._
+//import com.sksamuel.gwt.websockets._
+import m3.gwt.websocket._
 
 import java.io.Serializable
 
 import java.util.HashMap
 import java.util.Map
 import java.net.URI
+import java.util.UUID
 import java.util.logging.Level
 import java.util.logging.Logger
 
-case class WSListener(
-  onClose : () => Unit,
-  onMessage : String => Unit,
-  onOpen : () => Unit
-)
+trait WSChannelMgr {  
+  case class WSListener(
+    onClose : () => Unit,
+    onMessage : String => Unit,
+    onOpen : () => Unit
+  )
 
-trait WSChannelMgr {
-  lazy val socketsMap : Map[String,Websocket] = new HashMap
-
-  // create sockets
-  
-  implicit def createWS( /* uri : URI */ uri : String ) : Websocket = {
-    val socket : Websocket = new Websocket( uri )
-    socketsMap.put( uri, socket )
-    socket
-  }
-  
-  implicit def toListener( wsl : WSListener ) : WebsocketListener = {
-    new WebsocketListener() {
-      override def onClose() : Unit = {
-        wsl.onClose()
+  class WebPort(
+    uri : String,
+    wsl : WSListener
+  ) extends SimpleWebSocket(
+    uri,
+    null
+  ){
+    trait Identified {
+      val _id = UUID.randomUUID
+      def id() : String = _id.toString
+    }
+    class WebPortOutMsg(
+      val body : String
+    ) extends WebSocket.OutgoingMessage with Identified {
+      override def ack() = false
+    }
+    object WebPortOutMsg {
+      def apply( body : String ) : WebPortOutMsg = {
+	new WebPortOutMsg( body )
       }
-      
-      override def onMessage( msg : String ) : Unit = {
-        wsl.onMessage( msg )
+      def unapply( wpom : WebPortOutMsg ) : Option[( String )] = {
+	Some( ( wpom.body ) )
       }
-      
-      override def onOpen() : Unit = {
-        wsl.onOpen()
+    }
+    class WebPortInMsg(
+      val body : String
+    ) extends WebSocket.IncomingMessage with Identified {
+      override def ack() = false
+      override def acks() = {
+	throw new Exception( "acks not yet defined" )
+      }
+      override def delegate[T]() : T = {
+	throw new Exception( "delegate not yet defined" )
+      }
+    }
+    object WebPortInMsg {
+      def apply( body : String ) : WebPortInMsg = {
+	new WebPortInMsg( body )
+      }
+      def unapply( wpom : WebPortInMsg ) : Option[( String )] = {
+	Some( ( wpom.body ) )
+      }
+    }
+    class WebPortHandler(
+    ) extends WebSocket.Handler {
+      override def stateChange( state : WebSocket.State ) : Unit = {
+      }
+      override def incomingMessage(
+	message : WebSocket.IncomingMessage
+      ) : Unit = {	
+      }
+      override def deserialize( body : String ) : WebSocket.IncomingMessage = {
+	new WebPortInMsg( body )
+      }
+      override def onOpen() : Unit = {	
+      }
+      override def onError( msg : String ) : Unit = {
+      }
+      override def onClose( msg : String ) : Unit = {
+      }
+    }    
+  
+    implicit def toHandler( wsl : WSListener ) : WebPortHandler = {
+      new WebPortHandler() {
+	override def onClose( msg : String ) : Unit = {
+          wsl.onClose()
+	}
+	
+	override def incomingMessage( msg : WebSocket.IncomingMessage ) : Unit = {
+	  msg match {
+	    case wpim : WebPortInMsg => {
+	      wsl.onMessage( wpim.body )
+	    }
+	    case _ => {
+	      throw new Exception( "unexpected message type: " + msg )
+	    }
+	  }          
+	}
+	
+	override def onOpen() : Unit = {
+          wsl.onOpen()
+	}
       }
     }
   }
+  
+  lazy val socketsMap : Map[String,WebPort] = new HashMap
 
-  def withSocket( ws : Websocket )(
-    body : Websocket => Unit
-  ) : Unit = {
-    body( ws )
+  // create sockets
+
+  def getWS( key : String ) : Option[WebPort] = {
+    socketsMap.get( key ) match {
+      case null => None
+      case ws => Some( ws )
+    }
   }
-
-  def withSocket( ws : Websocket, wsl : WSListener )(
-    body : Websocket => Unit
-  ) : Unit = {
-    ws.addListener( wsl )
-    body( ws )
+  
+  implicit def createWS( /* uri : URI */ uri : String ) : WebPort = {
+    val socket : WebPort = new WebPort( uri, null )
+    socketsMap.put( uri, socket )
+    socket
   }
   
 }
@@ -118,6 +184,10 @@ object CwChatInputText {
     def cwChatInputButtonName() : String
 
     def cwChatInputButtonSend() : String
+    
+    def cwChatLeftRoom() : String
+    
+    def cwChatJoinedRoom() : String
 
     def cwChatColorMessageSelf() : String
   }
@@ -152,6 +222,7 @@ class CwChatInputText(
   @ShowcaseSource
   override def onInitialize(): Widget = {
     // set up websockets
+    createWS( "ws://localhost:8180/ws" )
     createWS( "ws://localhost:8888/room1" )
     createWS( "ws://localhost:8888/room2" )
     createWS( "ws://localhost:8888/room3" )
@@ -181,11 +252,11 @@ class CwChatInputText(
 
     // Create the text area and toolbar
     val area = new RichTextArea()
-    area.ensureDebugId("cwRichText-area")
-    area.setSize("100%", "14em")
-    val toolbar = new RichTextToolbar(area)
-    toolbar.ensureDebugId("cwRichText-toolbar")
-    toolbar.setWidth("100%")
+    area.ensureDebugId( "cwRichText-area" )
+    area.setSize( "100%", "14em" )
+    val toolbar = new RichTextToolbar( area )
+    toolbar.ensureDebugId( "cwRichText-toolbar" )
+    toolbar.setWidth( "100%" )
 
     // Add the components to a panel
     val grid = new Grid( 2, 1 )
@@ -196,23 +267,53 @@ class CwChatInputText(
 
     vPanel.add( grid )
 
-    hPanel.add( vPanel )
+    hPanel.add( vPanel )    
+
+    val chatCluster =
+      ChatCluster(
+	area,
+	logPanel,
+	None, 
+	"ws://localhost:8180/ws"
+      )
 
     // Add a normal button
     val sendButton : Button =
       new Button(
         constants.cwChatInputButtonSend,
-        ( clickEvent : ClickEvent ) => {
-	  val chatCluster =
-	    ChatCluster(
-	      area,
-	      logPanel,
-	      None, 
-	      "ws://localhost:8888/room1"
-	    )
+        ( clickEvent : ClickEvent ) => {	  	  	  
 	  sendChat( chatCluster, clickEvent )
 	}
+      )        
+
+    val wsl =
+      WSListener(
+	() => {
+	  addChatLine(
+	    chatCluster.displayArea,
+	    constants.cwChatLeftRoom,
+	    constants.cwChatColorMessageSelf
+	  )
+	},
+	( msg : String ) => {
+	  addChatLine(
+	    chatCluster.displayArea,
+	    msg,
+	    constants.cwChatColorMessageSelf
+	  )
+	},
+	() => {
+	  addChatLine(
+	    chatCluster.displayArea,
+	    constants.cwChatJoinedRoom,
+	    constants.cwChatColorMessageSelf
+	  )
+	}
       )
+
+    // for( ws <- getWS( "ws://localhost:8180/ws" ) ) {
+//       ws.addListener( toListener( wsl ) )
+//     }
 
     sendButton.ensureDebugId( "cwChatInputButton-send" )
     vPanel.add( sendButton )
@@ -234,14 +335,14 @@ class CwChatInputText(
     val ws = socketsMap.get( chatCluster.room )
     
     if ( ws != null ) {      
-      //Window.alert( "found a websocket for the room" )
+      Window.alert( "found a websocket for the room" )
       addChatLine(
 	chatCluster.displayArea,
 	line,
 	constants.cwChatColorMessageSelf
       )
       chatCluster.inputArea.setText( "" )
-      ws.send( line )
+      ws.send( new ws.WebPortOutMsg( line ) )
     }
   }
 

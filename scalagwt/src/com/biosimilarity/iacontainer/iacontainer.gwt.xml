@@ -5,7 +5,8 @@
   <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name="com.google.gwt.i18n.CldrLocales"/>
   <!-- inherits name="org.atmosphere.gwt.Client"/ -->
-  <inherits name="com.sksamuel.gwt.GwtWebsockets" />
+  <!-- inherits name="com.sksamuel.gwt.GwtWebsockets" / -->
+  <inherits name="m3.m3"/>
   <inherits name="com.google.gwt.user.theme.standard.StandardResources"/>
   <inherits name="com.google.gwt.user.theme.chrome.ChromeResources"/>
   <inherits name="com.google.gwt.user.theme.dark.DarkResources"/>
