@@ -6,11 +6,11 @@
   <property name="scala.args" value="-g:notailcalls -Xplugin:${basedir}/lib/scala/factorymanifests.jar -Xplugin:lib/scala/continuations.jar -P:continuations:enable -Yjribble-text"/>
 
   <path id="scala.class.path">
-    <!-- fileset dir="lib/atmosphere" includes="*.jar"/ -->
+    <fileset dir="lib/atmosphere" includes="*.jar"/>
     <fileset dir="lib/slf4j" includes="*.jar"/>
     <fileset dir="lib/geronimo" includes="*.jar"/>
     <!-- fileset dir="lib/gwt-websockets" includes="*.jar"/ -->
-    <fileset dir="lib/m3-gwt" includes="*.jar"/>
+    <!-- fileset dir="lib/m3-gwt" includes="*.jar"/ -->
     <fileset dir="lib/scala">
       <include name="scala-compiler.jar"/>
       <include name="scala-library.jar"/>
@@ -21,11 +21,11 @@
   <path id="project.class.path">
     <pathelement location="war/WEB-INF/classes"/>
     <fileset dir="lib/gwt" includes="*.jar"/>
-    <!-- fileset dir="lib/atmosphere" includes="*.jar"/ -->
+    <fileset dir="lib/atmosphere" includes="*.jar"/>
     <fileset dir="lib/slf4j" includes="*.jar"/>
     <fileset dir="lib/geronimo" includes="*.jar"/>
     <!-- fileset dir="lib/gwt-websockets" includes="*.jar"/ -->
-    <fileset dir="lib/m3-gwt" includes="*.jar"/>
+    <!-- fileset dir="lib/m3-gwt" includes="*.jar"/ -->
     <pathelement location="lib/scala/scala-library-gwt.jar"/>
     <!-- Add any additional non-server libs (such as JUnit) -->
     <fileset dir="war/WEB-INF/lib" includes="**/*.jar"/>
