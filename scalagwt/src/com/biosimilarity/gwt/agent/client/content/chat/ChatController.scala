@@ -52,6 +52,9 @@ class ChatController(
   val portMgr : AgentWebSocketMgr,
   val constants : CwChatInputText.CwConstants
 ) {
+  lazy val handlerRegistrationMap : HashMap[ChatState,HandlerRegistration] =
+    new HashMap[ChatState,HandlerRegistration]()
+
   def initialChatState(
     room : String,
     area : RichTextArea,
@@ -59,36 +62,44 @@ class ChatController(
     roomSelect : ListBox
   ) : ChatState = {
     lazy val port : WebSocket =
-      portMgr.openPort(
-	getUrlRoom( Some( room ) ),
-	ChatState(
-	  Some( port ), area, logPanel, None,
-	  roomSelect, None, None, Some( room )
-	)
-      )
-    
-    val chatState : ChatState = portMgr.stateMap.get( port )
+      portMgr.openPort(	getUrlRoom( Some( room ) ) )
 
-    lazy val handlerRegistration : HandlerRegistration =
+    val chatState : ChatState =
+      ChatState(
+	Some( port ), area, logPanel,
+	roomSelect, None, None, Some( room )
+      )
+
+    portMgr.registerState( port, chatState )   
+
+    val handlerRegistration : HandlerRegistration =
       chatState.roomSelect.addChangeHandler(
 	new ChangeHandler() {      
 	  override def onChange( event : ChangeEvent ) : Unit = {
-	    val room = 
-	      chatState.roomSelect.getValue(
-		chatState.roomSelect.getSelectedIndex()
-	      )
-	    changeRoom(
-	      handlerRegistration,
-	      chatState.withCHPR(
-		this,
-		portMgr.openPort( getUrl( room ), chatState ),
-		room
-	      )
-	    )
+	    val( _, newPort, newChatState ) =
+	      getRoomPortStateFromSelection( chatState, this )
+	    portMgr.registerState( newPort, newChatState )
+	    changeRoom( newChatState )
 	  }
 	})
 
+    handlerRegistrationMap.put( chatState, handlerRegistration )
+
     chatState
+  }
+
+  def getRoomPortStateFromSelection(
+    chatState : ChatState,
+    changeHandler : ChangeHandler
+  ) : ( String, WebSocket, ChatState ) = {
+    val room = 
+      chatState.roomSelect.getValue(
+	chatState.roomSelect.getSelectedIndex()
+      )
+    val port = portMgr.openPort( getUrl( room ) )
+    val state = chatState.withCHPR( changeHandler, port, room )
+
+    ( room, port, state )
   }
   
   def chatSendButton( chatState : ChatState ) : Button = {
@@ -96,7 +107,7 @@ class ChatController(
       new Button(
         constants.cwChatInputButtonSend,
         ( clickEvent : ClickEvent ) => {	  	  	  
-	  sendChat( chatState.withSendBtn( sendButton ), clickEvent )
+	  sendChat( chatState, clickEvent )
 	  //Window.alert( "Send button clicked" )
 	}
       )
@@ -168,7 +179,6 @@ class ChatController(
   }
 
   def changeRoom(
-    handlerRegistration : HandlerRegistration,
     chatState : ChatState
   ) : Unit = {
     chatState.port match {
@@ -176,8 +186,6 @@ class ChatController(
 	Window.alert( "attempting to send on a state with uninitialized port" )    
       }
       case Some( port : WebSocket ) => {
-	portMgr.registerState( port, chatState )
-
 	val auth = 
 	  chatState.author match {
 	    case Some( author ) => author
@@ -194,25 +202,22 @@ class ChatController(
       }      
     }
 
-    handlerRegistration.removeHandler()
-
-    lazy val handlerRegistration : HandlerRegistration = 
+    val handlerRegistration = handlerRegistrationMap.get( chatState )
+    if ( handlerRegistration != null ) {
+      handlerRegistration.removeHandler()
+    }
+    
+    val newHandlerRegistration : HandlerRegistration =
       chatState.roomSelect.addChangeHandler(
 	new ChangeHandler() {      
-	  override def onChange( event : ChangeEvent ) : Unit = {	    
-	    val room = 
-	      chatState.roomSelect.getValue(
-		chatState.roomSelect.getSelectedIndex()
-	      )
-	    changeRoom(
-	      handlerRegistration,
-	      chatState.withCHPR(
-		this,
-		portMgr.openPort( getUrl( room ), chatState ),
-		room
-	      )
-	    )		
+	  override def onChange( event : ChangeEvent ) : Unit = {
+	    val( _, newPort, newChatState ) =
+	      getRoomPortStateFromSelection( chatState, this )
+	    portMgr.registerState( newPort, newChatState )
+	    changeRoom( newChatState )
 	  }
 	})
+
+    handlerRegistrationMap.put( chatState, newHandlerRegistration )
   }  
 }

@@ -23,7 +23,6 @@ trait ChatStateDescription {
   def port : Option[WebSocket]
   def inputArea : RichTextArea
   def displayArea : HTMLPanel
-  def sendButton : Option[Button]
   def roomSelect : ListBox
   def changeHandler : Option[ChangeHandler]
   def author : Option[String]

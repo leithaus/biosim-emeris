@@ -169,7 +169,10 @@ extends ContentWidget( constants ) {
 
     vPanel.add( roomSelect )
 
-    hPanel.add( vPanel )            
+    hPanel.add( vPanel )
+
+    val anURL : String = 
+      controller.getUrl( "dukeOf" )
 
     // Add a normal button
     lazy val sendButton : Button =
@@ -177,7 +180,7 @@ extends ContentWidget( constants ) {
         constants.cwChatInputButtonSend,
         ( clickEvent : ClickEvent ) => {	  	  	  
 	  //sendChat( chatState.withSendBtn( sendButton ), clickEvent )
-	  Window.alert( "Send button clicked" )
+	  Window.alert( anURL )
 	}
       )            
 

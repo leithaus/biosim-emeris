@@ -23,7 +23,6 @@ case class ChatState(
   override val port : Option[WebSocket],
   override val inputArea : RichTextArea,
   override val displayArea : HTMLPanel,
-  override val sendButton : Option[Button],
   override val roomSelect : ListBox,
   override val changeHandler : Option[ChangeHandler],
   override val author : Option[String],
@@ -34,7 +33,6 @@ case class ChatState(
       port,
       inputArea,
       displayArea,
-      sendButton,
       roomSelect,
       changeHandler,
       author,
@@ -46,7 +44,6 @@ case class ChatState(
       port,
       inputArea,
       displayArea,
-      sendButton,
       roomSelect,
       changeHandler,
       Some( newAuthor ),
@@ -58,7 +55,6 @@ case class ChatState(
       port,
       inputArea,
       displayArea,
-      sendButton,
       roomSelect,
       changeHandler,
       Some( newAuthor ),
@@ -73,7 +69,6 @@ case class ChatState(
       port,
       inputArea,
       displayArea,
-      sendButton,
       roomSelect,
       Some( newChangeHandler ),
       author,
@@ -89,25 +84,13 @@ case class ChatState(
       Some( newPort ),
       inputArea,
       displayArea,
-      sendButton,
       roomSelect,
       Some( newChangeHandler ),
       author,
       Some( newRoom )
     )
   }
-  def withSendBtn( newSendButton : Button ) : ChatState = {
-    ChatState(
-      port,
-      inputArea,
-      displayArea,
-      Some( newSendButton ),
-      roomSelect,
-      changeHandler,
-      author,
-      room
-    )
-  }
+  
 }
 
 
