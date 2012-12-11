@@ -20,8 +20,6 @@ import m3.gwt.websocket._
 import java.util.HashMap
 
 class AgentWebSocketMgr(
-  //val presentation : CwPhloPanel
-  val presentation : CwChatInputText
 ) extends WebSocketMgr {
   override lazy val portMap : HashMap[String,WebSocket] = 
     new HashMap[String,WebSocket]()

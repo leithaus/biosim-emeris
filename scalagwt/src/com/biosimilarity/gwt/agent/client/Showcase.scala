@@ -33,6 +33,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler
 import com.google.gwt.http.client.UrlBuilder
 import com.google.gwt.i18n.client.LocaleInfo
 import com.google.gwt.resources.client.ImageResource
+import com.biosimilarity.gwt.agent.client.content.chat.CwChatInputText
 import com.biosimilarity.gwt.agent.client.content.i18n.CwConstantsExample
 import com.biosimilarity.gwt.agent.client.content.i18n.CwConstantsWithLookupExample
 import com.biosimilarity.gwt.agent.client.content.i18n.CwDateTimeFormat
@@ -272,67 +273,87 @@ class Showcase extends EntryPoint {
    private def setupMainMenu(constants: ShowcaseConstants): Unit = {
       val mainMenu = app.getMainMenu
 
-      // Widgets
+     // Widgets
       val catWidgets = mainMenu.addItem(constants.categoryWidgets)
-      List(new CwCheckBox(constants), new CwRadioButton(constants),
-           new CwBasicButton(constants), new CwCustomButton(constants),
-           new CwFileUpload(constants), new CwDatePicker(constants),
-           new CwHyperlink(constants)) foreach {
+      List(
+	//new CwCheckBox(constants), new CwRadioButton(constants),
+        //new CwBasicButton(constants), new CwCustomButton(constants),
+        //new CwFileUpload(constants), new CwDatePicker(constants),
+        //new CwHyperlink(constants),
+	new CwChatInputText( constants )
+      ) foreach {
          setupMainMenuOption(catWidgets, _, images.catWidgets);
       }
 
       // Lists
-      val catLists = mainMenu.addItem(constants.categoryLists)
-      List(new CwListBox(constants), new CwSuggestBox(constants),
-           new CwTree(constants), new CwMenuBar(constants),
-           new CwStackPanel(constants)) foreach {
-         setupMainMenuOption(catLists, _, images.catLists)
-      }
+      // val catLists = mainMenu.addItem(constants.categoryLists)
+//       List(
+// 	new CwListBox(constants), new CwSuggestBox(constants),
+//         new CwTree(constants), new CwMenuBar(constants),
+//         new CwStackPanel(constants)
+//       ) foreach {
+//          setupMainMenuOption(catLists, _, images.catLists)
+//       }
 
       // Text
-      val catText = mainMenu.addItem(constants.categoryTextInput)
-      List(new CwBasicText(constants), new CwRichText(constants)) foreach {
-         setupMainMenuOption(catText, _, images.catTextInput)
-      }
+//      val catText = mainMenu.addItem(constants.categoryTextInput)
+//      List(
+//        new CwBasicText(constants),
+//        new CwRichText(constants)
+//      ) foreach {
+//        setupMainMenuOption(catText, _, images.catTextInput)
+//      }
 
       // Popups
-      val catPopup = mainMenu.addItem(constants.categoryPopups)
-      List(new CwBasicPopup(constants), new CwDialogBox(constants)) foreach {
-         setupMainMenuOption(catPopup, _, images.catPopups)
-      }
+     // val catPopup = mainMenu.addItem(constants.categoryPopups)
+//      List(
+//        new CwBasicPopup(constants),
+//        new CwDialogBox(constants)
+//      ) foreach {
+//        setupMainMenuOption(catPopup, _, images.catPopups)
+//      }
 
       // Panels
-      val catPanels = mainMenu.addItem(constants.categoryPanels)
-      List(new CwDecoratorPanel(constants), new CwFlowPanel(constants),
-           new CwHorizontalPanel(constants), new CwVerticalPanel(constants),
-           new CwAbsolutePanel(constants), new CwDockPanel(constants),
-           new CwDisclosurePanel(constants), new CwTabPanel(constants),
-           new CwHorizontalSplitPanel(constants),
-           new CwVerticalSplitPanel(constants)) foreach {
-         setupMainMenuOption(catPanels, _, images.catPanels)
-      }
+//       val catPanels = mainMenu.addItem(constants.categoryPanels)
+//       List(
+// 	new CwDecoratorPanel(constants), new CwFlowPanel(constants),
+//         new CwHorizontalPanel(constants), new CwVerticalPanel(constants),
+//         new CwAbsolutePanel(constants), new CwDockPanel(constants),
+//         new CwDisclosurePanel(constants), new CwTabPanel(constants),
+//         new CwHorizontalSplitPanel(constants),
+//         new CwVerticalSplitPanel(constants)
+//       ) foreach {
+//         setupMainMenuOption(catPanels, _, images.catPanels)
+//       }
 
       // Tables
-      val catTables = mainMenu.addItem(constants.categoryTables)
-      List(new CwGrid(constants), new CwFlexTable(constants)) foreach {
-         setupMainMenuOption(catTables, _, images.catTables)
-      }
+//      val catTables = mainMenu.addItem(constants.categoryTables)
+//      List(
+//        new CwGrid(constants), new CwFlexTable(constants)
+//      ) foreach {
+//        setupMainMenuOption(catTables, _, images.catTables)
+//      }
 
       // Internationalization
-      val catI18N = mainMenu.addItem(constants.categoryI18N)
-      List(new CwNumberFormat(constants), new CwDateTimeFormat(constants),
-           new CwMessagesExample(constants), new CwPluralFormsExample(constants),
-           new CwConstantsExample(constants),
-           new CwConstantsWithLookupExample(constants),
-           new CwDictionaryExample(constants)) foreach {
-         setupMainMenuOption(catI18N, _, images.catI18N)
-      }
+      // val catI18N = mainMenu.addItem(constants.categoryI18N)
+//       List(
+// 	new CwNumberFormat(constants), new CwDateTimeFormat(constants),
+//         new CwMessagesExample(constants), new CwPluralFormsExample(constants),
+//         new CwConstantsExample(constants),
+//         new CwConstantsWithLookupExample(constants),
+//         new CwDictionaryExample(constants)
+//       ) foreach {
+//         setupMainMenuOption(catI18N, _, images.catI18N)
+//       }
 
       // Other
-      val catOther = mainMenu.addItem(constants.categoryOther)
-      List(new CwAnimation(constants), new CwCookies(constants)) foreach {
-         setupMainMenuOption(catOther, _, images.catOther)
-      }
+     // val catOther = mainMenu.addItem(constants.categoryOther)
+//      List(
+//        new CwAnimation(constants),
+//        new CwCookies(constants)
+//      ) foreach {
+//        setupMainMenuOption(catOther, _, images.catOther)
+//      }
    }
 
    /**

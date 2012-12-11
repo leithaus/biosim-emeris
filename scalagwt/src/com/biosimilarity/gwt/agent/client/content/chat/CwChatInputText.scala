@@ -110,12 +110,11 @@ object CwChatInputText {
     ".cw-RichText", ".gwt-Button"))
 class CwChatInputText(@ShowcaseData val constants : CwChatInputText.CwConstants)
 extends ContentWidget( constants ) {
-  val enclosingChat = this
-
-  object ChatWebPortMgr extends AgentWebSocketMgr( enclosingChat )
-
   override def getDescription() = constants.cwChatInputTextDescription
   override def getName() = constants.cwChatInputTextName  
+
+  val controller : ChatController =
+    new ChatController( new AgentWebSocketMgr(), constants )
 
   //lazy val logger : Logger = Logger.getLogger( classOf[CwChatInputText].getName );  
 
@@ -129,10 +128,6 @@ extends ContentWidget( constants ) {
 
     val vPanel = new VerticalPanel()
     vPanel.setSpacing(5)
-
-    //val chatDisplayTextArea = new TextArea()
-    //chatDisplayTextArea.setSize("100%", "14em")
-    //chatDisplayTextArea.ensureDebugId("cwBasicText-textbox")
 
     val logPanel : HTMLPanel = new HTMLPanel("") {
       override def add( widget : Widget ) : Unit = {
@@ -168,37 +163,7 @@ extends ContentWidget( constants ) {
     roomSelect.addItem( constants.cwChatRoomFourTitle, constants.cwChatRoomFourName )
     roomSelect.setSelectedIndex( 0 )    
 
-    val room = roomSelect.getValue( roomSelect.getSelectedIndex() )
-
-    lazy val port : WebSocket =
-      ChatWebPortMgr.openPort(
-	getUrlRoom( Some( room ) ),
-	ChatState(
-	  Some( port ), area, logPanel, None,
-	  roomSelect, None, None, Some( room )
-	)
-      )
-
-    val chatState : ChatState = ChatWebPortMgr.stateMap.get( port )
-
-    lazy val handlerRegistration : HandlerRegistration =
-      chatState.roomSelect.addChangeHandler(
-	new ChangeHandler() {      
-	  override def onChange( event : ChangeEvent ) : Unit = {
-	    val room = 
-	      chatState.roomSelect.getValue(
-		chatState.roomSelect.getSelectedIndex()
-	      )
-	    changeRoom(
-	      handlerRegistration,
-	      chatState.withCHPR(
-		this,
-		ChatWebPortMgr.openPort( getUrl( room ), chatState ),
-		room
-	      )
-	    )
-	  }
-	})
+    val room = roomSelect.getValue( roomSelect.getSelectedIndex() )    
 
     vPanel.add( grid )
 
@@ -211,7 +176,8 @@ extends ContentWidget( constants ) {
       new Button(
         constants.cwChatInputButtonSend,
         ( clickEvent : ClickEvent ) => {	  	  	  
-	  sendChat( chatState.withSendBtn( sendButton ), clickEvent )
+	  //sendChat( chatState.withSendBtn( sendButton ), clickEvent )
+	  Window.alert( "Send button clicked" )
 	}
       )            
 
@@ -220,119 +186,6 @@ extends ContentWidget( constants ) {
 
     hPanel
   }  
-
-
-  def clearChat( chatState : ChatState ) : Unit = {
-    chatState.displayArea.getElement().setInnerHTML("");
-  }
-
-  def addChatLine( chatState : ChatState, line : String, color : String ) : Unit = {
-    val newLine : HTML = new HTML( line )
-    newLine.getElement().getStyle().setColor( color )
-    chatState.displayArea.add( newLine )
-    newLine.getElement().scrollIntoView()
-  }
-
-  def sendChat( chatState : ChatState, click : ClickEvent ) : Unit = {    
-    val line = chatState.inputArea.getText      
-    //Window.alert( line )    
-    
-    addChatLine(
-      chatState,
-      line,
-      constants.cwChatColorMessageSelf
-    )
-
-    chatState.inputArea.setText( "" )
-
-    chatState.port match {      
-      case None => {
-	Window.alert( "attempting to send on a state with uninitialized port" )    
-      }
-      case Some( port : WebSocket ) => {
-	val auth = 
-	  chatState.author match {
-	    case Some( author ) => author
-	    case None => "anonymous"
-	  }	
-	val chatEvent =
-	  new Event( port._url, auth, line )
-	port.send( chatEvent.toString )
-      }      
-    }
-  }
-
-  def getUrl( chatState : ChatState ) : String = {
-    (
-      GWT.getModuleBaseURL()
-      + "gwtComet/"
-      + getUrlRoom( chatState.room ) 
-    )
-  }
-
-  def getUrl( room : String ) : String = {
-    (
-      GWT.getModuleBaseURL()
-      + "gwtComet/"
-      + getUrlRoom( Some( room ) )      
-    )
-  }
-
-  def getUrlRoom( room : Option[String] ) : String = {
-    room match {
-      case Some( room ) => room
-      case None => constants.cwChatRoomOneName
-    }
-  }
-
-  def changeRoom(
-    handlerRegistration : HandlerRegistration,
-    chatState : ChatState
-  ) : Unit = {
-    chatState.port match {
-      case None => {
-	Window.alert( "attempting to send on a state with uninitialized port" )    
-      }
-      case Some( port : WebSocket ) => {
-	ChatWebPortMgr.registerState( port, chatState )
-
-	val auth = 
-	  chatState.author match {
-	    case Some( author ) => author
-	    case None => "anonymous"
-	  }
-	val chatEvent = 
-	  Event(
-	    port._url,
-	    auth,
-	    constants.cwChatJoinedRoom
-	  )
-
-	port.send( chatEvent.toString )
-      }      
-    }
-
-    handlerRegistration.removeHandler()
-
-    lazy val handlerRegistration : HandlerRegistration = 
-      chatState.roomSelect.addChangeHandler(
-	new ChangeHandler() {      
-	  override def onChange( event : ChangeEvent ) : Unit = {	    
-	    val room = 
-	      chatState.roomSelect.getValue(
-		chatState.roomSelect.getSelectedIndex()
-	      )
-	    changeRoom(
-	      handlerRegistration,
-	      chatState.withCHPR(
-		this,
-		ChatWebPortMgr.openPort( getUrl( room ), chatState ),
-		room
-	      )
-	    )		
-	  }
-	})
-  }
 
   override def asyncOnInitialize(callback: AsyncCallback[Widget]) = {
     GWT.runAsync(new RunAsyncCallback() {

@@ -133,6 +133,8 @@ trait ShowcaseConstants extends Constants with
 
   def categoryWidgets(): String
 
+  def categoryAgent() : String
+
   /**
    * @return text for the link to more examples
    */

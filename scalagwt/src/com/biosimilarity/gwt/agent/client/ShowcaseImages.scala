@@ -47,6 +47,8 @@ trait ShowcaseImages extends ClientBundle {
 
   def jimmyThumb(): ImageResource
 
+  //def agentChat() : ImageResource
+
   /**
    * Indicates the locale selection box.
    */
