@@ -6,10 +6,6 @@
   <property name="scala.args" value="-g:notailcalls -Xplugin:${basedir}/lib/scala/factorymanifests.jar -Xplugin:lib/scala/continuations.jar -P:continuations:enable -Yjribble-text"/>
 
   <path id="scala.class.path">
-    <!-- fileset dir="lib/atmosphere" includes="*.jar"/ -->
-    <fileset dir="lib/slf4j" includes="*.jar"/>
-    <fileset dir="lib/geronimo" includes="*.jar"/>
-    <!-- fileset dir="lib/gwt-websockets" includes="*.jar"/ -->
     <fileset dir="lib/m3-gwt" includes="*.jar"/>
     <fileset dir="lib/scala">
       <include name="scala-compiler.jar"/>
@@ -20,14 +16,10 @@
 
   <path id="project.class.path">
     <pathelement location="war/WEB-INF/classes"/>
-    <fileset dir="lib/gwt" includes="*.jar"/>
-    <!-- fileset dir="lib/atmosphere" includes="*.jar"/ -->
-    <fileset dir="lib/slf4j" includes="*.jar"/>
-    <fileset dir="lib/geronimo" includes="*.jar"/>
-    <!-- fileset dir="lib/gwt-websockets" includes="*.jar"/ -->
-    <fileset dir="lib/m3-gwt" includes="*.jar"/>
+    <fileset dir="lib/gwt" includes="*.jar"/>    
     <pathelement location="lib/scala/scala-library-gwt.jar"/>
     <!-- Add any additional non-server libs (such as JUnit) -->
+    <fileset dir="lib/m3-gwt" includes="*.jar"/>
     <fileset dir="war/WEB-INF/lib" includes="**/*.jar"/>
   </path>
 
@@ -50,8 +42,8 @@
       <!-- arg value="com.google.gwt.sample.jribble.Hello"/ -->
       <!-- arg value="com.google.gwt.sample.mnemonics.Mnemonics"/ -->
       <!-- arg value="com.google.gwt.sample.showcase.Showcase"/ -->
+      <arg value="com.biosimilarity.gwt.agent.Agent"/>
       <!-- arg value="com.google.gwt.sample.gwtdlx.gwtdlx"/ -->
-      <arg value="com.biosimilarity.iacontainer.iacontainer"/>
     </java>
   </target>
   

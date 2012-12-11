@@ -8,6 +8,7 @@
 /war/WEB-INF/jribble
 /war/WEB-INF/showcase
 /bin
+/lib
 .scala_dependencies
 .settings/
 jribbleCache

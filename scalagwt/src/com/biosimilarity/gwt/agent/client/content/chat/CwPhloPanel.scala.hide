@@ -1,0 +1,137 @@
+/*
+ * Copyright 2008 Google Inc.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package com.biosimilarity.gwt.agent.client.content.chat;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.event.dom.client.ChangeEvent
+import com.google.gwt.event.dom.client.ChangeHandler
+import com.google.gwt.event.dom.client.ClickEvent
+import com.google.gwt.event.dom.client.ClickHandler
+import com.google.gwt.event.shared.HandlerRegistration
+import com.google.gwt.i18n.client.Constants;
+import com.biosimilarity.gwt.agent.client.ContentWidget;
+import com.biosimilarity.gwt.agent.client.ShowcaseAnnotations.ShowcaseData;
+import com.biosimilarity.gwt.agent.client.ShowcaseAnnotations.ShowcaseSource;
+import com.biosimilarity.gwt.agent.client.ShowcaseAnnotations.ShowcaseStyle;
+import com.google.gwt.user.client.Window
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Grid
+import com.google.gwt.user.client.ui.HTML
+import com.google.gwt.user.client.ui.HTMLPanel
+import com.google.gwt.user.client.ui.HorizontalPanel
+import com.google.gwt.user.client.ui.ListBox
+import com.google.gwt.user.client.ui.RichTextArea
+import com.google.gwt.user.client.ui.TextArea
+import com.google.gwt.user.client.ui.TextBox
+import com.google.gwt.user.client.ui.VerticalPanel
+import com.google.gwt.user.client.ui.Widget;
+
+import m3.gwt.websocket._
+
+import java.util.HashMap
+import java.util.Map
+
+object CwPhloPanel {
+  /**
+   * The constants used in this Content Widget.
+   */
+  @ShowcaseSource
+  trait CwConstants extends Constants with ContentWidget.CwConstants {
+    def cwPhloPanelDescription(): String
+
+    def cwPhloPanelItem(): String
+
+    def cwPhloPanelName(): String
+
+    def cwPhloPanelIOTextDescription() : String
+    def cwPhloPanelIOTextName() : String
+    def cwPhloPanelDisplayTextLabel() : String
+
+    def cwPhloPanelInputButtonClickMessage() : String
+    def cwPhloPanelInputButtonDescription() : String
+    def cwPhloPanelInputButtonName() : String
+    def cwPhloPanelInputButtonSend() : String
+    
+    def cwPhloPanelLeftRoom() : String    
+    def cwPhloPanelJoinedRoom() : String
+    def cwPhloPanelRoomConnected() : String
+    def cwPhloPanelRoomDisconnected() : String
+    def cwPhloPanelRoomError() : String
+
+    def cwPhloPanelColorSystemMessage() : String
+    def cwPhloPanelColorMessageSelf() : String
+    def cwPhloPanelColorMessageOthers() : String
+
+    def cwPhloPanelRoomOneTitle() : String
+    def cwPhloPanelRoomTwoTitle() : String
+    def cwPhloPanelRoomThreeTitle() : String
+    def cwPhloPanelRoomFourTitle() : String
+
+    def cwPhloPanelRoomOneName() : String
+    def cwPhloPanelRoomTwoName() : String
+    def cwPhloPanelRoomThreeName() : String
+    def cwPhloPanelRoomFourName() : String    
+  }
+}
+
+/**
+ * Example file.
+ */
+@ShowcaseStyle(Array(".cw-FlowPanel-checkBox"))
+class CwPhloPanel(constants: CwPhloPanel.CwConstants)
+extends ContentWidget(constants) {
+
+  override def getDescription() = constants.cwPhloPanelDescription
+
+  override def getName() = constants.cwPhloPanelName    
+
+  var webPortMgr : Option[AgentWebSocketMgr] = None
+  //var webSocket : Option[WebSocket] = None
+
+  /**
+   * Initialize this example.
+   */
+  @ShowcaseSource
+  override def onInitialize(): Widget = {
+    webPortMgr =
+      Some( new AgentWebSocketMgr( this ) )
+    // Create a Flow Panel
+    val flowPanel = new FlowPanel();
+    flowPanel.ensureDebugId("cwPhloPanel");
+
+    // Add some content to the panel
+    for (i <- 0 until 30) {
+      val checkbox = new CheckBox(constants.cwPhloPanelItem + " " + i);
+      checkbox.addStyleName("cw-FlowPanel-checkBox");
+      flowPanel.add(checkbox);
+    }
+
+    // Return the content
+    flowPanel;
+  }
+
+  override def asyncOnInitialize(callback: AsyncCallback[Widget]) = {
+    GWT.runAsync(new RunAsyncCallback() {
+      def onFailure(caught: Throwable) = callback.onFailure(caught)
+
+      def onSuccess() = callback.onSuccess(onInitialize())
+    })
+  }
+}
