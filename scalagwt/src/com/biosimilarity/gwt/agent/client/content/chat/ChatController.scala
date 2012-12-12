@@ -61,7 +61,7 @@ class ChatController(
     logPanel : HTMLPanel,
     roomSelect : ListBox
   ) : ChatState = {
-    lazy val port : WebSocket =
+    val port : WebSocket =
       portMgr.openPort(	getUrlRoom( Some( room ) ) )
 
     val chatState : ChatState =
@@ -102,17 +102,24 @@ class ChatController(
     ( room, port, state )
   }
   
-  def chatSendButton( chatState : ChatState ) : Button = {
-    lazy val sendButton : Button =
-      new Button(
-        constants.cwChatInputButtonSend,
-        ( clickEvent : ClickEvent ) => {	  	  	  
-	  sendChat( chatState, clickEvent )
-	  //Window.alert( "Send button clicked" )
+  def chatSendButton( oChatState : Option[ChatState] ) : Button = {
+    new Button(
+      constants.cwChatInputButtonSend,
+      oChatState match {
+	case Some( chatState ) => {	 
+          ( clickEvent : ClickEvent ) => {	  	  	  
+	    sendChat( chatState, clickEvent )
+	    //Window.alert( "Send button clicked" )
+	  }
 	}
-      )
-
-    sendButton
+	case None => {
+	  ( clickEvent : ClickEvent ) => {	  	  	  
+	    //sendChat( chatState, clickEvent )
+	    Window.alert( "Send button clicked" )
+	  }	    
+	}
+      }
+    )
   }
   
   def clearChat( chatState : ChatState ) : Unit = {

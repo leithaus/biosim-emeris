@@ -20,61 +20,14 @@ import m3.gwt.websocket._
 import java.util.HashMap
 
 case class ChatState(
-  override val port : Option[WebSocket],
-  override val inputArea : RichTextArea,
-  override val displayArea : HTMLPanel,
-  override val roomSelect : ListBox,
-  override val changeHandler : Option[ChangeHandler],
-  override val author : Option[String],
-  override val room : Option[String]    
-) extends ChatStateDescription {
-  def withRoom( newRoom : String ) : ChatState = {
-    ChatState(
-      port,
-      inputArea,
-      displayArea,
-      roomSelect,
-      changeHandler,
-      author,
-      Some( newRoom )
-    )
-  }
-  def withAuthor( newAuthor : String ) : ChatState = {
-    ChatState(
-      port,
-      inputArea,
-      displayArea,
-      roomSelect,
-      changeHandler,
-      Some( newAuthor ),
-      room
-    )
-  }
-  def withAuthorRoom( newAuthor : String, newRoom : String ) : ChatState = {
-    ChatState(
-      port,
-      inputArea,
-      displayArea,
-      roomSelect,
-      changeHandler,
-      Some( newAuthor ),
-      Some( newRoom )
-    )
-  }
-  def withCHR(
-    newChangeHandler : ChangeHandler,
-    newRoom : String
-  ) : ChatState = {
-    ChatState(
-      port,
-      inputArea,
-      displayArea,
-      roomSelect,
-      Some( newChangeHandler ),
-      author,
-      Some( newRoom )
-    )
-  }
+  val port : Option[WebSocket],
+  val inputArea : RichTextArea,
+  val displayArea : HTMLPanel,
+  val roomSelect : ListBox,
+  val changeHandler : Option[ChangeHandler],
+  val author : Option[String],
+  val room : Option[String]    
+) /* extends ChatStateDescription */ {  
   def withCHPR(
     newChangeHandler : ChangeHandler,
     newPort : WebSocket,

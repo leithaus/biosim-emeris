@@ -171,17 +171,18 @@ extends ContentWidget( constants ) {
 
     hPanel.add( vPanel )
 
-    val anURL : String = 
-      controller.getUrl( "dukeOf" )
+    // val port : WebSocket =
+//       new WebSocket( "http://agent/websocket/ws", null )
+
+    val chatState : ChatState =
+      new ChatState( None, area, logPanel, roomSelect, None, None, Some( room ) )
 
     // Add a normal button
-    lazy val sendButton : Button =
-      new Button(
-        constants.cwChatInputButtonSend,
-        ( clickEvent : ClickEvent ) => {	  	  	  
-	  //sendChat( chatState.withSendBtn( sendButton ), clickEvent )
-	  Window.alert( anURL )
-	}
+    val sendButton : Button =
+      controller.chatSendButton(
+	//controller.initialChatState( room, area, logPanel, roomSelect )
+	//None
+	Some( chatState )
       )            
 
     sendButton.ensureDebugId( "cwChatInputButton-send" )
