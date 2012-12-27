@@ -82,11 +82,13 @@ object ShowcaseConstants {
    * Link to GWT homepage.
    */
   val GWT_HOMEPAGE = "http://code.google.com/webtoolkit/"
+  //val GWT_HOMEPAGE = "http://qualityofid.com/"
 
   /**
    * Link to GWT examples page.
    */
   val GWT_EXAMPLES = GWT_HOMEPAGE + "examples/"
+  //val GWT_EXAMPLES = GWT_HOMEPAGE + "principles/"
 
   /**
    * The available style themes that the user can select.
