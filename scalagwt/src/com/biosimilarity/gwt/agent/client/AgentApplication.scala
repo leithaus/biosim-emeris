@@ -128,7 +128,8 @@ trait AgentApplication {
 
     //userContentPanelScroll.setWidget( userContentPanelDecorator )    
 
-    userEngagementLayout.add( userContentPanelScroll )
+    //userEngagementLayout.add( userContentPanelScroll )
+    userEngagementLayout.add( userContentPanel )
 
     //connectionPanelDecorator.setWidget( connectionPanel )
     //connectionPanelDecorator.addStyleName(DEFAULT_STYLE_NAME + "-content-decorator")
@@ -160,9 +161,28 @@ trait AgentApplication {
     labelPanel.add( labelPanelScroll )
   }
 
+  def installContentPanel( userContentPanel : VerticalPanel ) : Unit = {    
+    userContentPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER)
+    userEngagementPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP)
+
+    installContentFilterPanel( userContentFilterPanel )
+    installContentPostPanel( userContentPostPanel )
+    installContentDisplayPanel( userContentDisplayPanel )                
+
+    //userContentPanelScroll.setAlwaysShowScrollBars( true )
+    //userContentPanelScroll.setWidget( userContentPanel )
+
+    //userContentDisplayDecorator.setWidget( userContentDisplayPanel )    
+    //userContentPanel.add( userContentPanelScroll )
+  }
+
   def installContentFilterPanel( userContentFilterPanel : HorizontalPanel ) : Unit = {
     userContentFilterPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER)
     userContentFilterPanel.add( new HTML( "Drop labels and connections here" ) )
+
+    userContentFilterPanel.setSize( "100%", "6em" )    
+    userContentFilterDecorator.setWidget( userContentFilterPanel )
+    userContentPanel.add( userContentFilterDecorator )    
   }
 
   def installContentPostPanel( userContentPostPanel : HorizontalPanel ) : Unit = {
@@ -183,6 +203,9 @@ trait AgentApplication {
     grid.setWidget(1, 0, area)
 
     userContentPostPanel.add( grid )
+    
+    userContentPostPanel.setSize( "100%", "6em" )
+    userContentPanel.add( userContentPostPanel )
   }
 
   def installContentDisplayPanel( userContentDisplayPanel : VerticalPanel ) : Unit = {
@@ -190,32 +213,10 @@ trait AgentApplication {
 
     logPanel.add( new HTML( "Welcome to your agent" ) )    
     userContentDisplayPanel.add( logPanel )
-  }
-
-  def installContentPanel( userContentPanel : VerticalPanel ) : Unit = {    
-    userContentPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER)
-
-    installContentFilterPanel( userContentFilterPanel )
-    installContentPostPanel( userContentPostPanel )
-    installContentDisplayPanel( userContentDisplayPanel )    
-
-    userContentFilterPanel.setSize( "100%", "6em" )    
-    userContentFilterDecorator.setWidget( userContentFilterPanel )
-    userContentPanel.add( userContentFilterDecorator )    
-
-    userContentPostPanel.setSize( "100%", "6em" )
-    //userContentPostDecorator.setWidget( userContentPostPanel )
-    userContentPanel.add( userContentPostPanel )
 
     userContentDisplayPanel.setSize( "100%", "28em" )
     userContentPanel.add( userContentDisplayPanel )
-
-    userContentPanelScroll.setAlwaysShowScrollBars( true )
-    userContentPanelScroll.setWidget( userContentPanel )
-
-    //userContentDisplayDecorator.setWidget( userContentDisplayPanel )    
-    //userContentPanel.add( userContentPanelScroll )
-  }
+  }  
 
   def installConnectionPanel( connectionPanel : VerticalPanel ) : Unit = {    
     val item =
@@ -241,18 +242,20 @@ trait AgentApplication {
   }
 
   def onWindowResizedAgent( width : Int ) : Unit = {
-    val labelPanelWidth = labelPanel.getOffsetWidth
-    val connectionPanelWidth = connectionPanel.getOffsetWidth
-    val adjustedWidth = width - ( ( labelPanelWidth + connectionPanelWidth ) - 50 )
+    val labelPanelWidth = labelPanelScroll.getOffsetWidth
+    val connectionPanelWidth = connectionPanelScroll.getOffsetWidth
+    val adjustedWidth = width - ( ( labelPanelWidth + connectionPanelWidth ) - 20 )
     val contentWidth = math.max( adjustedWidth, 1 )
-    val contentWidthInner = math.max( contentWidth - 10, 1 )
+    val contentWidthInner = math.max( contentWidth - 20, 1 )
 
-    userContentPanel.setWidth( ( contentWidth - 20 ) + "px" )
-    userContentFilterPanel.setWidth( ( contentWidth - 30 ) + "px" )
-    userContentPostPanel.setWidth( ( contentWidth - 30 ) + "px" )
-    userContentPostInput.setWidth( ( contentWidth - 35 ) + "px" )    
-    userContentDisplayPanel.setWidth( ( contentWidth - 30 ) + "px" )
-    userContentDisplayLog.setWidth( ( contentWidth - 35 ) + "px" )
+    //Window.alert( "contentWidth = " + contentWidth )
+
+    userContentPanel.setWidth( ( contentWidthInner ) + "px" )
+    userContentFilterPanel.setWidth( ( contentWidthInner ) + "px" )
+    userContentPostPanel.setWidth( ( contentWidthInner ) + "px" )
+    userContentPostInput.setWidth( ( contentWidthInner ) + "px" )    
+    userContentDisplayPanel.setWidth( ( contentWidthInner ) + "px" )
+    userContentDisplayLog.setWidth( ( contentWidthInner ) + "px" )
 
     labelPanel.setWidth( labelPanelWidth + "px" )
 
